@@ -35,8 +35,7 @@ import com.flatcode.beautytouch.BuildConfig
 import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.Intent1
-import com.flatcode.beautytouch.utils.IntentClear
+import com.flatcode.beautytouch.utils.openActivity
 import com.flatcode.beautytouch.utils.InterstitialAd
 import com.flatcode.beautytouch.utils.InterstitialShow
 import com.flatcode.beautytouch.utils.Glide
@@ -91,7 +90,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        binding.toolbar.image.setOnClickListener { context.Intent1(ProfileActivity::class.java) }
+        binding.toolbar.image.setOnClickListener { context.openActivity<ProfileActivity>() }
         binding.toolbar.drawer.setOnClickListener {
             binding.drawerLayout.openDrawer(GravityCompat.START)
         }
@@ -100,16 +99,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         activity!!.InterstitialAd()
 
         binding.myProfile.setOnClickListener {
-            context.Intent1(ProfileActivity::class.java)
+            context.openActivity<ProfileActivity>()
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         }
-        binding.favorites.setOnClickListener { context.Intent1(FavoritesActivity::class.java) }
+        binding.favorites.setOnClickListener { context.openActivity<FavoritesActivity>() }
         binding.messenger.setOnClickListener {
             val i = Intent(Intent.ACTION_VIEW)
             i.data = Uri.parse("https://wa.me/message/E2YOU4NVTIEAD1")
             startActivity(i)
         }
-        binding.reward.setOnClickListener { context.Intent1(RewardActivity::class.java) }
+        binding.reward.setOnClickListener { context.openActivity<RewardActivity>() }
         binding.aboutApp.setOnClickListener { showDialogAboutApp() }
         binding.shareApp.setOnClickListener { ShareApp() }
         binding.aboutMy.setOnClickListener { showDialogAboutMy() }
@@ -173,7 +172,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-        binding.imageDrawer.setOnClickListener { context.Intent1(ProfileActivity::class.java) }
+        binding.imageDrawer.setOnClickListener { context.openActivity<ProfileActivity>() }
 
         observeViewModels()
         postViewModel.loadCategoryCounts(publisher, aname, DATA.SKIN_PRODUCTS, DATA.HAIR_PRODUCTS, DATA.SHOPPING_CENTERS)
@@ -340,7 +339,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialogBinding.yes.setOnClickListener {
             userViewModel.logout()
-            context.IntentClear(LoginActivity::class.java)
+            context.openActivity<LoginActivity>(clear = true)
             finish()
         }
         dialogBinding.no.setOnClickListener { dialog.cancel() }

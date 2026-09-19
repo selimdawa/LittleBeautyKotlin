@@ -15,7 +15,7 @@ import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.ui.post.PostDetailsActivity
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Glide
-import com.flatcode.beautytouch.utils.IntentExtra
+import com.flatcode.beautytouch.utils.openActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -73,7 +73,7 @@ class PostHotAdapter(private val mContext: Context?) :
             }
         }
         holder.binding.card.setOnClickListener {
-            mContext.IntentExtra(PostDetailsActivity::class.java, DATA.POST_ID, post.postid)
+            mContext?.openActivity<PostDetailsActivity>(DATA.POST_ID to post.postid)
         }
     }
 

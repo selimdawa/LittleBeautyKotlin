@@ -12,9 +12,20 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Main
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.CLASS
+import com.flatcode.beautytouchadmin.ui.ads.ADsMeterActivity
+import com.flatcode.beautytouchadmin.ui.other.HotProductActivity
+import com.flatcode.beautytouchadmin.ui.other.SessionNowInfoActivity
+import com.flatcode.beautytouchadmin.ui.other.SessionOldInfoActivity
+import com.flatcode.beautytouchadmin.ui.other.SliderShowActivity
+import com.flatcode.beautytouchadmin.ui.other.ToolsActivity
+import com.flatcode.beautytouchadmin.ui.post.PostAddActivity
+import com.flatcode.beautytouchadmin.ui.post.PostsActivity
+import com.flatcode.beautytouchadmin.ui.profile.AboutMeActivity
+import com.flatcode.beautytouchadmin.ui.shopping.ShoppingCentersActivity
+import com.flatcode.beautytouchadmin.ui.shopping.ShoppingCentersAddActivity
+import com.flatcode.beautytouchadmin.ui.user.UsersActivity
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.intent1
+import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemMainBinding
 import java.text.MessageFormat
 
@@ -41,22 +52,20 @@ class MainAdapter(private val context: Context) :
         }
         holder.name.text = name
         holder.itemView.setOnClickListener {
-            val intentClass = when (name) {
-                "Users" -> CLASS.USERS
-                "Hottest" -> CLASS.HOT_PRODUCTS
-                "My Posts" -> CLASS.POSTS
-                "Add Post" -> CLASS.POST_ADD
-                "Shopping Centers" -> CLASS.SHOPPING_CENTRES
-                "Add Shopping Center" -> CLASS.SHOPPING_CENTRES_ADD
-                "Current Session" -> CLASS.SESSION_NOW
-                "Previous Session" -> CLASS.SESSION_OLD
-                "Slider Show" -> CLASS.SLIDER_SHOW
-                "Ad Monitor" -> CLASS.ADS_METER
-                "About Me" -> CLASS.ABOUT_ME
-                "Tools" -> CLASS.TOOLS
-                else -> null
+            when (name) {
+                "Users" -> context.openActivity<UsersActivity>()
+                "Hottest" -> context.openActivity<HotProductActivity>()
+                "My Posts" -> context.openActivity<PostsActivity>()
+                "Add Post" -> context.openActivity<PostAddActivity>()
+                "Shopping Centers" -> context.openActivity<ShoppingCentersActivity>()
+                "Add Shopping Center" -> context.openActivity<ShoppingCentersAddActivity>()
+                "Current Session" -> context.openActivity<SessionNowInfoActivity>()
+                "Previous Session" -> context.openActivity<SessionOldInfoActivity>()
+                "Slider Show" -> context.openActivity<SliderShowActivity>()
+                "Ad Monitor" -> context.openActivity<ADsMeterActivity>()
+                "About Me" -> context.openActivity<AboutMeActivity>()
+                "Tools" -> context.openActivity<ToolsActivity>()
             }
-            intentClass?.let { context.intent1(it) }
         }
     }
 

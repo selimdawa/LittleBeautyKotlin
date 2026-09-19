@@ -57,7 +57,7 @@ class ShoppingCentersActivity : AppCompatActivity() {
             .setTitle("Choose...")
             .setItems(options) { _: DialogInterface?, which: Int ->
                 if (which == 0) {
-                    context.intentExtra(CLASS.SHOPPING_CENTRES_EDIT, DATA.SHOPPING_CENTER_ID, item.id)
+                    context.openActivity<ShoppingCentresEditActivity>(DATA.SHOPPING_CENTER_ID to item.id)
                 } else if (which == 1) {
                     showDeleteDialog(item)
                 }

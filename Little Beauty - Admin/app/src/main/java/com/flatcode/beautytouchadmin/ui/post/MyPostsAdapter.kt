@@ -12,10 +12,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.CLASS
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.glide
-import com.flatcode.beautytouchadmin.utils.intentExtra
+import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemMyPostBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -76,7 +75,7 @@ class MyPostsAdapter(
 
         holder.more.setOnClickListener { listener.onMoreClick(post) }
         holder.card.setOnClickListener {
-            mContext.intentExtra(CLASS.POST_DETAILS, DATA.POST_ID, post.postid)
+            mContext.openActivity<PostDetailsActivity>(DATA.POST_ID to post.postid)
         }
     }
 

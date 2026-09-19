@@ -15,10 +15,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.Application
 import com.flatcode.beautytouchadmin.filter.ADsUserFilter
 import com.flatcode.beautytouchadmin.model.User
-import com.flatcode.beautytouchadmin.utils.CLASS
+import com.flatcode.beautytouchadmin.ui.ads.ADsInfoActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.glide
-import com.flatcode.beautytouchadmin.utils.intentExtra
+import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemAdsUserBinding
 import java.text.MessageFormat
 
@@ -68,7 +68,7 @@ class ADsUserAdapter(private val context: Context, initialList: MutableList<User
         holder.numberADsClick.text = MessageFormat.format("{0}{1}", DATA.EMPTY, adClicked)
 
         holder.item.setOnClickListener {
-            context.intentExtra(CLASS.ADS_INFO, DATA.PROFILE_ID, userId)
+            context.openActivity<ADsInfoActivity>(DATA.PROFILE_ID to userId)
         }
     }
 

@@ -11,10 +11,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Post
-import com.flatcode.beautytouchadmin.utils.CLASS
+import com.flatcode.beautytouchadmin.ui.post.PostDetailsActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.glide
-import com.flatcode.beautytouchadmin.utils.intentExtra
+import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemProductLinearBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -60,7 +60,7 @@ class FavoritesAdapter(private val mContext: Context, initialList: MutableList<P
 
         nrLikes(holder.likes, post.postid)
         holder.card.setOnClickListener {
-            mContext.intentExtra(CLASS.POST_DETAILS, DATA.POST_ID, id)
+            mContext.openActivity<PostDetailsActivity>(DATA.POST_ID to id)
         }
     }
 

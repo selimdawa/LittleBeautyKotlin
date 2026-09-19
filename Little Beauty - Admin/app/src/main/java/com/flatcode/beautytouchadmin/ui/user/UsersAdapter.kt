@@ -11,10 +11,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.User
-import com.flatcode.beautytouchadmin.utils.CLASS
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.glide
-import com.flatcode.beautytouchadmin.utils.intentExtra
+import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemUserBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -54,7 +53,7 @@ class UsersAdapter(private val mContext: Context, initialList: MutableList<User?
 
         nrFavorites(holder.favorites, id)
         holder.card.setOnClickListener {
-            mContext.intentExtra(CLASS.USER_DETAILS, DATA.PROFILE_ID, id)
+            mContext.openActivity<UserDetailActivity>(DATA.PROFILE_ID to id)
         }
     }
 

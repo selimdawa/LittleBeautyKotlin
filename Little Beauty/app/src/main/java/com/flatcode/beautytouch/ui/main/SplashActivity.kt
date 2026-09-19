@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.flatcode.beautytouch.utils.Intent1
+import com.flatcode.beautytouch.utils.openActivity
 import com.flatcode.beautytouch.ui.auth.AuthActivity
 import com.flatcode.beautytouch.databinding.ActivitySplashBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -32,9 +32,9 @@ class SplashActivity : AppCompatActivity() {
         //get current user, if logged in
         val firebaseUser = auth!!.currentUser
         if (firebaseUser == null) {
-            context.Intent1(AuthActivity::class.java)
+            context.openActivity<AuthActivity>()
         } else {
-            context.Intent1(MainActivity::class.java)
+            context.openActivity<MainActivity>()
         }
         finish()
     }

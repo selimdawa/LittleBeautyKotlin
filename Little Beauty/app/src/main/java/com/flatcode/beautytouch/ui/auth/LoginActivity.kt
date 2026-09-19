@@ -15,8 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.databinding.ActivityLoginBinding
 import com.flatcode.beautytouch.ui.main.MainActivity
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.Intent1
-import com.flatcode.beautytouch.utils.IntentClear
+import com.flatcode.beautytouch.utils.openActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -46,10 +45,10 @@ class LoginActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
 
         binding.forget.setOnClickListener {
-            context.Intent1(ForgetPasswordActivity::class.java)
+            context.openActivity<ForgetPasswordActivity>()
         }
         binding.noAccount.setOnClickListener {
-            context.Intent1(RegisterActivity::class.java)
+            context.openActivity<RegisterActivity>()
         }
         binding.loginBtn.setOnClickListener { validateDate() }
 
@@ -68,7 +67,7 @@ class LoginActivity : AppCompatActivity() {
 
                     is Resource.Success -> {
                         dialog!!.dismiss()
-                        context.IntentClear(MainActivity::class.java)
+                        context.openActivity<MainActivity>(clear = true)
                     }
 
                     is Resource.Error -> {

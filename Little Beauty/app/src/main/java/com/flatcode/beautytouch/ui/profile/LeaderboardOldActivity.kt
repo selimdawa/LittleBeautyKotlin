@@ -11,8 +11,8 @@ import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.model.User
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.extensions.Glide
-import com.flatcode.beautytouch.utils.extensions.IntentExtra
+import com.flatcode.beautytouch.utils.Glide
+import com.flatcode.beautytouch.utils.openActivity
 import com.flatcode.beautytouch.ui.post.PostDetailsActivity
 import com.flatcode.beautytouch.databinding.ActivityLeaderboardBinding
 import com.google.firebase.database.DataSnapshot
@@ -93,7 +93,7 @@ class LeaderboardOldActivity : AppCompatActivity() {
                     if (post?.postid == R) {
                         Reward.Glide(false, context, post.postimage)
                         Reward.setOnClickListener {
-                            context.IntentExtra(PostDetailsActivity::class.java, DATA.POST_ID, R)
+                            context.openActivity<PostDetailsActivity>(DATA.POST_ID to R)
                         }
                     }
                 }

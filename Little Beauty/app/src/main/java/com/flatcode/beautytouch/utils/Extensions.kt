@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Parcelable
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
 import androidx.core.graphics.createBitmap
@@ -34,37 +35,25 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
+import java.io.Serializable
 
-fun Context.IntentClear(c: Class<*>?) {
-    val intent = Intent(this, c)
-    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-    this.startActivity(intent)
-}
-
-fun Context?.Intent1(c: Class<*>?) {
-    val intent = Intent(this, c)
-    this!!.startActivity(intent)
-}
-
-fun Context?.IntentExtra(c: Class<*>?, key: String?, value: String?) {
-    val intent = Intent(this, c)
-    intent.putExtra(key, value)
-    this!!.startActivity(intent)
-}
-
-fun Context.IntentExtra2(c: Class<*>?, key: String?, value: String?, key2: String?, value2: String?) {
-    val intent = Intent(this, c)
-    intent.putExtra(key, value)
-    intent.putExtra(key2, value2)
-    this.startActivity(intent)
-}
-
-fun Context.IntentExtra3(c: Class<*>?, key: String?, value: String?, key2: String?, value2: String?, key3: String?, value3: String?) {
-    val intent = Intent(this, c)
-    intent.putExtra(key, value)
-    intent.putExtra(key2, value2)
-    intent.putExtra(key3, value3)
-    this.startActivity(intent)
+inline fun <reified T : Activity> Context.openActivity(
+    vararg extras: Pair<String, Any?>,
+    clear: Boolean = false
+) {
+    val intent = Intent(this, T::class.java).apply {
+        if (clear) addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        extras.forEach { (key, value) ->
+            when (value) {
+                is String -> putExtra(key, value)
+                is Int -> putExtra(key, value)
+                is Boolean -> putExtra(key, value)
+                is Serializable -> putExtra(key, value)
+                is Parcelable -> putExtra(key, value)
+            }
+        }
+    }
+    startActivity(intent)
 }
 
 fun ImageView.Glide(isUser: Boolean, context: Context?, Url: String?) {

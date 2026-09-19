@@ -10,10 +10,10 @@ import android.widget.TextView
 import com.google.android.material.card.MaterialCardView
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Post
-import com.flatcode.beautytouchadmin.utils.CLASS
+import com.flatcode.beautytouchadmin.ui.post.PostDetailsActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.glide
-import com.flatcode.beautytouchadmin.utils.intentExtra
+import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemProductRemoveBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -57,7 +57,7 @@ class HotProductRemoveAdapter(
         nrLikes(holder.likes, id)
         holder.remove.setOnClickListener { listener.onRemoveClick(post) }
         holder.card.setOnClickListener {
-            mContext.intentExtra(CLASS.POST_DETAILS, DATA.POST_ID, id)
+            mContext.openActivity<PostDetailsActivity>(DATA.POST_ID to id)
         }
     }
 

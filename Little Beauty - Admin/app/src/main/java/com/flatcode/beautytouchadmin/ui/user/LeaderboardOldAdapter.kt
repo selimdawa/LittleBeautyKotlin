@@ -14,10 +14,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.filter.LeaderboardOldFilter
 import com.flatcode.beautytouchadmin.model.User
-import com.flatcode.beautytouchadmin.utils.CLASS
+import com.flatcode.beautytouchadmin.ui.ads.ADsInfoActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.glide
-import com.flatcode.beautytouchadmin.utils.intentExtra
+import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemLeaderboradBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -71,7 +71,7 @@ class LeaderboardOldAdapter(
         }
 
         holder.item.setOnClickListener {
-            mContext.intentExtra(CLASS.ADS_INFO, DATA.PROFILE_ID, id)
+            mContext.openActivity<ADsInfoActivity>(DATA.PROFILE_ID to id)
         }
     }
 

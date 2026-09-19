@@ -75,7 +75,7 @@ class PostsActivity : AppCompatActivity() {
             .setTitle("Choose...")
             .setItems(options) { _: DialogInterface?, which: Int ->
                 if (which == 0) {
-                    context.intentExtra(CLASS.POST_EDIT, DATA.POST_ID, post.postid)
+                    context.openActivity<PostEditActivity>(DATA.POST_ID to post.postid)
                 } else if (which == 1) {
                     showDeleteDialog(post)
                 }
