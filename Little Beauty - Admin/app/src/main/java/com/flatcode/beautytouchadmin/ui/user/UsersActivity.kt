@@ -46,9 +46,9 @@ class UsersActivity : AppCompatActivity() {
                         binding!!.recyclerView.visibility = View.VISIBLE
                         binding!!.emptyText.visibility = View.GONE
                         adapter?.let {
-                            it.list.clear()
-                            it.list.addAll(users)
-                            it.notifyDataSetChanged()
+                            val newList = ArrayList<User?>()
+                            newList.addAll(users)
+                            it.list = newList
                         }
                     } else {
                         binding!!.recyclerView.visibility = View.GONE

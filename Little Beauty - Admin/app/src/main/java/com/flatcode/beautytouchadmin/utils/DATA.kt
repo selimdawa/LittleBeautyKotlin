@@ -67,4 +67,8 @@ object DATA {
     
     const val WEBSITE = "https://flat-code.com"
     const val FB_ID = "/flatcode"
+
+    //Cloudinary
+    const val CLOUDINARY_CLOUD_NAME = "j8jsphcf"
+    const val CLOUDINARY_UPLOAD_PRESET = "flat_code"
 }

@@ -7,11 +7,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.card.MaterialCardView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.utils.CLASS
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.intentExtra
 import com.flatcode.beautytouchadmin.databinding.ItemUserBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -19,8 +22,18 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.text.MessageFormat
 
-class UsersAdapter(private val mContext: Context, var list: MutableList<User?>) :
-    RecyclerView.Adapter<UsersAdapter.ViewHolder>() {
+class UsersAdapter(private val mContext: Context, initialList: MutableList<User?>) :
+    ListAdapter<User, UsersAdapter.ViewHolder>(DiffCallback) {
+
+    var list: MutableList<User?> = initialList
+        set(value) {
+            field = value
+            submitList(value.filterNotNull())
+        }
+
+    init {
+        submitList(initialList.filterNotNull())
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemUserBinding.inflate(LayoutInflater.from(mContext), parent, false)
@@ -28,10 +41,10 @@ class UsersAdapter(private val mContext: Context, var list: MutableList<User?>) 
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val user = list[position]
-        val id = DATA.EMPTY + user!!.id
+        val user = list[position] ?: return
+        val id = DATA.EMPTY + user.id
 
-        VOID.Glide(true, mContext, user.imageurl, holder.image)
+        holder.image.glide(true, user.imageurl)
         if (user.username == DATA.EMPTY) {
             holder.name.visibility = View.GONE
         } else {
@@ -41,7 +54,7 @@ class UsersAdapter(private val mContext: Context, var list: MutableList<User?>) 
 
         nrFavorites(holder.favorites, id)
         holder.card.setOnClickListener {
-            VOID.IntentExtra(mContext, CLASS.USER_DETAILS, DATA.PROFILE_ID, id)
+            mContext.intentExtra(CLASS.USER_DETAILS, DATA.PROFILE_ID, id)
         }
     }
 
@@ -65,5 +78,15 @@ class UsersAdapter(private val mContext: Context, var list: MutableList<User?>) 
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback<User>() {
+        override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
+            return oldItem == newItem
+        }
     }
 }

@@ -8,20 +8,22 @@ import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.R
-import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.VOID
 import com.flatcode.beautytouch.databinding.ItemPostDetailBinding
+import com.flatcode.beautytouch.model.Post
+import com.flatcode.beautytouch.utils.DATA
+import com.flatcode.beautytouch.utils.Glide
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.text.MessageFormat
 
-class PostDetailAdapter(private val mContext: Context, private val mPost: MutableList<Post?>?) :
-    RecyclerView.Adapter<PostDetailAdapter.ViewHolder>() {
+class PostDetailAdapter(private val mContext: Context) :
+    ListAdapter<Post, PostDetailAdapter.ViewHolder>(PostDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemPostDetailBinding.inflate(LayoutInflater.from(mContext), parent, false)
@@ -29,161 +31,99 @@ class PostDetailAdapter(private val mContext: Context, private val mPost: Mutabl
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val post = mPost!![position]
+        val post = getItem(position) ?: return
 
-        VOID.Glide(false, mContext, post!!.postimage, holder.image_product)
-        VOID.Glide(false, mContext, post.postimage, holder.image_product_1)
-        VOID.Glide(false, mContext, post.postimage2, holder.image_product_2)
-        VOID.Glide(false, mContext, post.postimage3, holder.image_product_3)
-        VOID.Glide(false, mContext, post.postimage4, holder.image_product_4)
-        VOID.Glide(false, mContext, post.postimage5, holder.image_product_5)
-        VOID.Glide(false, mContext, post.postimage6, holder.image_product_6)
-        VOID.Glide(false, mContext, post.postimage7, holder.image_product_7)
-        VOID.Glide(false, mContext, post.postimage8, holder.image_product_8)
-        VOID.Glide(false, mContext, post.postimage9, holder.image_product_9)
-        VOID.Glide(false, mContext, post.postimage10, holder.image_product_10)
+        with(holder) {
+            image_product.Glide(false, mContext, post.postimage)
+            image_product_1.Glide(false, mContext, post.postimage)
+            image_product_2.Glide(false, mContext, post.postimage2)
+            image_product_3.Glide(false, mContext, post.postimage3)
+            image_product_4.Glide(false, mContext, post.postimage4)
+            image_product_5.Glide(false, mContext, post.postimage5)
+            image_product_6.Glide(false, mContext, post.postimage6)
+            image_product_7.Glide(false, mContext, post.postimage7)
+            image_product_8.Glide(false, mContext, post.postimage8)
+            image_product_9.Glide(false, mContext, post.postimage9)
+            image_product_10.Glide(false, mContext, post.postimage10)
 
-        if (post.postimage2 == DATA.EMPTY) {
-            holder.image_product_2.visibility = View.GONE
-        } else {
-            holder.image_product_2.visibility = View.VISIBLE
-        }
-        if (post.postimage3 == DATA.EMPTY) {
-            holder.image_product_3.visibility = View.GONE
-        } else {
-            holder.image_product_3.visibility = View.VISIBLE
-        }
-        if (post.postimage4 == DATA.EMPTY) {
-            holder.image_product_4.visibility = View.GONE
-        } else {
-            holder.image_product_4.visibility = View.VISIBLE
-        }
-        if (post.postimage5 == DATA.EMPTY) {
-            holder.image_product_5.visibility = View.GONE
-        } else {
-            holder.image_product_5.visibility = View.VISIBLE
-        }
-        if (post.postimage6 == DATA.EMPTY) {
-            holder.image_product_6.visibility = View.GONE
-        } else {
-            holder.image_product_6.visibility = View.VISIBLE
-        }
-        if (post.postimage7 == DATA.EMPTY) {
-            holder.image_product_7.visibility = View.GONE
-        } else {
-            holder.image_product_7.visibility = View.VISIBLE
-        }
-        if (post.postimage8 == DATA.EMPTY) {
-            holder.image_product_8.visibility = View.GONE
-        } else {
-            holder.image_product_8.visibility = View.VISIBLE
-        }
-        if (post.postimage9 == DATA.EMPTY) {
-            holder.image_product_9.visibility = View.GONE
-        } else {
-            holder.image_product_9.visibility = View.VISIBLE
-        }
-        if (post.postimage10 == DATA.EMPTY) {
-            holder.image_product_10.visibility = View.GONE
-        } else {
-            holder.image_product_10.visibility = View.VISIBLE
-        }
-        if (post.postimage2 == DATA.EMPTY && post.postimage3 == DATA.EMPTY && post.postimage4 == DATA.EMPTY && post.postimage5 == DATA.EMPTY && post.postimage6 == DATA.EMPTY && post.postimage7 == DATA.EMPTY && post.postimage8 == DATA.EMPTY && post.postimage9 == DATA.EMPTY && post.postimage10 == DATA.EMPTY) {
-            holder.scroll_image.visibility = View.GONE
-        } else {
-            holder.scroll_image.visibility = View.VISIBLE
-        }
-        if (post.name == DATA.EMPTY) {
-            holder.product_name.visibility = View.GONE
-        } else {
-            holder.product_name.visibility = View.VISIBLE
-            holder.product_name.text = post.name
-        }
-        if (post.price == DATA.EMPTY) {
-            holder.price_product.visibility = View.GONE
-        } else {
-            holder.price_product.visibility = View.VISIBLE
-            holder.price_product.text = MessageFormat.format("{0} SYP", post.price)
-        }
-        if (post.indications == DATA.EMPTY) {
-            holder.linear_indications.visibility = View.GONE
-            holder.linear_indications2.visibility = View.GONE
-        } else {
-            holder.linear_indications.visibility = View.VISIBLE
-            holder.text_indications.visibility = View.VISIBLE
-            holder.linear_indications2.visibility = View.VISIBLE
-            holder.indications.visibility = View.VISIBLE
-            holder.indications.text = post.indications
-        }
-        if (post.use == DATA.EMPTY) {
-            holder.linear_how_to_use.visibility = View.GONE
-            holder.linear_how_to_use2.visibility = View.GONE
-        } else {
-            holder.linear_how_to_use.visibility = View.VISIBLE
-            holder.text_how_to_use.visibility = View.VISIBLE
-            holder.linear_how_to_use2.visibility = View.VISIBLE
-            holder.how_to_use.visibility = View.VISIBLE
-            holder.how_to_use.text = post.use
-        }
+            image_product_2.visibility = if (post.postimage2 == DATA.EMPTY) View.GONE else View.VISIBLE
+            image_product_3.visibility = if (post.postimage3 == DATA.EMPTY) View.GONE else View.VISIBLE
+            image_product_4.visibility = if (post.postimage4 == DATA.EMPTY) View.GONE else View.VISIBLE
+            image_product_5.visibility = if (post.postimage5 == DATA.EMPTY) View.GONE else View.VISIBLE
+            image_product_6.visibility = if (post.postimage6 == DATA.EMPTY) View.GONE else View.VISIBLE
+            image_product_7.visibility = if (post.postimage7 == DATA.EMPTY) View.GONE else View.VISIBLE
+            image_product_8.visibility = if (post.postimage8 == DATA.EMPTY) View.GONE else View.VISIBLE
+            image_product_9.visibility = if (post.postimage9 == DATA.EMPTY) View.GONE else View.VISIBLE
+            image_product_10.visibility = if (post.postimage10 == DATA.EMPTY) View.GONE else View.VISIBLE
 
-        isLiked(post.postid, holder.like)
-        isSaved(post.postid, holder.save)
-        nrLikes(holder.like_number, post.postid)
+            val hasMoreImages = post.postimage2 != DATA.EMPTY || post.postimage3 != DATA.EMPTY ||
+                    post.postimage4 != DATA.EMPTY || post.postimage5 != DATA.EMPTY ||
+                    post.postimage6 != DATA.EMPTY || post.postimage7 != DATA.EMPTY ||
+                    post.postimage8 != DATA.EMPTY || post.postimage9 != DATA.EMPTY ||
+                    post.postimage10 != DATA.EMPTY
 
-        holder.save.setOnClickListener {
-            if (holder.save.tag == "save") {
-                FirebaseDatabase.getInstance().reference.child(DATA.SAVES)
-                    .child(DATA.FirebaseUserUid)
-                    .child(post.postid!!).setValue(true)
+            scroll_image.visibility = if (hasMoreImages) View.VISIBLE else View.GONE
+
+            if (post.name == DATA.EMPTY) {
+                product_name.visibility = View.GONE
             } else {
-                FirebaseDatabase.getInstance().reference.child(DATA.SAVES)
-                    .child(DATA.FirebaseUserUid)
-                    .child(post.postid!!).removeValue()
+                product_name.visibility = View.VISIBLE
+                product_name.text = post.name
             }
-        }
-        holder.like.setOnClickListener {
-            if (holder.like.tag == "like") {
-                FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(post.postid!!)
-                    .child(DATA.FirebaseUserUid).setValue(true)
+            if (post.price == DATA.EMPTY) {
+                price_product.visibility = View.GONE
             } else {
-                FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(post.postid!!)
-                    .child(DATA.FirebaseUserUid).removeValue()
+                price_product.visibility = View.VISIBLE
+                price_product.text = MessageFormat.format("{0} SYP", post.price)
             }
-        }
-        holder.image_product_1.setOnClickListener {
-            VOID.Glide(false, mContext, post.postimage, holder.image_product)
-        }
-        holder.image_product_2.setOnClickListener {
-            VOID.Glide(false, mContext, post.postimage2, holder.image_product)
-        }
-        holder.image_product_3.setOnClickListener {
-            VOID.Glide(false, mContext, post.postimage3, holder.image_product)
-        }
-        holder.image_product_4.setOnClickListener {
-            VOID.Glide(false, mContext, post.postimage4, holder.image_product)
-        }
-        holder.image_product_5.setOnClickListener {
-            VOID.Glide(false, mContext, post.postimage5, holder.image_product)
-        }
-        holder.image_product_6.setOnClickListener {
-            VOID.Glide(false, mContext, post.postimage6, holder.image_product)
-        }
-        holder.image_product_7.setOnClickListener {
-            VOID.Glide(false, mContext, post.postimage7, holder.image_product)
-        }
-        holder.image_product_8.setOnClickListener {
-            VOID.Glide(false, mContext, post.postimage8, holder.image_product)
-        }
-        holder.image_product_9.setOnClickListener {
-            VOID.Glide(false, mContext, post.postimage9, holder.image_product)
-        }
-        holder.image_product_10.setOnClickListener {
-            VOID.Glide(false, mContext, post.postimage10, holder.image_product)
-        }
-    }
+            
+            if (post.indications == DATA.EMPTY) {
+                linear_indications.visibility = View.GONE
+                linear_indications2.visibility = View.GONE
+            } else {
+                linear_indications.visibility = View.VISIBLE
+                text_indications.visibility = View.VISIBLE
+                linear_indications2.visibility = View.VISIBLE
+                indications.visibility = View.VISIBLE
+                indications.text = post.indications
+            }
+            if (post.use == DATA.EMPTY) {
+                linear_how_to_use.visibility = View.GONE
+                linear_how_to_use2.visibility = View.GONE
+            } else {
+                linear_how_to_use.visibility = View.VISIBLE
+                text_how_to_use.visibility = View.VISIBLE
+                linear_how_to_use2.visibility = View.VISIBLE
+                how_to_use.visibility = View.VISIBLE
+                how_to_use.text = post.use
+            }
 
-    override fun getItemCount(): Int {
-        return mPost!!.size
+            isLiked(post.postid, like)
+            isSaved(post.postid, save)
+            nrLikes(like_number, post.postid)
+
+            save.setOnClickListener {
+                val ref = FirebaseDatabase.getInstance().reference.child(DATA.SAVES)
+                    .child(DATA.FirebaseUserUid).child(post.postid)
+                if (save.tag == "save") ref.setValue(true) else ref.removeValue()
+            }
+            like.setOnClickListener {
+                val ref = FirebaseDatabase.getInstance().reference.child(DATA.LIKES)
+                    .child(post.postid).child(DATA.FirebaseUserUid)
+                if (like.tag == "like") ref.setValue(true) else ref.removeValue()
+            }
+            
+            image_product_1.setOnClickListener { image_product.Glide(false, mContext, post.postimage) }
+            image_product_2.setOnClickListener { image_product.Glide(false, mContext, post.postimage2) }
+            image_product_3.setOnClickListener { image_product.Glide(false, mContext, post.postimage3) }
+            image_product_4.setOnClickListener { image_product.Glide(false, mContext, post.postimage4) }
+            image_product_5.setOnClickListener { image_product.Glide(false, mContext, post.postimage5) }
+            image_product_6.setOnClickListener { image_product.Glide(false, mContext, post.postimage6) }
+            image_product_7.setOnClickListener { image_product.Glide(false, mContext, post.postimage7) }
+            image_product_8.setOnClickListener { image_product.Glide(false, mContext, post.postimage8) }
+            image_product_9.setOnClickListener { image_product.Glide(false, mContext, post.postimage9) }
+            image_product_10.setOnClickListener { image_product.Glide(false, mContext, post.postimage10) }
+        }
     }
 
     class ViewHolder(val binding: ItemPostDetailBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -214,9 +154,8 @@ class PostDetailAdapter(private val mContext: Context, private val mPost: Mutabl
         val scroll_image: HorizontalScrollView = binding.scrollImage
     }
 
-    private fun isLiked(postId: String?, imageView: ImageView) {
-        val reference = FirebaseDatabase.getInstance().reference
-            .child(DATA.LIKES).child(postId!!)
+    private fun isLiked(postId: String, imageView: ImageView) {
+        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.child(DATA.FirebaseUserUid).exists()) {
@@ -227,17 +166,15 @@ class PostDetailAdapter(private val mContext: Context, private val mPost: Mutabl
                     imageView.tag = "like"
                 }
             }
-
             override fun onCancelled(databaseError: DatabaseError) {}
         })
     }
 
-    private fun isSaved(postId: String?, imageView: ImageView) {
-        val reference = FirebaseDatabase.getInstance().reference
-            .child(DATA.SAVES).child(DATA.FirebaseUserUid)
+    private fun isSaved(postId: String, imageView: ImageView) {
+        val reference = FirebaseDatabase.getInstance().reference.child(DATA.SAVES).child(DATA.FirebaseUserUid)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.child(postId!!).exists()) {
+                if (dataSnapshot.child(postId).exists()) {
                     imageView.setImageResource(R.drawable.ic_favorites_selected)
                     imageView.tag = "saved"
                 } else {
@@ -245,22 +182,22 @@ class PostDetailAdapter(private val mContext: Context, private val mPost: Mutabl
                     imageView.tag = "save"
                 }
             }
-
             override fun onCancelled(databaseError: DatabaseError) {}
         })
     }
 
-    private fun nrLikes(likes: TextView, postId: String?) {
-        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId!!)
+    private fun nrLikes(likes: TextView, postId: String) {
+        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 likes.text = MessageFormat.format("{0}", dataSnapshot.childrenCount)
             }
-
             override fun onCancelled(databaseError: DatabaseError) {}
         })
     }
 
-    companion object {
+    class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
+        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean = oldItem.postid == newItem.postid
+        override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean = oldItem == newItem
     }
 }

@@ -15,7 +15,7 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.VOID
+import com.flatcode.beautytouch.utils.Intent1
 import com.flatcode.beautytouch.ui.profile.UserViewModel
 import com.flatcode.beautytouch.ui.profile.LeaderboardActivity
 import com.flatcode.beautytouch.ui.profile.LeaderboardOldActivity
@@ -60,10 +60,10 @@ class RewardActivity : AppCompatActivity() {
 
         binding!!.toolbar.nameSpace.setText(R.string.earn_points)
         binding!!.leaderboardCard.setOnClickListener {
-            VOID.Intent1(context, LeaderboardActivity::class.java)
+            context.Intent1(LeaderboardActivity::class.java)
         }
         binding!!.leaderboardCardOld.setOnClickListener {
-            VOID.Intent1(context, LeaderboardOldActivity::class.java)
+            context.Intent1(LeaderboardOldActivity::class.java)
         }
         MobileAds.initialize(context) { }
         loadRewardedAd()

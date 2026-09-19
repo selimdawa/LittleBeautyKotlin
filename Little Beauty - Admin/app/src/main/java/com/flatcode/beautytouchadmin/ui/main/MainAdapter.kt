@@ -7,17 +7,19 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Main
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.CLASS
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.intent1
 import com.flatcode.beautytouchadmin.databinding.ItemMainBinding
 import java.text.MessageFormat
 
-class MainAdapter(private val context: Context, var list: MutableList<Main>) :
-    RecyclerView.Adapter<MainAdapter.ViewHolder>() {
+class MainAdapter(private val context: Context) :
+    ListAdapter<Main, MainAdapter.ViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemMainBinding.inflate(LayoutInflater.from(context), parent, false)
@@ -25,7 +27,7 @@ class MainAdapter(private val context: Context, var list: MutableList<Main>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val model = list[position]
+        val model = getItem(position)
         val image = model.image
         val number = model.number
         val name = model.title
@@ -54,12 +56,8 @@ class MainAdapter(private val context: Context, var list: MutableList<Main>) :
                 "Tools" -> CLASS.TOOLS
                 else -> null
             }
-            intentClass?.let { VOID.Intent1(context, it) }
+            intentClass?.let { context.intent1(it) }
         }
-    }
-
-    override fun getItemCount(): Int {
-        return list.size
     }
 
     class ViewHolder(binding: ItemMainBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -67,5 +65,15 @@ class MainAdapter(private val context: Context, var list: MutableList<Main>) :
         val number: TextView = binding.number
         val image: ImageView = binding.image
         val item: LinearLayout = binding.item
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback<Main>() {
+        override fun areItemsTheSame(oldItem: Main, newItem: Main): Boolean {
+            return oldItem.title == newItem.title
+        }
+
+        override fun areContentsTheSame(oldItem: Main, newItem: Main): Boolean {
+            return oldItem == newItem
+        }
     }
 }

@@ -15,7 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityToolsBinding
 import com.theartofdev.edmodo.cropper.CropImage
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,19 +49,19 @@ class ToolsActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
 
         binding!!.editImageSessionNow.setOnClickListener {
-            VOID.CropImageSession(activity)
+            activity!!.cropImageSession()
             IMAGE_NUMBER = IMAGE_NOW
         }
         binding!!.editImageSessionOld.setOnClickListener {
-            VOID.CropImageSession(activity)
+            activity!!.cropImageSession()
             IMAGE_NUMBER = IMAGE_OLD
         }
         binding!!.editLogoSessionNow.setOnClickListener {
-            VOID.CropImageSession(activity)
+            activity!!.cropImageSession()
             IMAGE_NUMBER = LOGO_NOW
         }
         binding!!.editLogoSessionOld.setOnClickListener {
-            VOID.CropImageSession(activity)
+            activity!!.cropImageSession()
             IMAGE_NUMBER = LOGO_OLD
         }
         binding!!.toolbar.nameSpace.setText(R.string.tools)
@@ -76,10 +76,10 @@ class ToolsActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.tools.collect { tools ->
                     tools?.let {
-                        VOID.Glide(false, context, it.imageSession, binding!!.imageSessionNow)
-                        VOID.Glide(false, context, it.oldImageSession, binding!!.imageSessionOld)
-                        VOID.Glide(false, context, it.imageLogo, binding!!.logoSessionNow)
-                        VOID.Glide(false, context, it.oldImageLogo, binding!!.logoSessionOld)
+                        binding!!.imageSessionNow.glide(false, it.imageSession)
+                        binding!!.imageSessionOld.glide(false, it.oldImageSession)
+                        binding!!.logoSessionNow.glide(false, it.imageLogo)
+                        binding!!.logoSessionOld.glide(false, it.oldImageLogo)
                         binding!!.sessionNow.setText(it.session)
                         binding!!.sessionOld.setText(it.oldSession)
                         binding!!.sessionNumberNow.setText(it.sessionNumber)
@@ -125,10 +125,10 @@ class ToolsActivity : AppCompatActivity() {
             viewModel.updateTools(
                 sessionNow, sessionOld, sessionNumberNow, sessionNumberOld, yearNow, yearOld,
                 imageUri, imageUri2, imageUri3, imageUri4,
-                imageUri?.let { VOID.getFileExtension(it, context) },
-                imageUri2?.let { VOID.getFileExtension(it, context) },
-                imageUri3?.let { VOID.getFileExtension(it, context) },
-                imageUri4?.let { VOID.getFileExtension(it, context) }
+                imageUri?.getFileExtension(context),
+                imageUri2?.getFileExtension(context),
+                imageUri3?.getFileExtension(context),
+                imageUri4?.getFileExtension(context)
             )
         }
     }
@@ -146,7 +146,7 @@ class ToolsActivity : AppCompatActivity() {
                 }
                 requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
             } else {
-                VOID.CropImageSquare(activity)
+                activity!!.cropImageSquare()
             }
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {

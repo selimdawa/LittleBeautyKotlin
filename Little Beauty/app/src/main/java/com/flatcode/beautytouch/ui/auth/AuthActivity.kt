@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import com.flatcode.beautytouch.utils.VOID
+import com.flatcode.beautytouch.utils.Intent1
 import com.flatcode.beautytouch.databinding.ActivityAuthBinding
 
 class AuthActivity : AppCompatActivity() {
@@ -28,7 +28,7 @@ class AuthActivity : AppCompatActivity() {
             insets
         }
 
-        binding!!.loginBtn.setOnClickListener { VOID.Intent1(context, LoginActivity::class.java) }
-        binding!!.skipBtn.setOnClickListener { VOID.Intent1(context, RegisterActivity::class.java) }
+        binding!!.loginBtn.setOnClickListener { context.Intent1(LoginActivity::class.java) }
+        binding!!.skipBtn.setOnClickListener { context.Intent1(RegisterActivity::class.java) }
     }
 }

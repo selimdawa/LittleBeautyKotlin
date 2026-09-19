@@ -1,29 +1,25 @@
 package com.flatcode.beautytouchadmin
 
 import android.app.Application
-import android.text.format.DateFormat
+import com.flatcode.beautytouchadmin.utils.DATA
 import dagger.hilt.android.HiltAndroidApp
 import io.selimdawa.multicolors.MultiColorManager
 import timber.log.Timber
-import java.util.Calendar
-import java.util.Locale
 
 @HiltAndroidApp
 class Application : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        MultiColorManager.init(this)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
+        MultiColorManager.init(this)
     }
 
-    companion object {
-        fun formatTimestamp(timestamp: Long): String {
-            val calendar = Calendar.getInstance(Locale.ENGLISH)
-            calendar.timeInMillis = timestamp
-            return DateFormat.format("dd/MM/yyyy", calendar).toString()
-        }
-    }
+    // Cloudinary Initialization
+    val config = mapOf(
+        "cloud_name" to DATA.CLOUDINARY_CLOUD_NAME, "secure" to true
+    )
+    MediaManager.init(this, config)
 }

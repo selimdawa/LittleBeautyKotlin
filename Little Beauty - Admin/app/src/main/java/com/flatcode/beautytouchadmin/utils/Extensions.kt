@@ -1,158 +1,75 @@
 package com.flatcode.beautytouchadmin.utils
 
 import android.app.Activity
-import android.app.Dialog
-import android.content.ActivityNotFoundException
-import android.content.ContentResolver
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
+import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
-import android.view.LayoutInflater
-import android.view.Window
-import android.view.WindowManager
+import android.os.Bundle
+import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
-import androidx.appcompat.app.AlertDialog
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.NavController
 import coil3.load
 import coil3.request.crossfade
 import coil3.request.placeholder
 import coil3.request.transformations
-import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.databinding.DialogAboutBinding
-import com.flatcode.beautytouchadmin.databinding.DialogLogoutBinding
-import com.flatcode.beautytouchadmin.ui.auth.LoginActivity
-import com.google.firebase.auth.FirebaseAuth
-import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
-import android.graphics.Bitmap
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.scale
 import coil3.size.Size
 import coil3.transform.Transformation
-import java.text.MessageFormat
+import com.flatcode.beautytouchadmin.R
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 
-// --- Activity Extensions ---
-
-fun Activity.dialogLogout() {
-    if (this.isFinishing || this.isDestroyed) return
-
-    val binding = DialogLogoutBinding.inflate(LayoutInflater.from(this))
-    val dialog = Dialog(this)
-
-    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-    dialog.setContentView(binding.root)
-    dialog.setCancelable(true)
-
-    dialog.window?.let { window ->
-        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val lp = WindowManager.LayoutParams().apply {
-            copyFrom(window.attributes)
-            width = WindowManager.LayoutParams.WRAP_CONTENT
-            height = WindowManager.LayoutParams.WRAP_CONTENT
-        }
-        window.attributes = lp
-    }
-
-    binding.yes.setOnClickListener {
-        FirebaseAuth.getInstance().signOut()
-
-        val intent = Intent(this@dialogLogout, LoginActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-        }
-        this@dialogLogout.startActivity(intent)
-
-        dialog.dismiss()
-    }
-
-    binding.no.setOnClickListener {
-        dialog.cancel()
-    }
-
-    dialog.show()
-}
-
-fun Activity.dialogAboutApp() {
-    if (this.isFinishing || this.isDestroyed) return
-
-    val binding = DialogAboutBinding.inflate(LayoutInflater.from(this))
-    val dialog = Dialog(this)
-
-    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-    dialog.setContentView(binding.root)
-    dialog.setCancelable(true)
-
-    dialog.window?.let { window ->
-        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val lp = WindowManager.LayoutParams().apply {
-            copyFrom(window.attributes)
-            width = WindowManager.LayoutParams.WRAP_CONTENT
-            height = WindowManager.LayoutParams.WRAP_CONTENT
-        }
-        window.attributes = lp
-    }
-
-    dialog.show()
-}
-
-fun Activity.startCropImageSquare() {
-    CropImage.activity().setGuidelines(CropImageView.Guidelines.ON).setMultiTouchEnabled(true)
-        .setMinCropResultSize(DATA.MIN_SQUARE, DATA.MIN_SQUARE).setAspectRatio(1, 1)
-        .setCropShape(CropImageView.CropShape.OVAL).start(this)
-}
-
-// --- Context Extensions ---
-
-fun Context.openActivityAndClear(c: Class<*>) {
+fun Context.intentClear(c: Class<*>?) {
     val intent = Intent(this, c)
     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
     this.startActivity(intent)
 }
 
-fun Context.openActivity(c: Class<*>, vararg extras: Pair<String, String?>) {
+fun Context.intent1(c: Class<*>?) {
     val intent = Intent(this, c)
-    extras.forEach { intent.putExtra(it.first, it.second) }
     this.startActivity(intent)
 }
 
-fun Context.shareApp() {
-    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain"
-        putExtra(Intent.EXTRA_SUBJECT, "share app")
-        putExtra(
-            Intent.EXTRA_TEXT,
-            "Download the app now from Google Play: https://google.com${this@shareApp.packageName}"
-        )
-    }
-    this.startActivity(Intent.createChooser(shareIntent, "Choose how to share"))
+fun Context.intentExtra(c: Class<*>?, key: String?, value: String?) {
+    val intent = Intent(this, c)
+    intent.putExtra(key, value)
+    this.startActivity(intent)
 }
 
-fun Context.rateApp() {
-    val packageName = this.packageName
-    val marketUri = Uri.parse("market://details?id=$packageName")
-    val webUri = Uri.parse("https://google.com")
-
-    try {
-        this.startActivity(Intent(Intent.ACTION_VIEW, marketUri))
-    } catch (_: ActivityNotFoundException) {
-        this.startActivity(Intent(Intent.ACTION_VIEW, webUri))
-    }
+fun NavController.navigateAction(actionId: Int) {
+    this.navigate(actionId)
 }
 
-fun Context.showMoreOptions(options: Array<String>, onOptionSelected: (Int) -> Unit) {
-    AlertDialog.Builder(this).setTitle("Choose Options")
-        .setItems(options) { _: DialogInterface?, which: Int ->
-            onOptionSelected(which)
-        }.show()
+fun NavController.navigateWithBundle(actionId: Int, bundle: Bundle) {
+    this.navigate(actionId, bundle)
 }
 
-// --- ImageView Extensions ---
+fun Context.intentExtra2(
+    c: Class<*>?, key: String?, value: String?, key2: String?, value2: String?
+) {
+    val intent = Intent(this, c)
+    intent.putExtra(key, value)
+    intent.putExtra(key2, value2)
+    this.startActivity(intent)
+}
 
-fun ImageView.loadImage(isUser: Boolean, url: String?) {
+fun Context.intentExtra3(
+    c: Class<*>?, key: String?, value: String?,
+    key2: String?, value2: String?, key3: String?, value3: String?
+) {
+    val intent = Intent(this, c)
+    intent.putExtra(key, value)
+    intent.putExtra(key2, value2)
+    intent.putExtra(key3, value3)
+    this.startActivity(intent)
+}
+
+fun ImageView.glide(isUser: Boolean, url: String?) {
     try {
         if (url == DATA.BASIC) {
             if (isUser) {
@@ -166,12 +83,12 @@ fun ImageView.loadImage(isUser: Boolean, url: String?) {
                 crossfade(true)
             }
         }
-    } catch (_: Exception) {
+    } catch (e: Exception) {
         this.setImageResource(R.drawable.icon)
     }
 }
 
-fun ImageView.loadBlurImage(isUser: Boolean, url: String, level: Int) {
+fun ImageView.glideBlur(isUser: Boolean, url: String?, level: Int) {
     try {
         if (url == DATA.BASIC) {
             if (isUser) {
@@ -185,13 +102,129 @@ fun ImageView.loadBlurImage(isUser: Boolean, url: String, level: Int) {
                 transformations(SimpleBlurTransformation(level.toFloat()))
             }
         }
-    } catch (_: Exception) {
+    } catch (e: Exception) {
         this.setImageResource(R.drawable.icon)
     }
 }
 
-fun Uri.getFileExtension(context: Context): String {
-    val cR: ContentResolver = context.contentResolver
-    val mime: MimeTypeMap = MimeTypeMap.getSingleton()
-    return mime.getExtensionFromMimeType(cR.getType(this))!!
+fun Activity.cropImageSquare() {
+    CropImage.activity()
+        .setGuidelines(CropImageView.Guidelines.ON)
+        .setMultiTouchEnabled(true)
+        .setMinCropResultSize(DATA.MIN_SQUARE, DATA.MIN_SQUARE)
+        .setAspectRatio(1, 1)
+        .setCropShape(CropImageView.CropShape.OVAL)
+        .start(this)
+}
+
+fun Activity.cropImageSlider() {
+    CropImage.activity()
+        .setGuidelines(CropImageView.Guidelines.ON)
+        .setMultiTouchEnabled(true)
+        .setMinCropResultSize(DATA.MIX_SLIDER_X, DATA.MIX_SLIDER_Y)
+        .setAspectRatio(16, 9)
+        .setCropShape(CropImageView.CropShape.OVAL)
+        .start(this)
+}
+
+fun Activity.cropImageShoppingCenter() {
+    CropImage.activity()
+        .setGuidelines(CropImageView.Guidelines.ON)
+        .setMultiTouchEnabled(true)
+        .setMinCropResultSize(DATA.MIX_SLIDER_X, DATA.MIX_SLIDER_Y)
+        .setAspectRatio(2, 1)
+        .setCropShape(CropImageView.CropShape.OVAL)
+        .start(this)
+}
+
+fun Activity.cropImageSession() {
+    CropImage.activity()
+        .setGuidelines(CropImageView.Guidelines.ON)
+        .setMultiTouchEnabled(true)
+        .setMinCropResultSize(DATA.MIN_SQUARE, DATA.MIN_SQUARE)
+        .setAspectRatio(1, 1)
+        .setCropShape(CropImageView.CropShape.OVAL)
+        .start(this)
+}
+
+fun Uri.getFileExtension(context: Context): String? {
+    val cR = context.contentResolver
+    val mime = MimeTypeMap.getSingleton()
+    return mime.getExtensionFromMimeType(cR.getType(this))
+}
+
+fun View.applySystemBarsPadding() {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, windowInsets ->
+        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+        v.setPadding(v.paddingLeft, insets.top, v.paddingRight, insets.bottom)
+        windowInsets
+    }
+}
+
+fun View.applyStatusBarPadding() {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, windowInsets ->
+        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+        v.setPadding(v.paddingLeft, insets.top, v.paddingRight, v.paddingBottom)
+        windowInsets
+    }
+}
+
+fun View.applyNavigationBarPadding() {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, windowInsets ->
+        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+        v.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, insets.bottom)
+        windowInsets
+    }
+}
+
+class SimpleBlurTransformation(private val radius: Float) : Transformation() {
+    override val cacheKey: String = "${SimpleBlurTransformation::class.java.name}-$radius"
+
+    override suspend fun transform(input: Bitmap, size: Size): Bitmap {
+        if (input.isRecycled) return input
+        val scaleFactor = 6
+        val w = (input.width / scaleFactor).coerceAtLeast(1)
+        val h = (input.height / scaleFactor).coerceAtLeast(1)
+        val small = input.scale(w, h, true)
+        val r = (radius / scaleFactor).toInt().coerceAtLeast(1)
+        val pix = IntArray(w * h)
+        small.getPixels(pix, 0, w, 0, 0, w, h)
+        val blurred = IntArray(w * h)
+        for (y in 0 until h) for (x in 0 until w) {
+            var rs = 0L
+            var gs = 0L
+            var bs = 0L
+            var c = 0
+            for (i in -r..r) {
+                val xi = (x + i).coerceIn(0, w - 1)
+                val p = pix[y * w + xi]
+                rs += (p shr 16) and 0xff
+                gs += (p shr 8) and 0xff
+                bs += p and 0xff
+                c++
+            }
+            blurred[y * w + x] = (0xff shl 24) or ((rs / c).toInt() shl 16) or ((gs / c).toInt() shl 8) or (bs / c).toInt()
+        }
+        for (x in 0 until w) for (y in 0 until h) {
+            var rs = 0L
+            var gs = 0L
+            var bs = 0L
+            var c = 0
+            for (i in -r..r) {
+                val yi = (y + i).coerceIn(0, h - 1)
+                val p = blurred[yi * w + x]
+                rs += (p shr 16) and 0xff
+                gs += (p shr 8) and 0xff
+                bs += p and 0xff
+                c++
+            }
+            pix[y * w + x] = (0xff shl 24) or ((rs / c).toInt() shl 16) or ((gs / c).toInt() shl 8) or (bs / c).toInt()
+        }
+        val output = createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        output.setPixels(pix, 0, w, 0, 0, w, h)
+        val finalOutput = output.scale(input.width, input.height, true)
+        if (output != finalOutput) output.recycle()
+        if (small != input) small.recycle()
+        return finalOutput
+    }
 }

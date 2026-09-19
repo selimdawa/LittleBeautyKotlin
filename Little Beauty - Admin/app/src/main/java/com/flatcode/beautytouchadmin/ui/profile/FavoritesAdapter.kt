@@ -7,11 +7,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.card.MaterialCardView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.utils.CLASS
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.intentExtra
 import com.flatcode.beautytouchadmin.databinding.ItemProductLinearBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -19,8 +22,18 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.text.MessageFormat
 
-class FavoritesAdapter(private val mContext: Context, var list: MutableList<Post?>) :
-    RecyclerView.Adapter<FavoritesAdapter.ViewHolder>() {
+class FavoritesAdapter(private val mContext: Context, initialList: MutableList<Post?>) :
+    ListAdapter<Post, FavoritesAdapter.ViewHolder>(DiffCallback) {
+
+    var list: MutableList<Post?> = initialList
+        set(value) {
+            field = value
+            submitList(value.filterNotNull())
+        }
+
+    init {
+        submitList(initialList.filterNotNull())
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemProductLinearBinding.inflate(LayoutInflater.from(mContext), parent, false)
@@ -28,10 +41,10 @@ class FavoritesAdapter(private val mContext: Context, var list: MutableList<Post
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val post = list[position]
-        val id = DATA.EMPTY + post!!.postid
+        val post = list[position] ?: return
+        val id = DATA.EMPTY + post.postid
 
-        VOID.Glide(true, mContext, post.postimage, holder.image_product)
+        holder.image_product.glide(true, post.postimage)
         if (post.name == DATA.EMPTY) {
             holder.name.visibility = View.GONE
         } else {
@@ -47,7 +60,7 @@ class FavoritesAdapter(private val mContext: Context, var list: MutableList<Post
 
         nrLikes(holder.likes, post.postid)
         holder.card.setOnClickListener {
-            VOID.IntentExtra(mContext, CLASS.POST_DETAILS, DATA.POST_ID, id)
+            mContext.intentExtra(CLASS.POST_DETAILS, DATA.POST_ID, id)
         }
     }
 
@@ -74,5 +87,15 @@ class FavoritesAdapter(private val mContext: Context, var list: MutableList<Post
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback<Post>() {
+        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem.postid == newItem.postid
+        }
+
+        override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem == newItem
+        }
     }
 }

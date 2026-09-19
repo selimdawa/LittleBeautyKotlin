@@ -16,7 +16,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.cropImageSquare
+import com.flatcode.beautytouchadmin.utils.getFileExtension
 import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
 import com.theartofdev.edmodo.cropper.CropImage
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,7 +57,7 @@ class PostAddActivity : AppCompatActivity() {
             binding!!.typeTwo.text = "Hair Products ✓"
         }
         binding!!.go.setOnClickListener { validateData() }
-        binding!!.layoutImageProfile.setOnClickListener { VOID.CropImageSquare(activity) }
+        binding!!.layoutImageProfile.setOnClickListener { activity!!.cropImageSquare() }
 
         observeViewModel()
     }
@@ -100,7 +101,7 @@ class PostAddActivity : AppCompatActivity() {
             dialog!!.show()
             viewModel.addPost(
                 name, indications, howToUse, price, typePost, imageUri!!,
-                VOID.getFileExtension(imageUri, context)!!
+                imageUri!!.getFileExtension(context)!!
             )
         }
     }
@@ -113,7 +114,7 @@ class PostAddActivity : AppCompatActivity() {
                 imageUri = uri
                 requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
             } else {
-                VOID.CropImageSquare(activity)
+                activity!!.cropImageSquare()
             }
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {

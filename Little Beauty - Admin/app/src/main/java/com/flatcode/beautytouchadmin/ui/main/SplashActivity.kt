@@ -8,7 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.flatcode.beautytouchadmin.utils.CLASS
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.intent1
 import com.flatcode.beautytouchadmin.databinding.ActivitySplashBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -32,9 +32,9 @@ class SplashActivity : AppCompatActivity() {
 
     private fun checkUser() {
         if (!viewModel.isUserLoggedIn()) {
-            VOID.Intent1(context, CLASS.LOGIN)
+            context.intent1(CLASS.LOGIN)
         } else {
-            VOID.Intent1(context, CLASS.MAIN)
+            context.intent1(CLASS.MAIN)
         }
         finish()
     }

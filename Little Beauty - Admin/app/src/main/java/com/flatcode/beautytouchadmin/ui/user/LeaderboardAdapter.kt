@@ -9,12 +9,15 @@ import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.filter.LeaderboardFilter
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.utils.CLASS
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.intentExtra
 import com.flatcode.beautytouchadmin.databinding.ItemLeaderboradBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -24,13 +27,23 @@ import java.text.MessageFormat
 
 class LeaderboardAdapter(
     private val mContext: Context, 
-    var list: MutableList<User?>, 
+    initialList: MutableList<User?>, 
     var isUser: Boolean,
     private val pointsKey: String? = null
-) : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>(), Filterable {
+) : ListAdapter<User, LeaderboardAdapter.ViewHolder>(DiffCallback), Filterable {
 
-    var filterList: MutableList<User?> = list
+    var list: MutableList<User?> = initialList
+        set(value) {
+            field = value
+            submitList(value.filterNotNull())
+        }
+
+    var filterList: MutableList<User?> = initialList
     private var filter: LeaderboardFilter? = null
+
+    init {
+        submitList(initialList.filterNotNull())
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemLeaderboradBinding.inflate(LayoutInflater.from(mContext), parent, false)
@@ -45,7 +58,7 @@ class LeaderboardAdapter(
         val rankValue = list.size - position
 
         holder.rank.text = MessageFormat.format("{0}", rankValue)
-        VOID.Glide(true, mContext, image, holder.profileImage)
+        holder.profileImage.glide(true, image)
         if (username == DATA.EMPTY) {
             holder.username.visibility = View.GONE
         } else {
@@ -58,7 +71,7 @@ class LeaderboardAdapter(
         }
         
         holder.item.setOnClickListener {
-            VOID.IntentExtra(mContext, CLASS.ADS_INFO, DATA.PROFILE_ID, id)
+            mContext.intentExtra(CLASS.ADS_INFO, DATA.PROFILE_ID, id)
         }
     }
 
@@ -95,5 +108,15 @@ class LeaderboardAdapter(
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback<User>() {
+        override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
+            return oldItem == newItem
+        }
     }
 }

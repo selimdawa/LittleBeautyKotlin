@@ -52,6 +52,7 @@ class SessionOldInfoActivity : AppCompatActivity() {
                 viewModel.users.collect { users ->
                     list.clear()
                     list.addAll(users)
+                    adapter?.list = list
                     adapter?.notifyDataSetChanged()
 
                     binding!!.bar.visibility = View.GONE

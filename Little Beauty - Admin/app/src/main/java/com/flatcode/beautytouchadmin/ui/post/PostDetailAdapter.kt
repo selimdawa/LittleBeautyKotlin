@@ -8,34 +8,46 @@ import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.glide
 import com.flatcode.beautytouchadmin.databinding.ItemPostDetailBinding
 import java.text.MessageFormat
 
 class PostDetailAdapter(
     private val mContext: Context, 
-    var list: MutableList<Post?>,
+    initialList: MutableList<Post?>,
     private val listener: OnItemClickListener
-) : RecyclerView.Adapter<PostDetailAdapter.ViewHolder>() {
+) : ListAdapter<Post, PostDetailAdapter.ViewHolder>(DiffCallback) {
 
     interface OnItemClickListener {
         fun onLikeClick(post: Post)
         fun onSaveClick(post: Post)
     }
 
+    var list: MutableList<Post?> = initialList
+        set(value) {
+            field = value
+            submitList(value.filterNotNull())
+        }
+
     private var isLiked: Boolean = false
     private var isSaved: Boolean = false
     private var likesCount: Long = 0
+
+    init {
+        submitList(initialList.filterNotNull())
+    }
 
     fun updateStates(isLiked: Boolean, isSaved: Boolean, likesCount: Long) {
         this.isLiked = isLiked
         this.isSaved = isSaved
         this.likesCount = likesCount
-        notifyDataSetChanged()
+        submitList(list.filterNotNull())
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -46,17 +58,17 @@ class PostDetailAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = list[position] ?: return
 
-        VOID.Glide(false, mContext, post.postimage, holder.image_product)
-        VOID.Glide(false, mContext, post.postimage, holder.image_product_1)
-        VOID.Glide(false, mContext, post.postimage2, holder.image_product_2)
-        VOID.Glide(false, mContext, post.postimage3, holder.image_product_3)
-        VOID.Glide(false, mContext, post.postimage4, holder.image_product_4)
-        VOID.Glide(false, mContext, post.postimage5, holder.image_product_5)
-        VOID.Glide(false, mContext, post.postimage6, holder.image_product_6)
-        VOID.Glide(false, mContext, post.postimage7, holder.image_product_7)
-        VOID.Glide(false, mContext, post.postimage8, holder.image_product_8)
-        VOID.Glide(false, mContext, post.postimage9, holder.image_product_9)
-        VOID.Glide(false, mContext, post.postimage10, holder.image_product_10)
+        holder.image_product.glide(false, post.postimage)
+        holder.image_product_1.glide(false, post.postimage)
+        holder.image_product_2.glide(false, post.postimage2)
+        holder.image_product_3.glide(false, post.postimage3)
+        holder.image_product_4.glide(false, post.postimage4)
+        holder.image_product_5.glide(false, post.postimage5)
+        holder.image_product_6.glide(false, post.postimage6)
+        holder.image_product_7.glide(false, post.postimage7)
+        holder.image_product_8.glide(false, post.postimage8)
+        holder.image_product_9.glide(false, post.postimage9)
+        holder.image_product_10.glide(false, post.postimage10)
 
         // Visibility logic
         holder.image_product_2.visibility = if (post.postimage2 == DATA.EMPTY) View.GONE else View.VISIBLE
@@ -135,7 +147,7 @@ class PostDetailAdapter(
 
     private fun buttonClick(view: View, url: String?, mainImage: ImageView) {
         view.setOnClickListener {
-            VOID.Glide(false, mContext, url, mainImage)
+            mainImage.glide(false, url)
         }
     }
 
@@ -169,5 +181,15 @@ class PostDetailAdapter(
         val linear_how_to_use: LinearLayout = binding.linearHowToUse
         val linear_how_to_use2: LinearLayout = binding.linearHowToUse2
         val scroll_image: HorizontalScrollView = binding.scrollImage
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback<Post>() {
+        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem.postid == newItem.postid
+        }
+
+        override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem == newItem
+        }
     }
 }

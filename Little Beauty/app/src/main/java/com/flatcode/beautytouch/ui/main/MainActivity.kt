@@ -35,7 +35,12 @@ import com.flatcode.beautytouch.BuildConfig
 import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.VOID
+import com.flatcode.beautytouch.utils.Intent1
+import com.flatcode.beautytouch.utils.IntentClear
+import com.flatcode.beautytouch.utils.InterstitialAd
+import com.flatcode.beautytouch.utils.InterstitialShow
+import com.flatcode.beautytouch.utils.Glide
+import com.flatcode.beautytouch.utils.RateUs
 import com.flatcode.beautytouch.databinding.ActivityMainBinding
 import com.flatcode.beautytouch.databinding.DialogAboutBinding
 import com.flatcode.beautytouch.databinding.DialogAppBinding
@@ -86,25 +91,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        binding.toolbar.image.setOnClickListener { VOID.Intent1(context, ProfileActivity::class.java) }
+        binding.toolbar.image.setOnClickListener { context.Intent1(ProfileActivity::class.java) }
         binding.toolbar.drawer.setOnClickListener {
             binding.drawerLayout.openDrawer(GravityCompat.START)
         }
 
         MobileAds.initialize(this) { }
-        VOID.InterstitialAd(activity!!)
+        activity!!.InterstitialAd()
 
         binding.myProfile.setOnClickListener {
-            VOID.Intent1(context, ProfileActivity::class.java)
+            context.Intent1(ProfileActivity::class.java)
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         }
-        binding.favorites.setOnClickListener { VOID.Intent1(context, FavoritesActivity::class.java) }
+        binding.favorites.setOnClickListener { context.Intent1(FavoritesActivity::class.java) }
         binding.messenger.setOnClickListener {
             val i = Intent(Intent.ACTION_VIEW)
             i.data = Uri.parse("https://wa.me/message/E2YOU4NVTIEAD1")
             startActivity(i)
         }
-        binding.reward.setOnClickListener { VOID.Intent1(context, RewardActivity::class.java) }
+        binding.reward.setOnClickListener { context.Intent1(RewardActivity::class.java) }
         binding.aboutApp.setOnClickListener { showDialogAboutApp() }
         binding.shareApp.setOnClickListener { ShareApp() }
         binding.aboutMy.setOnClickListener { showDialogAboutMy() }
@@ -145,7 +150,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 4 -> {
                     Toast.makeText(applicationContext, shopping_center, Toast.LENGTH_SHORT)
                         .show()
-                    VOID.InterstitialShow(activity!!, DATA.INTERSTITIAL_HOME)
+                    activity!!.InterstitialShow(DATA.INTERSTITIAL_HOME)
                 }
             }
         }
@@ -168,7 +173,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
-        binding.imageDrawer.setOnClickListener { VOID.Intent1(context, ProfileActivity::class.java) }
+        binding.imageDrawer.setOnClickListener { context.Intent1(ProfileActivity::class.java) }
 
         observeViewModels()
         postViewModel.loadCategoryCounts(publisher, aname, DATA.SKIN_PRODUCTS, DATA.HAIR_PRODUCTS, DATA.SHOPPING_CENTERS)
@@ -269,7 +274,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             userViewModel.appTools.collect { resource ->
                 if (resource is Resource.Success) {
                     val tools = resource.data
-                    VOID.Glide(true, context, tools.imageMe, dialogBinding.image)
+                    dialogBinding.image.Glide(true, context, tools.imageMe)
                     dialogBinding.text.text = tools.aboutMe
                 }
             }
@@ -291,7 +296,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         lp.copyFrom(dialog.window!!.attributes)
         lp.width = WindowManager.LayoutParams.WRAP_CONTENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialogBinding.linearRate.setOnClickListener { VOID.RateUs(activity!!) }
+        dialogBinding.linearRate.setOnClickListener { activity!!.RateUs() }
         dialogBinding.facebookDesign.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View) {
                 startActivity(openFacebookIntent)
@@ -335,7 +340,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialogBinding.yes.setOnClickListener {
             userViewModel.logout()
-            VOID.IntentClear(context, LoginActivity::class.java)
+            context.IntentClear(LoginActivity::class.java)
             finish()
         }
         dialogBinding.no.setOnClickListener { dialog.cancel() }

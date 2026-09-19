@@ -7,12 +7,15 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.card.MaterialCardView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.CLASS
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.intentExtra
 import com.flatcode.beautytouchadmin.databinding.ItemMyPostBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -22,13 +25,23 @@ import java.text.MessageFormat
 
 class MyPostsAdapter(
     private val mContext: Context, 
-    var list: MutableList<Post?>,
+    initialList: MutableList<Post?>,
     private val listener: OnItemClickListener
-) : RecyclerView.Adapter<MyPostsAdapter.ViewHolder>() {
+) : ListAdapter<Post, MyPostsAdapter.ViewHolder>(DiffCallback) {
 
     interface OnItemClickListener {
         fun onMoreClick(post: Post)
         fun onLikeClick(post: Post, isLiked: Boolean)
+    }
+
+    var list: MutableList<Post?> = initialList
+        set(value) {
+            field = value
+            submitList(value.filterNotNull())
+        }
+
+    init {
+        submitList(initialList.filterNotNull())
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -39,7 +52,7 @@ class MyPostsAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = list[position] ?: return
 
-        VOID.Glide(false, mContext, post.postimage, holder.image_product)
+        holder.image_product.glide(false, post.postimage)
         if (post.name == DATA.EMPTY) {
             holder.name.visibility = View.GONE
         } else {
@@ -63,7 +76,7 @@ class MyPostsAdapter(
 
         holder.more.setOnClickListener { listener.onMoreClick(post) }
         holder.card.setOnClickListener {
-            VOID.IntentExtra(mContext, CLASS.POST_DETAILS, DATA.POST_ID, post.postid)
+            mContext.intentExtra(CLASS.POST_DETAILS, DATA.POST_ID, post.postid)
         }
     }
 
@@ -107,5 +120,15 @@ class MyPostsAdapter(
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback<Post>() {
+        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem.postid == newItem.postid
+        }
+
+        override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem == newItem
+        }
     }
 }

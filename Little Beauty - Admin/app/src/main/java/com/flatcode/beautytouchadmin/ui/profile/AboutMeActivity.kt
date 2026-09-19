@@ -22,7 +22,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.ui.other.ToolsViewModel
 import com.flatcode.beautytouchadmin.databinding.ActivityAboutMeBinding
 import com.theartofdev.edmodo.cropper.CropImage
@@ -52,7 +52,7 @@ class AboutMeActivity : AppCompatActivity() {
         binding!!.toolbar.back.setOnClickListener { onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
         binding!!.show.setOnClickListener { showDialogAboutMy() }
-        binding!!.editImageIcon.setOnClickListener { VOID.CropImageSquare(activity) }
+        binding!!.editImageIcon.setOnClickListener { activity?.cropImageSquare() }
 
         observeViewModel()
     }
@@ -62,7 +62,7 @@ class AboutMeActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.tools.collect { tools ->
                     tools?.let {
-                        VOID.Glide(true, context, it.imageMe, binding!!.image)
+                        binding!!.image.glide(true, it.imageMe)
                         binding!!.name.setText(it.aboutMe)
                     }
                 }
@@ -91,7 +91,7 @@ class AboutMeActivity : AppCompatActivity() {
         } else {
             dialog!!.setMessage("Image is being updated...")
             dialog!!.show()
-            viewModel.updateAboutMe(name, imageUri, imageUri?.let { VOID.getFileExtension(it, context) })
+            viewModel.updateAboutMe(name, imageUri, imageUri?.getFileExtension(context))
         }
     }
 
@@ -109,7 +109,7 @@ class AboutMeActivity : AppCompatActivity() {
         val text = dialog.findViewById<TextView>(R.id.text)
         
         viewModel.tools.value?.let {
-            VOID.Glide(true, context, it.imageMe, image)
+            image.glide(true, it.imageMe)
             text.text = it.aboutMe
         }
         
@@ -125,7 +125,7 @@ class AboutMeActivity : AppCompatActivity() {
                 imageUri = uri
                 requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
             } else {
-                VOID.CropImageSquare(activity)
+                activity?.cropImageSquare()
             }
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {

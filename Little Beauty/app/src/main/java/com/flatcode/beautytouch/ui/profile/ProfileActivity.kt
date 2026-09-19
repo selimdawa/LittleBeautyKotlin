@@ -20,7 +20,8 @@ import androidx.lifecycle.lifecycleScope
 import coil3.load
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.VOID
+import com.flatcode.beautytouch.utils.CropImageSquare
+import com.flatcode.beautytouch.utils.getFileExtension
 import com.flatcode.beautytouch.databinding.ActivityProfileBinding
 import com.theartofdev.edmodo.cropper.CropImage
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,7 +56,7 @@ class ProfileActivity : AppCompatActivity() {
         dialog!!.setTitle("Please wait...")
         dialog!!.setCanceledOnTouchOutside(false)
         binding!!.back.setOnClickListener { onBackPressed() }
-        binding!!.editImageIcon.setOnClickListener { VOID.CropImageSquare(activity) }
+        binding!!.editImageIcon.setOnClickListener { activity.CropImageSquare() }
 
         binding!!.imageEdit.setOnClickListener {
             binding!!.imageEdit.visibility = View.GONE
@@ -153,7 +154,7 @@ class ProfileActivity : AppCompatActivity() {
             if (imageUri == null) {
                 viewModel.updateProfile(username)
             } else {
-                viewModel.uploadProfileImage(imageUri!!, VOID.getFileExtension(imageUri, context)!!)
+                viewModel.uploadProfileImage(imageUri!!, imageUri.getFileExtension(context)!!)
             }
         }
     }
@@ -166,7 +167,7 @@ class ProfileActivity : AppCompatActivity() {
                 imageUri = uri
                 requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
             } else {
-                VOID.CropImageSquare(activity)
+                activity.CropImageSquare()
             }
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {

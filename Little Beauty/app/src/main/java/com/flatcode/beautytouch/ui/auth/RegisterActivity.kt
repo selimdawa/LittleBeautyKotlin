@@ -15,7 +15,8 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.ui.main.MainActivity
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.VOID
+import com.flatcode.beautytouch.utils.Intent1
+import com.flatcode.beautytouch.utils.IntentClear
 import com.flatcode.beautytouch.databinding.ActivityRegisterBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -47,10 +48,10 @@ class RegisterActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
 
         binding!!.login.setOnClickListener {
-            VOID.Intent1(context, LoginActivity::class.java)
+            context.Intent1(LoginActivity::class.java)
             finish()
         }
-        binding!!.forget.setOnClickListener { VOID.Intent1(context, ForgetPasswordActivity::class.java) }
+        binding!!.forget.setOnClickListener { context.Intent1(ForgetPasswordActivity::class.java) }
         binding!!.go.setOnClickListener { validateData() }
 
         observeViewModel()
@@ -69,7 +70,7 @@ class RegisterActivity : AppCompatActivity() {
                     is Resource.Success -> {
                         dialog!!.dismiss()
                         Toast.makeText(context, "Account created", Toast.LENGTH_SHORT).show()
-                        VOID.IntentClear(context, MainActivity::class.java)
+                        context.IntentClear(MainActivity::class.java)
                         finish()
                     }
 

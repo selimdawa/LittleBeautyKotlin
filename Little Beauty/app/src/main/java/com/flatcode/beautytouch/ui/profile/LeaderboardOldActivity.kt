@@ -11,7 +11,8 @@ import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.model.User
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.VOID
+import com.flatcode.beautytouch.utils.extensions.Glide
+import com.flatcode.beautytouch.utils.extensions.IntentExtra
 import com.flatcode.beautytouch.ui.post.PostDetailsActivity
 import com.flatcode.beautytouch.databinding.ActivityLeaderboardBinding
 import com.google.firebase.database.DataSnapshot
@@ -27,7 +28,6 @@ class LeaderboardOldActivity : AppCompatActivity() {
 
     private var binding: ActivityLeaderboardBinding? = null
     var context: Context = this@LeaderboardOldActivity
-    private var list: ArrayList<User?>? = null
     private var adapter: LeaderboardOldAdapter? = null
 
     private val viewModel: UserViewModel by viewModels()
@@ -38,8 +38,7 @@ class LeaderboardOldActivity : AppCompatActivity() {
         val view = binding!!.root
         setContentView(view)
 
-        list = ArrayList()
-        adapter = LeaderboardOldAdapter(context, list!!)
+        adapter = LeaderboardOldAdapter(context)
         binding!!.recyclerView.adapter = adapter
 
         observeViewModel()
@@ -51,8 +50,8 @@ class LeaderboardOldActivity : AppCompatActivity() {
                 Timber.d("App tools collected: $resource")
                 if (resource is Resource.Success) {
                     val tools = resource.data
-                    VOID.Glide(false, context, tools.oldImageSession, binding!!.imageSession)
-                    VOID.Glide(false, context, tools.oldImageLogo, binding!!.imageLogo)
+                    binding!!.imageSession.Glide(false, context, tools.oldImageSession)
+                    binding!!.imageLogo.Glide(false, context, tools.oldImageLogo)
                     binding!!.sessionNumber.text = tools.oldSession
                     val key = tools.oldYear + "_" + tools.oldSessionNumber
                     viewModel.loadLeaderboard(key)
@@ -64,9 +63,8 @@ class LeaderboardOldActivity : AppCompatActivity() {
             viewModel.leaderboard.collect { resource ->
                 Timber.d("Leaderboard collected: $resource")
                 if (resource is Resource.Success) {
-                    list!!.clear()
-                    list!!.addAll(resource.data)
-                    adapter!!.notifyDataSetChanged()
+                    adapter!!.submitList(resource.data)
+                    adapter!!.filterList = ArrayList(resource.data)
                 }
             }
         }
@@ -93,9 +91,9 @@ class LeaderboardOldActivity : AppCompatActivity() {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val post = dataSnapshot.getValue(Post::class.java)
                     if (post?.postid == R) {
-                        VOID.Glide(false, context, post.postimage, Reward)
+                        Reward.Glide(false, context, post.postimage)
                         Reward.setOnClickListener {
-                            VOID.IntentExtra(context, PostDetailsActivity::class.java, DATA.POST_ID, R)
+                            context.IntentExtra(PostDetailsActivity::class.java, DATA.POST_ID, R)
                         }
                     }
                 }

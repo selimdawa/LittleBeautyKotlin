@@ -12,7 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.utils.CLASS
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.intentExtra
 import com.flatcode.beautytouchadmin.databinding.ItemProductRemoveBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -39,7 +40,7 @@ class HotProductRemoveAdapter(
         val post = list[position] ?: return
         val id = post.postid
 
-        VOID.Glide(false, mContext, post.postimage, holder.image_product)
+        holder.image_product.glide(false, post.postimage)
         if (post.name == DATA.EMPTY) {
             holder.name.visibility = View.GONE
         } else {
@@ -56,7 +57,7 @@ class HotProductRemoveAdapter(
         nrLikes(holder.likes, id)
         holder.remove.setOnClickListener { listener.onRemoveClick(post) }
         holder.card.setOnClickListener {
-            VOID.IntentExtra(mContext, CLASS.POST_DETAILS, DATA.POST_ID, id)
+            mContext.intentExtra(CLASS.POST_DETAILS, DATA.POST_ID, id)
         }
     }
 

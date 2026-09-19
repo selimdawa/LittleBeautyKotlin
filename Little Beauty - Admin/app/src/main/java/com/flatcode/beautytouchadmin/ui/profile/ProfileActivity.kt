@@ -16,8 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityProfileBinding
 import com.theartofdev.edmodo.cropper.CropImage
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,7 +43,7 @@ class ProfileActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
 
         binding!!.back.setOnClickListener { onBackPressed() }
-        binding!!.editImageIcon.setOnClickListener { VOID.CropImageSquare(activity) }
+        binding!!.editImageIcon.setOnClickListener { activity?.cropImageSquare() }
 
         binding!!.imageEdit.setOnClickListener {
             binding!!.imageEdit.visibility = View.GONE
@@ -79,7 +78,7 @@ class ProfileActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.user.collect { user ->
                     user?.let {
-                        VOID.Glide(true, context, it.imageurl, binding!!.image)
+                        binding!!.image.glide(true, it.imageurl)
                         binding!!.name.text = it.username
                         binding!!.nameEdit.setText(it.username)
                     }
@@ -110,7 +109,7 @@ class ProfileActivity : AppCompatActivity() {
             dialog!!.show()
             viewModel.updateProfile(
                 DATA.FirebaseUserUid, username, imageUri,
-                imageUri?.let { VOID.getFileExtension(it, context) }
+                imageUri?.getFileExtension(context)
             )
         }
     }
@@ -123,7 +122,7 @@ class ProfileActivity : AppCompatActivity() {
                 imageUri = uri
                 requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
             } else {
-                VOID.CropImageSquare(activity)
+                activity?.cropImageSquare()
             }
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {

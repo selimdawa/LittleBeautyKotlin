@@ -27,7 +27,6 @@ class LeaderboardFilter(var list: ArrayList<User?>, var adapter: LeaderboardAdap
     }
 
     override fun publishResults(constraint: CharSequence, results: FilterResults) {
-        adapter.list = (results.values as ArrayList<User?>)
-        adapter.notifyDataSetChanged()
+        adapter.submitList(results.values as List<User?>?)
     }
 }

@@ -24,7 +24,6 @@ class PostDetailsActivity : AppCompatActivity() {
     var context: Context = this@PostDetailsActivity
     private var binding: ActivityPostDetailBinding? = null
     private var adapter: PostDetailAdapter? = null
-    private var list: MutableList<Post?>? = null
     var postId: String? = null
 
     private val viewModel: PostDetailsViewModel by viewModels()
@@ -46,8 +45,7 @@ class PostDetailsActivity : AppCompatActivity() {
         postId = intent.getStringExtra(DATA.POST_ID)
         binding!!.toolbar.nameSpace.setText(R.string.post_detail)
 
-        list = ArrayList()
-        adapter = PostDetailAdapter(context, list)
+        adapter = PostDetailAdapter(context)
         binding!!.recyclerView.adapter = adapter
 
         observeViewModel()
@@ -58,9 +56,7 @@ class PostDetailsActivity : AppCompatActivity() {
             viewModel.postDetails.collect { resource ->
                 when (resource) {
                     is Resource.Success -> {
-                        list!!.clear()
-                        list!!.add(resource.data)
-                        adapter!!.notifyDataSetChanged()
+                        adapter!!.submitList(listOf(resource.data))
                     }
                     else -> {}
                 }

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:ignore="all"
-    tools:context=".Auth.AuthActivity">
+    tools:context=".Auth.AuthActivity"
+    tools:ignore="all">
 
     <ImageView
         android:id="@+id/background"
@@ -79,18 +80,24 @@
             android:layout_above="@+id/skipBtn"
             android:layout_marginBottom="10sp"
             android:background="@drawable/button6"
-            android:backgroundTint="?mc_track"
             android:text="@string/login"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:backgroundTint="?mc_track" />
 
-        <Button
+        <TextView
             android:id="@+id/skipBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="@drawable/button"
+            android:gravity="center"
+            android:padding="15dp"
             android:text="@string/register"
-            android:textColor="?colorError" />
+            android:textColor="?attr/colorError"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 

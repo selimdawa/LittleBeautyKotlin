@@ -15,8 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
 import com.theartofdev.edmodo.cropper.CropImage
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,7 +61,7 @@ class PostEditActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.text = "Edit post"
         binding!!.toolbar.back.setOnClickListener { onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
-        binding!!.layoutImageProfile.setOnClickListener { VOID.CropImageSquare(activity) }
+        binding!!.layoutImageProfile.setOnClickListener { activity?.cropImageSquare() }
 
         id?.let { viewModel.loadPost(it) }
         observeViewModel()
@@ -74,7 +73,7 @@ class PostEditActivity : AppCompatActivity() {
                 viewModel.post.collect { item ->
                     item?.let {
                         typePost = it.category
-                        VOID.Glide(true, context, it.postimage, binding!!.image)
+                        binding!!.image.glide(true, it.postimage)
                         binding!!.name.setText(it.name)
                         binding!!.price.setText(it.price)
                         binding!!.indications.setText(it.indications)
@@ -125,7 +124,7 @@ class PostEditActivity : AppCompatActivity() {
             dialog!!.show()
             viewModel.updatePost(
                 id!!, name, indications, howToUse, price, typePost ?: "",
-                imageUri, imageUri?.let { VOID.getFileExtension(it, context) }
+                imageUri, imageUri?.getFileExtension(context)
             )
         }
     }
@@ -138,7 +137,7 @@ class PostEditActivity : AppCompatActivity() {
                 imageUri = uri
                 requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
             } else {
-                VOID.CropImageSquare(activity)
+                activity?.cropImageSquare()
             }
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {

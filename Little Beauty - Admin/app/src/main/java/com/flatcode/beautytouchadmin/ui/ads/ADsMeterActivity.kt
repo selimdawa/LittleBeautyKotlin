@@ -58,6 +58,7 @@ class ADsMeterActivity : AppCompatActivity() {
                 viewModel.users.collect { users ->
                     list.clear()
                     list.addAll(users)
+                    adapter?.list = list
                     adapter?.notifyDataSetChanged()
 
                     binding!!.progress.visibility = View.GONE

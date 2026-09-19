@@ -14,8 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityShoppingCentersAddBinding
 import com.theartofdev.edmodo.cropper.CropImage
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,11 +44,11 @@ class ShoppingCentersAddActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
 
         binding!!.addImage.setOnClickListener {
-            VOID.CropImageShoppingCenter(activity)
+            activity?.cropImageShoppingCenter()
             IMAGE_NUMBER = IMAGE_PIC
         }
         binding!!.addImageTwo.setOnClickListener {
-            VOID.CropImageShoppingCenter(activity)
+            activity?.cropImageShoppingCenter()
             IMAGE_NUMBER = IMAGE_MAP
         }
 
@@ -103,8 +102,8 @@ class ShoppingCentersAddActivity : AppCompatActivity() {
             viewModel.addShoppingCenter(
                 name, locationOne, locationTwo, locationThree, numberPhone,
                 imageUri!!, imageUri2!!,
-                VOID.getFileExtension(imageUri, context)!!,
-                VOID.getFileExtension(imageUri2, context)!!
+                imageUri?.getFileExtension(context)!!,
+                imageUri2?.getFileExtension(context)!!
             )
         }
     }
@@ -121,7 +120,7 @@ class ShoppingCentersAddActivity : AppCompatActivity() {
                 }
                 requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
             } else {
-                VOID.CropImageShoppingCenter(activity)
+                activity?.cropImageShoppingCenter()
             }
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {

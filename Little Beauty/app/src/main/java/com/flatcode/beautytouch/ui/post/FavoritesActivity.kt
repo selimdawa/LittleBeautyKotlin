@@ -11,11 +11,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.ui.adapter.ProductsStaggeredAdapter
-import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.VOID.BannerAd
+import com.flatcode.beautytouch.utils.extensions.BannerAd
 import com.flatcode.beautytouch.databinding.ActivityFavoritesBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -26,7 +25,6 @@ class FavoritesActivity : AppCompatActivity() {
 
     private val context: Context = this@FavoritesActivity
     private var binding: ActivityFavoritesBinding? = null
-    private var postList: MutableList<Post?>? = null
     private var adapter: ProductsStaggeredAdapter? = null
     var publisher = DATA.PUBLISHER_NAME
     var aname = DATA.APP_NAME
@@ -47,10 +45,9 @@ class FavoritesActivity : AppCompatActivity() {
         }
 
         binding!!.toolbar.nameSpace.setText(R.string.favorites)
-        BannerAd(applicationContext, binding!!.adView, DATA.BANNER_FAVORITES)
+        binding!!.adView.BannerAd(applicationContext, DATA.BANNER_FAVORITES)
 
-        postList = ArrayList()
-        adapter = ProductsStaggeredAdapter(context, postList as ArrayList<Post?>)
+        adapter = ProductsStaggeredAdapter(context)
         binding!!.recyclerView.adapter = adapter
 
         observeViewModel()
@@ -67,18 +64,16 @@ class FavoritesActivity : AppCompatActivity() {
                         binding!!.emptyText.visibility = View.GONE
                     }
                     is Resource.Success -> {
-                        postList!!.clear()
-                        postList!!.addAll(resource.data)
-                        postList!!.reverse()
+                        val posts = resource.data.reversed()
                         binding!!.bar.visibility = View.GONE
-                        if (postList!!.isNotEmpty()) {
+                        if (posts.isNotEmpty()) {
                             binding!!.recyclerView.visibility = View.VISIBLE
                             binding!!.emptyText.visibility = View.GONE
                         } else {
                             binding!!.recyclerView.visibility = View.GONE
                             binding!!.emptyText.visibility = View.VISIBLE
                         }
-                        adapter!!.notifyDataSetChanged()
+                        adapter!!.submitList(posts)
                     }
                     is Resource.Error -> {
                         binding!!.bar.visibility = View.GONE

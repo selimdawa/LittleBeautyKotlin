@@ -16,7 +16,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.cropImageSlider
+import com.flatcode.beautytouchadmin.utils.getFileExtension
+import com.flatcode.beautytouchadmin.utils.glide
 import com.flatcode.beautytouchadmin.databinding.ActivitySliderShowBinding
 import com.theartofdev.edmodo.cropper.CropImage
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,7 +62,7 @@ class SliderShowActivity : AppCompatActivity() {
         )
         buttons.forEachIndexed { index, button ->
             button.setOnClickListener {
-                VOID.CropImageSlider(activity)
+                activity!!.cropImageSlider()
                 IMAGE_NUMBER = index + 1
             }
         }
@@ -111,7 +113,7 @@ class SliderShowActivity : AppCompatActivity() {
         for (i in 0 until 20) {
             val key = (i + 1).toString()
             val url = sliders[key] ?: ""
-            VOID.Glide(false, context, url, images[i])
+            images[i].glide(false, url)
             linears[i].visibility = if (count >= i) View.VISIBLE else View.GONE
         }
         binding!!.bar.visibility = View.GONE
@@ -125,7 +127,7 @@ class SliderShowActivity : AppCompatActivity() {
                 imageUri = uri
                 requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
             } else {
-                VOID.CropImageSlider(activity)
+                activity!!.cropImageSlider()
             }
         }
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -136,7 +138,7 @@ class SliderShowActivity : AppCompatActivity() {
                 dialog!!.show()
                 viewModel.uploadSlider(
                     IMAGE_NUMBER.toString(), imageUri!!,
-                    VOID.getFileExtension(imageUri, context)!!
+                    imageUri!!.getFileExtension(context)!!
                 )
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 val error = result.error

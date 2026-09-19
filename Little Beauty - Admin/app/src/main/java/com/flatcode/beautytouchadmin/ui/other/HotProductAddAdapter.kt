@@ -13,7 +13,8 @@ import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.CLASS
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.intentExtra
 import com.flatcode.beautytouchadmin.databinding.ItemProductAddBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -40,7 +41,7 @@ class HotProductAddAdapter(
         val post = list[position] ?: return
         val id = post.postid
 
-        VOID.Glide(false, mContext, post.postimage, holder.image_product)
+        holder.image_product.glide(false, post.postimage)
         if (post.name == DATA.EMPTY) {
             holder.name.visibility = View.GONE
         } else {
@@ -57,7 +58,7 @@ class HotProductAddAdapter(
         nrLikes(holder.likes, id)
         holder.add.setOnClickListener { listener.onAddClick(post) }
         holder.card.setOnClickListener {
-            VOID.IntentExtra(mContext, CLASS.POST_DETAILS, DATA.POST_ID, id)
+            mContext.intentExtra(CLASS.POST_DETAILS, DATA.POST_ID, id)
         }
     }
 

@@ -19,9 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.CLASS
-import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityPostsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -77,7 +75,7 @@ class PostsActivity : AppCompatActivity() {
             .setTitle("Choose...")
             .setItems(options) { _: DialogInterface?, which: Int ->
                 if (which == 0) {
-                    VOID.IntentExtra(context, CLASS.POST_EDIT, DATA.POST_ID, post.postid)
+                    context.intentExtra(CLASS.POST_EDIT, DATA.POST_ID, post.postid)
                 } else if (which == 1) {
                     showDeleteDialog(post)
                 }
@@ -113,6 +111,7 @@ class PostsActivity : AppCompatActivity() {
                 viewModel.posts.collect { posts ->
                     list.clear()
                     list.addAll(posts)
+                    adapter?.list = list
                     adapter?.notifyDataSetChanged()
 
                     binding!!.progress.visibility = View.GONE

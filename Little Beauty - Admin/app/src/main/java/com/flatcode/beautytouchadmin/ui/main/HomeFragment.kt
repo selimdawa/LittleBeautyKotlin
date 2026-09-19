@@ -12,7 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.model.Main
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.glide
 import com.flatcode.beautytouchadmin.utils.viewBinding
 import com.flatcode.beautytouchadmin.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +33,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             // TODO: Use NavController to navigate to Profile
         }
 
-        adapter = MainAdapter(requireContext(), list as ArrayList<Main>)
+        adapter = MainAdapter(requireContext())
         binding.recyclerView.adapter = adapter
 
         observeViewModel()
@@ -53,7 +53,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun updateUI(state: MainState) {
         state.user?.let { user ->
-            VOID.Glide(true, requireContext(), user.imageurl, binding.toolbar.image)
+            binding.toolbar.image.glide(true, user.imageurl)
         }
 
         list.clear()
@@ -70,7 +70,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         list.add(Main(R.drawable.ic_my, "About Me", 0))
         list.add(Main(R.drawable.ic_settings, "Tools", 0))
 
-        adapter?.notifyDataSetChanged()
+        adapter?.submitList(list.toList())
         binding.progress.visibility = View.GONE
         binding.recyclerView.visibility = View.VISIBLE
     }

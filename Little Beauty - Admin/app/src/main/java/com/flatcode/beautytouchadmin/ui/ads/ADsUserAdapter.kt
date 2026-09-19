@@ -9,21 +9,34 @@ import android.widget.Filterable
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.Application
 import com.flatcode.beautytouchadmin.filter.ADsUserFilter
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.utils.CLASS
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.intentExtra
 import com.flatcode.beautytouchadmin.databinding.ItemAdsUserBinding
 import java.text.MessageFormat
 
-class ADsUserAdapter(private val context: Context, var list: MutableList<User?>, var isUser: Boolean) :
-    RecyclerView.Adapter<ADsUserAdapter.ViewHolder>(), Filterable {
+class ADsUserAdapter(private val context: Context, initialList: MutableList<User?>, var isUser: Boolean) :
+    ListAdapter<User, ADsUserAdapter.ViewHolder>(DiffCallback), Filterable {
 
-    var filterList: MutableList<User?> = list
+    var list: MutableList<User?> = initialList
+        set(value) {
+            field = value
+            submitList(value.filterNotNull())
+        }
+
+    var filterList: MutableList<User?> = initialList
     private var filter: ADsUserFilter? = null
+
+    init {
+        submitList(initialList.filterNotNull())
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemAdsUserBinding.inflate(LayoutInflater.from(context), parent, false)
@@ -31,8 +44,8 @@ class ADsUserAdapter(private val context: Context, var list: MutableList<User?>,
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = list[position]
-        val userId = DATA.EMPTY + item!!.id
+        val item = list[position] ?: return
+        val userId = DATA.EMPTY + item.id
         val username = DATA.EMPTY + item.username
         val profileImage = DATA.EMPTY + item.imageurl
         val timestamp = DATA.EMPTY + item.started
@@ -40,7 +53,7 @@ class ADsUserAdapter(private val context: Context, var list: MutableList<User?>,
         val adClicked = DATA.EMPTY + item.adClick
         val formattedDate: String = Application.formatTimestamp(timestamp.toLong())
 
-        VOID.Glide(true, context, profileImage, holder.profileImage)
+        holder.profileImage.glide(true, profileImage)
         if (username == DATA.EMPTY) {
             holder.username.visibility = View.GONE
         } else {
@@ -55,7 +68,7 @@ class ADsUserAdapter(private val context: Context, var list: MutableList<User?>,
         holder.numberADsClick.text = MessageFormat.format("{0}{1}", DATA.EMPTY, adClicked)
 
         holder.item.setOnClickListener {
-            VOID.IntentExtra(context, CLASS.ADS_INFO, DATA.PROFILE_ID, userId)
+            context.intentExtra(CLASS.ADS_INFO, DATA.PROFILE_ID, userId)
         }
     }
 
@@ -78,5 +91,15 @@ class ADsUserAdapter(private val context: Context, var list: MutableList<User?>,
         val numberADsClick: TextView = binding.numberADsClick
         val time: TextView = binding.time
         val item: LinearLayout = binding.item
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback<User>() {
+        override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
+            return oldItem == newItem
+        }
     }
 }

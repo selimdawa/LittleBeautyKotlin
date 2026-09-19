@@ -10,8 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.ui.profile.FavoritesAdapter
 import com.flatcode.beautytouchadmin.model.Post
-import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityUserDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -45,7 +44,7 @@ class UserDetailActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.user.collect { user ->
                     user?.let {
-                        VOID.Glide(true, context, it.imageurl, binding!!.image)
+                        binding!!.image.glide(true, it.imageurl)
                         binding!!.name.text = it.username
                     }
                 }
@@ -57,6 +56,7 @@ class UserDetailActivity : AppCompatActivity() {
                 viewModel.savedPosts.collect { posts ->
                     list.clear()
                     list.addAll(posts)
+                    adapter?.list = list
                     adapter?.notifyDataSetChanged()
                     binding!!.recyclerView.visibility = View.VISIBLE
                 }

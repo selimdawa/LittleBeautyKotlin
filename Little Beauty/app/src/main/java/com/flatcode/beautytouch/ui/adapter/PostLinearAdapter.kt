@@ -8,21 +8,24 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.flatcode.beautytouch.ui.post.PostDetailsActivity
-import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.R
-import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.VOID
 import com.flatcode.beautytouch.databinding.ItemProductLinearBinding
+import com.flatcode.beautytouch.model.Post
+import com.flatcode.beautytouch.ui.post.PostDetailsActivity
+import com.flatcode.beautytouch.utils.DATA
+import com.flatcode.beautytouch.utils.Glide
+import com.flatcode.beautytouch.utils.IntentExtra
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.text.MessageFormat
 
-class PostLinearAdapter(private val mContext: Context?, private val mPost: List<Post?>) :
-    RecyclerView.Adapter<PostLinearAdapter.ViewHolder>() {
+class PostLinearAdapter(private val mContext: Context?) :
+    ListAdapter<Post, PostLinearAdapter.ViewHolder>(PostDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemProductLinearBinding.inflate(LayoutInflater.from(mContext), parent, false)
@@ -30,34 +33,32 @@ class PostLinearAdapter(private val mContext: Context?, private val mPost: List<
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val post = mPost[position]
+        val post = getItem(position) ?: return
 
-        if (post != null) {
-            VOID.Glide(false, mContext, post.postimage, holder.image_product)
-            if (post.name == DATA.EMPTY) {
-                holder.name.visibility = View.GONE
-            } else {
-                holder.name.visibility = View.VISIBLE
-                holder.name.text = post.name
-            }
-            if (post.price == DATA.EMPTY) {
-                holder.price.visibility = View.GONE
-            } else {
-                holder.price.visibility = View.VISIBLE
-                holder.price.text = MessageFormat.format("{0} SYP", post.price)
-            }
+        holder.image_product.Glide(false, mContext, post.postimage)
+        if (post.name == DATA.EMPTY) {
+            holder.name.visibility = View.GONE
+        } else {
+            holder.name.visibility = View.VISIBLE
+            holder.name.text = post.name
+        }
+        if (post.price == DATA.EMPTY) {
+            holder.price.visibility = View.GONE
+        } else {
+            holder.price.visibility = View.VISIBLE
+            holder.price.text = MessageFormat.format("{0} SYP", post.price)
         }
 
-        isLiked(post!!.postid, holder.like)
+        isLiked(post.postid, holder.like)
         isSaved(post.postid, holder.save)
         nrLikes(holder.likes, post.postid)
 
         holder.like.setOnClickListener {
             if (holder.like.tag == "like") {
-                FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(post.postid!!)
+                FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(post.postid)
                     .child(DATA.FirebaseUserUid).setValue(true)
             } else {
-                FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(post.postid!!)
+                FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(post.postid)
                     .child(DATA.FirebaseUserUid).removeValue()
             }
         }
@@ -65,20 +66,16 @@ class PostLinearAdapter(private val mContext: Context?, private val mPost: List<
             if (holder.save.tag == "save") {
                 FirebaseDatabase.getInstance().reference.child(DATA.SAVES)
                     .child(DATA.FirebaseUserUid)
-                    .child(post.postid!!).setValue(true)
+                    .child(post.postid).setValue(true)
             } else {
                 FirebaseDatabase.getInstance().reference.child(DATA.SAVES)
                     .child(DATA.FirebaseUserUid)
-                    .child(post.postid!!).removeValue()
+                    .child(post.postid).removeValue()
             }
         }
         holder.card.setOnClickListener {
-            VOID.IntentExtra(mContext, PostDetailsActivity::class.java, DATA.POST_ID, post.postid)
+            mContext.IntentExtra(PostDetailsActivity::class.java, DATA.POST_ID, post.postid)
         }
-    }
-
-    override fun getItemCount(): Int {
-        return mPost.size
     }
 
     class ViewHolder(val binding: ItemProductLinearBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -92,8 +89,8 @@ class PostLinearAdapter(private val mContext: Context?, private val mPost: List<
         val color: LinearLayout = binding.color
     }
 
-    private fun isLiked(postId: String?, imageView: ImageView) {
-        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId!!)
+    private fun isLiked(postId: String, imageView: ImageView) {
+        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.child(DATA.FirebaseUserUid).exists()) {
@@ -109,12 +106,12 @@ class PostLinearAdapter(private val mContext: Context?, private val mPost: List<
         })
     }
 
-    private fun isSaved(postId: String?, imageView: ImageView) {
+    private fun isSaved(postId: String, imageView: ImageView) {
         val reference = FirebaseDatabase.getInstance().reference
             .child(DATA.SAVES).child(DATA.FirebaseUserUid)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.child(postId!!).exists()) {
+                if (dataSnapshot.child(postId).exists()) {
                     imageView.setImageResource(R.drawable.ic_favorites_selected)
                     imageView.tag = "saved"
                 } else {
@@ -127,8 +124,8 @@ class PostLinearAdapter(private val mContext: Context?, private val mPost: List<
         })
     }
 
-    private fun nrLikes(likes: TextView, postId: String?) {
-        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId!!)
+    private fun nrLikes(likes: TextView, postId: String) {
+        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 likes.text = MessageFormat.format("{0}", dataSnapshot.childrenCount)
@@ -136,5 +133,15 @@ class PostLinearAdapter(private val mContext: Context?, private val mPost: List<
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+    }
+
+    class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
+        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem.postid == newItem.postid
+        }
+
+        override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem == newItem
+        }
     }
 }

@@ -19,9 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.model.ShoppingCenter
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.CLASS
-import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityShoppingCentersBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -59,7 +57,7 @@ class ShoppingCentersActivity : AppCompatActivity() {
             .setTitle("Choose...")
             .setItems(options) { _: DialogInterface?, which: Int ->
                 if (which == 0) {
-                    VOID.IntentExtra(context, CLASS.SHOPPING_CENTRES_EDIT, DATA.SHOPPING_CENTER_ID, item.id)
+                    context.intentExtra(CLASS.SHOPPING_CENTRES_EDIT, DATA.SHOPPING_CENTER_ID, item.id)
                 } else if (which == 1) {
                     showDeleteDialog(item)
                 }
@@ -95,6 +93,7 @@ class ShoppingCentersActivity : AppCompatActivity() {
                 viewModel.centers.collect { centers ->
                     list.clear()
                     list.addAll(centers)
+                    adapter?.list = list
                     adapter?.notifyDataSetChanged()
 
                     binding!!.bar.visibility = View.GONE

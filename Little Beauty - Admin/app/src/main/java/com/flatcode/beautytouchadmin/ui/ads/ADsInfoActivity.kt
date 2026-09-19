@@ -11,7 +11,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.model.ADs
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.glide
 import com.flatcode.beautytouchadmin.databinding.ActivityAdsInfoBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -53,7 +53,7 @@ class ADsInfoActivity : AppCompatActivity() {
                 viewModel.user.collect { user ->
                     user?.let {
                         binding!!.username.text = it.username
-                        VOID.Glide(true, context, it.imageurl, binding!!.profileImage)
+                        binding!!.profileImage.glide(true, it.imageurl)
                     }
                 }
             }
@@ -64,6 +64,7 @@ class ADsInfoActivity : AppCompatActivity() {
                 viewModel.ads.collect { ads ->
                     list.clear()
                     list.addAll(ads)
+                    adapter?.list = list
                     adapter?.notifyDataSetChanged()
 
                     binding!!.progress.visibility = View.GONE

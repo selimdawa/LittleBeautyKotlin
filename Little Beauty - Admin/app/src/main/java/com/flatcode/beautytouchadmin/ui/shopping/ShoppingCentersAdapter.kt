@@ -7,21 +7,33 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.ShoppingCenter
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.glide
 import com.flatcode.beautytouchadmin.databinding.ItemShoppingCenterBinding
 import java.text.MessageFormat
 
 class ShoppingCentersAdapter(
     private val mContext: Context, 
-    var list: MutableList<ShoppingCenter?>,
+    initialList: MutableList<ShoppingCenter?>,
     private val listener: OnItemClickListener
-) : RecyclerView.Adapter<ShoppingCentersAdapter.ViewHolder>() {
+) : ListAdapter<ShoppingCenter, ShoppingCentersAdapter.ViewHolder>(DiffCallback) {
 
     interface OnItemClickListener {
         fun onMoreClick(item: ShoppingCenter)
+    }
+
+    var list: MutableList<ShoppingCenter?> = initialList
+        set(value) {
+            field = value
+            submitList(value.filterNotNull())
+        }
+
+    init {
+        submitList(initialList.filterNotNull())
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,8 +44,8 @@ class ShoppingCentersAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val shoppingCenter = list[position] ?: return
 
-        VOID.Glide(false, mContext, shoppingCenter.imageurl, holder.image_product)
-        VOID.Glide(false, mContext, shoppingCenter.imageurl2, holder.image_product2)
+        holder.image_product.glide(false, shoppingCenter.imageurl)
+        holder.image_product2.glide(false, shoppingCenter.imageurl2)
         if (shoppingCenter.name == DATA.EMPTY) {
             holder.linearName.visibility = View.GONE
         } else {
@@ -78,5 +90,15 @@ class ShoppingCentersAdapter(
         val linearNumberPhone: LinearLayout = binding.linearNumberPhone
         val view: View = binding.view
         val view2: View = binding.view2
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback<ShoppingCenter>() {
+        override fun areItemsTheSame(oldItem: ShoppingCenter, newItem: ShoppingCenter): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: ShoppingCenter, newItem: ShoppingCenter): Boolean {
+            return oldItem == newItem
+        }
     }
 }

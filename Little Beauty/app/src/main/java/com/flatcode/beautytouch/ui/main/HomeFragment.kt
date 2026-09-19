@@ -25,9 +25,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     var hotpostAdapter: PostHotAdapter? = null
-    var hotpostLists: MutableList<Post?>? = null
     var allpostAdapter: PostLinearAdapter? = null
-    var allpostLists: MutableList<Post?>? = null
     var publisher = DATA.PUBLISHER_NAME
     var aname = DATA.APP_NAME
 
@@ -38,12 +36,10 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        hotpostLists = ArrayList()
-        hotpostAdapter = PostHotAdapter(context, hotpostLists as ArrayList<Post?>)
+        hotpostAdapter = PostHotAdapter(context)
         binding.recyclerView.adapter = hotpostAdapter
 
-        allpostLists = ArrayList()
-        allpostAdapter = PostLinearAdapter(context, allpostLists as ArrayList<Post?>)
+        allpostAdapter = PostLinearAdapter(context)
         binding.recyclerView2.adapter = allpostAdapter
 
         observeViewModel()
@@ -69,9 +65,7 @@ class HomeFragment : Fragment() {
                     }
 
                     is Resource.Success -> {
-                        hotpostLists!!.clear()
-                        hotpostLists!!.addAll(resource.data)
-                        hotpostAdapter!!.notifyDataSetChanged()
+                        hotpostAdapter!!.submitList(resource.data)
                         binding.progressCircular.visibility = View.GONE
                         binding.recyclerView.visibility = View.VISIBLE
                     }
@@ -95,9 +89,7 @@ class HomeFragment : Fragment() {
                     }
 
                     is Resource.Success -> {
-                        allpostLists!!.clear()
-                        allpostLists!!.addAll(resource.data)
-                        allpostAdapter!!.notifyDataSetChanged()
+                        allpostAdapter!!.submitList(resource.data)
                         binding.progressCircular2.visibility = View.GONE
                         binding.recyclerView2.visibility = View.VISIBLE
                     }

@@ -8,10 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.ui.adapter.ProductsStaggeredAdapter
-import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.VOID.BannerAd
+import com.flatcode.beautytouch.utils.extensions.BannerAd
 import com.flatcode.beautytouch.databinding.FragmentHairProductsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -20,7 +19,6 @@ import kotlinx.coroutines.launch
 class HairProductsFragment : Fragment() {
 
     private var binding: FragmentHairProductsBinding? = null
-    private var list: MutableList<Post?>? = null
     private var adapter: ProductsStaggeredAdapter? = null
     var publisher = DATA.PUBLISHER_NAME
     var aname = DATA.APP_NAME
@@ -32,10 +30,9 @@ class HairProductsFragment : Fragment() {
     ): View? {
         binding = FragmentHairProductsBinding.inflate(inflater, container, false)
 
-        BannerAd(context, binding!!.adView, DATA.BANNER_HAIR)
+        binding!!.adView.BannerAd(context, DATA.BANNER_HAIR)
 
-        list = ArrayList()
-        adapter = ProductsStaggeredAdapter(context, list as ArrayList<Post?>)
+        adapter = ProductsStaggeredAdapter(context)
         binding!!.recyclerView.adapter = adapter
 
         observeViewModel()
@@ -53,18 +50,16 @@ class HairProductsFragment : Fragment() {
                     }
 
                     is Resource.Success -> {
-                        list!!.clear()
-                        list!!.addAll(resource.data)
-                        list!!.reverse()
+                        val posts = resource.data.reversed()
                         binding!!.bar.visibility = View.GONE
-                        if (list!!.isNotEmpty()) {
+                        if (posts.isNotEmpty()) {
                             binding!!.recyclerView.visibility = View.VISIBLE
                             binding!!.emptyText.visibility = View.GONE
                         } else {
                             binding!!.recyclerView.visibility = View.GONE
                             binding!!.emptyText.visibility = View.VISIBLE
                         }
-                        adapter!!.notifyDataSetChanged()
+                        adapter!!.submitList(posts)
                     }
 
                     is Resource.Error -> {

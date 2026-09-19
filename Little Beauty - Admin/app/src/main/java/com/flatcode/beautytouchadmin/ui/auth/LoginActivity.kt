@@ -13,7 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.utils.CLASS
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.VOID
+import com.flatcode.beautytouchadmin.utils.intent1
+import com.flatcode.beautytouchadmin.utils.intentClear
 import com.flatcode.beautytouchadmin.utils.viewBinding
 import com.flatcode.beautytouchadmin.databinding.ActivityLoginBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +36,7 @@ class LoginActivity : AppCompatActivity() {
         dialog!!.setTitle("Please wait...")
         dialog!!.setCanceledOnTouchOutside(false)
 
-        binding.forget.setOnClickListener { VOID.Intent1(context, CLASS.FORGET_PASSWORD) }
+        binding.forget.setOnClickListener { context.intent1(CLASS.FORGET_PASSWORD) }
         binding.loginBtn.setOnClickListener { validateDate() }
 
         observeViewModel()
@@ -47,7 +48,7 @@ class LoginActivity : AppCompatActivity() {
                 viewModel.actionStatus.collect { result ->
                     dialog!!.dismiss()
                     result.onSuccess {
-                        VOID.IntentClear(context, CLASS.MAIN)
+                        context.intentClear(CLASS.MAIN)
                     }.onFailure {
                         Toast.makeText(context, DATA.EMPTY + it.message, Toast.LENGTH_SHORT).show()
                     }

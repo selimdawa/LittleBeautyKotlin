@@ -58,6 +58,7 @@ class PostDetailsActivity : AppCompatActivity() {
                     post?.let {
                         list.clear()
                         list.add(it)
+                        adapter?.list = list
                         adapter?.notifyDataSetChanged()
                     }
                 }
