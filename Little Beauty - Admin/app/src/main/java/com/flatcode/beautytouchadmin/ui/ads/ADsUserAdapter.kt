@@ -72,13 +72,9 @@ class ADsUserAdapter(private val context: Context, initialList: MutableList<User
         }
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
     override fun getFilter(): Filter {
         if (filter == null) {
-            filter = ADsUserFilter(filterList as ArrayList<User?>, this)
+            filter = ADsUserFilter(filterList, this)
         }
         return filter!!
     }

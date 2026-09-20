@@ -38,7 +38,11 @@ class LeaderboardOldActivity : AppCompatActivity() {
         val view = binding!!.root
         setContentView(view)
 
-        adapter = LeaderboardOldAdapter(context)
+        adapter = LeaderboardOldAdapter(
+            onItemClick = { user ->
+                // Handle item click if needed
+            }
+        )
         binding!!.recyclerView.adapter = adapter
 
         observeViewModel()

@@ -24,7 +24,6 @@ import java.text.MessageFormat
 
 class MyPostsAdapter(
     private val mContext: Context, 
-    initialList: MutableList<Post?>,
     private val listener: OnItemClickListener
 ) : ListAdapter<Post, MyPostsAdapter.ViewHolder>(DiffCallback) {
 
@@ -33,23 +32,13 @@ class MyPostsAdapter(
         fun onLikeClick(post: Post, isLiked: Boolean)
     }
 
-    var list: MutableList<Post?> = initialList
-        set(value) {
-            field = value
-            submitList(value.filterNotNull())
-        }
-
-    init {
-        submitList(initialList.filterNotNull())
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemMyPostBinding.inflate(LayoutInflater.from(mContext), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val post = list[position] ?: return
+        val post = getItem(position) ?: return
 
         holder.image_product.glide(false, post.postimage)
         if (post.name == DATA.EMPTY) {

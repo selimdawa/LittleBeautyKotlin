@@ -10,9 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.ui.adapter.ImageSliderAdapter
 import com.flatcode.beautytouch.ui.adapter.PostHotAdapter
 import com.flatcode.beautytouch.ui.adapter.PostLinearAdapter
-import com.flatcode.beautytouch.model.Post
+import com.flatcode.beautytouch.ui.post.PostDetailsActivity
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
+import com.flatcode.beautytouch.utils.openActivity
 import com.flatcode.beautytouch.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -36,10 +37,18 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        hotpostAdapter = PostHotAdapter(context)
+        hotpostAdapter = PostHotAdapter(
+            onItemClick = { post -> context?.openActivity<PostDetailsActivity>(DATA.POST_ID to post.postid) },
+            onLikeClick = { post -> viewModel.toggleLike(post) },
+            onSaveClick = { post -> viewModel.toggleSave(post) }
+        )
         binding.recyclerView.adapter = hotpostAdapter
 
-        allpostAdapter = PostLinearAdapter(context)
+        allpostAdapter = PostLinearAdapter(
+            onItemClick = { post -> context?.openActivity<PostDetailsActivity>(DATA.POST_ID to post.postid) },
+            onLikeClick = { post -> viewModel.toggleLike(post) },
+            onSaveClick = { post -> viewModel.toggleSave(post) }
+        )
         binding.recyclerView2.adapter = allpostAdapter
 
         observeViewModel()
@@ -48,10 +57,10 @@ class HomeFragment : Fragment() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.sliderCount.collect { resource ->
-                Timber.d("Slider count collected: $resource")
+            viewModel.sliderImages.collect { resource ->
+                Timber.d("Slider images collected: $resource")
                 if (resource is Resource.Success) {
-                    binding.imageSlider.sliderAdapter = ImageSliderAdapter(context, resource.data)
+                    binding.imageSlider.setSliderAdapter(ImageSliderAdapter(resource.data))
                 }
             }
         }

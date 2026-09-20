@@ -75,13 +75,9 @@ class LeaderboardOldAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
     override fun getFilter(): Filter {
         if (filter == null) {
-            filter = LeaderboardOldFilter(filterList as ArrayList<User?>, this)
+            filter = LeaderboardOldFilter(filterList, this)
         }
         return filter!!
     }

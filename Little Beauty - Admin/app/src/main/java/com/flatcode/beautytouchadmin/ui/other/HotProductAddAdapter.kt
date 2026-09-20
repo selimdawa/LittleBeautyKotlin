@@ -8,6 +8,8 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.card.MaterialCardView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.R
@@ -24,9 +26,8 @@ import java.text.MessageFormat
 
 class HotProductAddAdapter(
     private val mContext: Context, 
-    var list: MutableList<Post?>,
     private val listener: OnItemClickListener
-) : RecyclerView.Adapter<HotProductAddAdapter.ViewHolder>() {
+) : ListAdapter<Post, HotProductAddAdapter.ViewHolder>(DiffCallback) {
 
     interface OnItemClickListener {
         fun onAddClick(post: Post)
@@ -38,7 +39,7 @@ class HotProductAddAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val post = list[position] ?: return
+        val post = getItem(position) ?: return
         val id = post.postid
 
         holder.image_product.glide(false, post.postimage)
@@ -62,10 +63,6 @@ class HotProductAddAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
     class ViewHolder(binding: ItemProductAddBinding) : RecyclerView.ViewHolder(binding.root) {
         val card: MaterialCardView = binding.card
         val image_product: ImageView = binding.imageProduct
@@ -84,5 +81,15 @@ class HotProductAddAdapter(
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback<Post>() {
+        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem.postid == newItem.postid
+        }
+
+        override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
+            return oldItem == newItem
+        }
     }
 }

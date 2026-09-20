@@ -41,7 +41,7 @@ class FavoritesAdapter(private val mContext: Context, initialList: MutableList<P
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val post = list[position] ?: return
+        val post = getItem(position) ?: return
         val id = DATA.EMPTY + post.postid
 
         holder.image_product.glide(true, post.postimage)
@@ -62,10 +62,6 @@ class FavoritesAdapter(private val mContext: Context, initialList: MutableList<P
         holder.card.setOnClickListener {
             mContext.openActivity<PostDetailsActivity>(DATA.POST_ID to id)
         }
-    }
-
-    override fun getItemCount(): Int {
-        return list.size
     }
 
     class ViewHolder(binding: ItemProductLinearBinding) : RecyclerView.ViewHolder(binding.root) {

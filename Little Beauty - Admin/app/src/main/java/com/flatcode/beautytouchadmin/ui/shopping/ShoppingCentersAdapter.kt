@@ -18,22 +18,11 @@ import java.text.MessageFormat
 
 class ShoppingCentersAdapter(
     private val mContext: Context, 
-    initialList: MutableList<ShoppingCenter?>,
     private val listener: OnItemClickListener
 ) : ListAdapter<ShoppingCenter, ShoppingCentersAdapter.ViewHolder>(DiffCallback) {
 
     interface OnItemClickListener {
         fun onMoreClick(item: ShoppingCenter)
-    }
-
-    var list: MutableList<ShoppingCenter?> = initialList
-        set(value) {
-            field = value
-            submitList(value.filterNotNull())
-        }
-
-    init {
-        submitList(initialList.filterNotNull())
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -42,7 +31,7 @@ class ShoppingCentersAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val shoppingCenter = list[position] ?: return
+        val shoppingCenter = getItem(position) ?: return
 
         holder.image_product.glide(false, shoppingCenter.imageurl)
         holder.image_product2.glide(false, shoppingCenter.imageurl2)

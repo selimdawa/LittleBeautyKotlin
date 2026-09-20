@@ -23,8 +23,8 @@ class HomeViewModel @Inject constructor(
     private val _allPosts = MutableStateFlow<Resource<List<Post>>?>(null)
     val allPosts: StateFlow<Resource<List<Post>>?> = _allPosts
 
-    private val _sliderCount = MutableStateFlow<Resource<Int>?>(null)
-    val sliderCount: StateFlow<Resource<Int>?> = _sliderCount
+    private val _sliderImages = MutableStateFlow<Resource<List<String>>?>(null)
+    val sliderImages: StateFlow<Resource<List<String>>?> = _sliderImages
 
     fun loadHomeData(publisher: String, aname: String) {
         Timber.d("Loading home data for publisher: $publisher, aname: $aname")
@@ -41,10 +41,18 @@ class HomeViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            repository.getImageSliderCount().collect {
-                _sliderCount.value = it
-                Timber.d("Slider count state updated: $it")
+            repository.getImageSliderUrls().collect {
+                _sliderImages.value = it
+                Timber.d("Slider images state updated: $it")
             }
         }
+    }
+
+    fun toggleLike(post: Post) {
+        repository.toggleLike(post.postid, post.isLiked)
+    }
+
+    fun toggleSave(post: Post) {
+        repository.toggleSave(post.postid, post.isSaved)
     }
 }

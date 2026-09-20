@@ -45,7 +45,10 @@ class PostDetailsActivity : AppCompatActivity() {
         postId = intent.getStringExtra(DATA.POST_ID)
         binding!!.toolbar.nameSpace.setText(R.string.post_detail)
 
-        adapter = PostDetailAdapter(context)
+        adapter = PostDetailAdapter(
+            onLikeClick = { post -> viewModel.toggleLike(post) },
+            onSaveClick = { post -> viewModel.toggleSave(post) }
+        )
         binding!!.recyclerView.adapter = adapter
 
         observeViewModel()

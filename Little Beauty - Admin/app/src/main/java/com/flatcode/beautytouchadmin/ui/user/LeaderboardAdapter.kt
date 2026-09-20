@@ -27,23 +27,12 @@ import java.text.MessageFormat
 
 class LeaderboardAdapter(
     private val mContext: Context, 
-    initialList: MutableList<User?>, 
     var isUser: Boolean,
     private val pointsKey: String? = null
 ) : ListAdapter<User, LeaderboardAdapter.ViewHolder>(DiffCallback), Filterable {
 
-    var list: MutableList<User?> = initialList
-        set(value) {
-            field = value
-            submitList(value.filterNotNull())
-        }
-
-    var filterList: MutableList<User?> = initialList
+    var filterList: MutableList<User?> = mutableListOf()
     private var filter: LeaderboardFilter? = null
-
-    init {
-        submitList(initialList.filterNotNull())
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemLeaderboradBinding.inflate(LayoutInflater.from(mContext), parent, false)
@@ -51,11 +40,11 @@ class LeaderboardAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = list[position] ?: return
+        val item = getItem(position) ?: return
         val id = DATA.EMPTY + item.id
         val username = DATA.EMPTY + item.username
         val image = DATA.EMPTY + item.imageurl
-        val rankValue = list.size - position
+        val rankValue = itemCount - position
 
         holder.rank.text = MessageFormat.format("{0}", rankValue)
         holder.profileImage.glide(true, image)

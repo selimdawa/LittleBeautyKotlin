@@ -21,18 +21,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.text.MessageFormat
 
-class UsersAdapter(private val mContext: Context, initialList: MutableList<User?>) :
+class UsersAdapter(private val mContext: Context) :
     ListAdapter<User, UsersAdapter.ViewHolder>(DiffCallback) {
-
-    var list: MutableList<User?> = initialList
-        set(value) {
-            field = value
-            submitList(value.filterNotNull())
-        }
-
-    init {
-        submitList(initialList.filterNotNull())
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemUserBinding.inflate(LayoutInflater.from(mContext), parent, false)
@@ -40,7 +30,7 @@ class UsersAdapter(private val mContext: Context, initialList: MutableList<User?
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val user = list[position] ?: return
+        val user = getItem(position) ?: return
         val id = DATA.EMPTY + user.id
 
         holder.image.glide(true, user.imageurl)

@@ -48,13 +48,9 @@ class ADsInfoAdapter(private val context: Context, initialList: MutableList<ADs?
         holder.numberADsClick.text = MessageFormat.format("{0}{1}", DATA.EMPTY, adsClickedCount)
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
     override fun getFilter(): Filter {
         if (filter == null) {
-            filter = ADsInfoFilter(filterList as ArrayList<ADs?>, this)
+            filter = ADsInfoFilter(filterList, this)
         }
         return filter!!
     }

@@ -1,6 +1,5 @@
 package com.flatcode.beautytouch.ui.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -10,22 +9,28 @@ import com.flatcode.beautytouch.databinding.ItemShoppingCentersBinding
 import com.flatcode.beautytouch.model.ShoppingCenter
 import com.flatcode.beautytouch.utils.Glide
 
-class ShoppingCentersAdapter(private val mContext: Context?) :
-    ListAdapter<ShoppingCenter, ShoppingCentersAdapter.ViewHolder>(ShoppingCenterDiffCallback()) {
+class ShoppingCentersAdapter(
+    private val onItemClick: (ShoppingCenter) -> Unit
+) : ListAdapter<ShoppingCenter, ShoppingCentersAdapter.ViewHolder>(ShoppingCenterDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemShoppingCentersBinding.inflate(LayoutInflater.from(mContext), parent, false)
+        val binding = ItemShoppingCentersBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position) ?: return
+        val context = holder.itemView.context
 
-        holder.binding.imageProduct.Glide(false, mContext, item.imageurl)
-        holder.binding.imageProduct2.Glide(false, mContext, item.imageurl2)
-        holder.binding.name.text = item.name
-        holder.binding.location.text = item.location
-        holder.binding.numberPhone.text = item.numberPhone
+        with(holder.binding) {
+            imageProduct.Glide(false, context, item.imageurl)
+            imageProduct2.Glide(false, context, item.imageurl2)
+            name.text = item.name
+            location.text = item.location
+            numberPhone.text = item.numberPhone
+            
+            root.setOnClickListener { onItemClick(item) }
+        }
     }
 
     class ViewHolder(val binding: ItemShoppingCentersBinding) : RecyclerView.ViewHolder(binding.root)

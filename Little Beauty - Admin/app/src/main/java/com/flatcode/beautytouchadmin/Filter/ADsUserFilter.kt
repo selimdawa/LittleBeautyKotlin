@@ -27,7 +27,6 @@ class ADsUserFilter(var list: MutableList<User?>, var adapter: ADsUserAdapter) :
     }
 
     override fun publishResults(constraint: CharSequence, results: FilterResults) {
-        adapter.list = (results.values as MutableList<User?>)
-        adapter.notifyDataSetChanged()
+        adapter.submitList(results.values as MutableList<User>)
     }
 }

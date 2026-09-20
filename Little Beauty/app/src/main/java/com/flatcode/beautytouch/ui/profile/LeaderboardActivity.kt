@@ -49,7 +49,11 @@ class LeaderboardActivity : AppCompatActivity() {
             insets
         }
 
-        adapter = LeaderboardAdapter(context)
+        adapter = LeaderboardAdapter(
+            onItemClick = { user ->
+                // Handle item click if needed, e.g., open user profile
+            }
+        )
         binding!!.recyclerView.adapter = adapter
 
         observeViewModel()

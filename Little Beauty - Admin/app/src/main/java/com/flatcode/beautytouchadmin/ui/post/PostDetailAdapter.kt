@@ -151,10 +151,6 @@ class PostDetailAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
     class ViewHolder(binding: ItemPostDetailBinding) : RecyclerView.ViewHolder(binding.root) {
         val image_product: ImageView = binding.imageProduct
         val save: ImageView = binding.save

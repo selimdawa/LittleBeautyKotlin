@@ -27,7 +27,6 @@ class LeaderboardOldFilter(var list: MutableList<User?>, var adapter: Leaderboar
     }
 
     override fun publishResults(constraint: CharSequence, results: FilterResults) {
-        adapter.list = (results.values as MutableList<User?>)
-        adapter.notifyDataSetChanged()
+        adapter.submitList(results.values as MutableList<User>)
     }
 }

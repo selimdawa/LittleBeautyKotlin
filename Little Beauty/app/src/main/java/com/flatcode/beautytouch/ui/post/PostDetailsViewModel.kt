@@ -27,4 +27,12 @@ class PostDetailsViewModel @Inject constructor(
         }
         repository.addPostView(postId)
     }
+
+    fun toggleLike(post: Post) {
+        repository.toggleLike(post.postid, post.isLiked)
+    }
+
+    fun toggleSave(post: Post) {
+        repository.toggleSave(post.postid, post.isSaved)
+    }
 }

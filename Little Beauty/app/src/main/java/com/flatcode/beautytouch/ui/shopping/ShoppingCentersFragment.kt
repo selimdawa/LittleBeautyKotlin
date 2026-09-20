@@ -33,7 +33,11 @@ class ShoppingCentersFragment : Fragment() {
 
         binding!!.adView.BannerAd(context, DATA.BANNER_SHOPPING_CENTRES)
 
-        adapter = ShoppingCentersAdapter(context)
+        adapter = ShoppingCentersAdapter(
+            onItemClick = { center ->
+                // Handle item click if needed
+            }
+        )
         binding!!.recyclerView.adapter = adapter
 
         observeViewModel()
