@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,8 +8,7 @@
     android:layout_marginBottom="10dp"
     android:elevation="6dp"
     app:cardCornerRadius="15dp"
-    app:strokeWidth="0dp"
-    tools:ignore="all">
+    app:strokeWidth="0dp">
 
     <LinearLayout
         android:id="@+id/item"
@@ -57,13 +55,13 @@
                 android:id="@+id/profileImage"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:scaleType="centerCrop"
-                android:contentDescription="@null"
-                android:src="@color/image_profile"
-                app:strokeColor="@color/white"
-                app:strokeWidth="2dp"
                 android:background="@color/black"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                android:src="@color/image_profile"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
+                app:strokeColor="@color/white"
+                app:strokeWidth="2dp" />
 
             <TextView
                 android:id="@+id/username"

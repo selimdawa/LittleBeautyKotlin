@@ -6,7 +6,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.storage.FirebaseStorage
+import com.cloudinary.Cloudinary
+
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 class SliderRepository @Inject constructor(
     private val database: FirebaseDatabase,
-    private val storage: FirebaseStorage
+    private val cloudinary: Cloudinary
 ) {
 
     fun getSliders(): Flow<Map<String, String>> = callbackFlow {
@@ -35,10 +36,8 @@ class SliderRepository @Inject constructor(
     }
 
     suspend fun uploadSliderImage(name: String, imageUri: Uri, extension: String): String {
-        val filePathAndName = "Images/ImageLinks/$name.$extension"
-        val reference = storage.getReference(filePathAndName)
-        val uploadTask = reference.putFile(imageUri).await()
-        return uploadTask.storage.downloadUrl.await().toString()
+        // TODO: Replace with Cloudinary implementation
+        return ""
     }
 
     suspend fun updateSlider(data: Map<String, Any?>) {

@@ -93,8 +93,8 @@ class RegisterActivity : AppCompatActivity() {
 
         //get data
         name = binding!!.nameEt.text.toString().trim { it <= ' ' }
-        number = binding!!.phoneEt.text.toString().trim { it <= ' ' }
-        email = binding!!.phoneEt.text.toString().trim { it <= ' ' } + "@flatcodetest.com"
+        number = binding!!.emailEt.text.toString().trim { it <= ' ' }
+        email = binding!!.emailEt.text.toString().trim { it <= ' ' } + "@flatcodetest.com"
         password = binding!!.passwordEt.text.toString().trim { it <= ' ' }
         val cPassword = binding!!.cPasswordEt.text.toString().trim { it <= ' ' }
 

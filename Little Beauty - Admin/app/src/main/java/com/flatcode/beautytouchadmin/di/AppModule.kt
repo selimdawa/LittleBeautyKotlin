@@ -5,7 +5,9 @@ import androidx.room.Room
 import com.flatcode.beautytouchadmin.db.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
+import com.cloudinary.Cloudinary
+import com.cloudinary.utils.ObjectUtils
+
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,7 +29,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
+    fun provideCloudinary(): Cloudinary = Cloudinary(
+        ObjectUtils.asMap(
+            "cloud_name", "YOUR_CLOUD_NAME",
+            "api_key", "YOUR_API_KEY",
+            "api_secret", "YOUR_API_SECRET"
+        )
+    )
 
     @Provides
     @Singleton

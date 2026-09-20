@@ -1,6 +1,5 @@
 package com.flatcode.beautytouchadmin.ui.profile
 
-import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
@@ -18,7 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityProfileBinding
-import com.theartofdev.edmodo.cropper.CropImage
+import com.canhub.cropper.CropImageContract
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -32,6 +31,18 @@ class ProfileActivity : AppCompatActivity() {
     private var dialog: ProgressDialog? = null
     private val viewModel: ProfileViewModel by viewModels()
 
+    private val cropImage = registerForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            imageUri = result.uriContent
+            binding!!.image.setImageURI(imageUri)
+            binding!!.imageTrue.visibility = View.VISIBLE
+        } else {
+            val error = result.error
+            Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
+            binding!!.imageTrue.visibility = View.GONE
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -43,7 +54,7 @@ class ProfileActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
 
         binding!!.back.setOnClickListener { onBackPressed() }
-        binding!!.editImageIcon.setOnClickListener { activity?.cropImageSquare() }
+        binding!!.editImageIcon.setOnClickListener { cropImage.launch(cropImageSquareOptions()) }
 
         binding!!.imageEdit.setOnClickListener {
             binding!!.imageEdit.visibility = View.GONE
@@ -111,31 +122,6 @@ class ProfileActivity : AppCompatActivity() {
                 DATA.FirebaseUserUid, username, imageUri,
                 imageUri?.getFileExtension(context)
             )
-        }
-    }
-
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
-            val uri = CropImage.getPickImageResultUri(context, data)
-            if (CropImage.isReadExternalStoragePermissionsRequired(context, uri)) {
-                imageUri = uri
-                requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
-            } else {
-                activity?.cropImageSquare()
-            }
-        }
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-            if (resultCode == RESULT_OK) {
-                imageUri = result.uri
-                binding!!.image.setImageURI(imageUri)
-                binding!!.imageTrue.visibility = View.VISIBLE
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                val error = result.error
-                Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
-                binding!!.imageTrue.visibility = View.GONE
-            }
         }
     }
 

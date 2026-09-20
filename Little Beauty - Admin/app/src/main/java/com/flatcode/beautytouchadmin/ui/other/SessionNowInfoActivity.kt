@@ -19,7 +19,6 @@ class SessionNowInfoActivity : AppCompatActivity() {
 
     private var binding: ActivitySessionNowInfoBinding? = null
     private val context: Context = this@SessionNowInfoActivity
-    private val list = mutableListOf<User?>()
     private var adapter: LeaderboardAdapter? = null
     private val viewModel: SessionViewModel by viewModels()
 
@@ -40,7 +39,7 @@ class SessionNowInfoActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.pointsKey.collect { key ->
                     if (key != null) {
-                        adapter = LeaderboardAdapter(context, list, true, key)
+                        adapter = LeaderboardAdapter(context, true, key)
                         binding!!.recyclerView.adapter = adapter
                     }
                 }
@@ -50,13 +49,10 @@ class SessionNowInfoActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.users.collect { users ->
-                    list.clear()
-                    list.addAll(users)
-                    adapter?.list = list
-                    adapter?.notifyDataSetChanged()
+                    adapter?.submitList(users)
 
                     binding!!.bar.visibility = View.GONE
-                    if (list.isNotEmpty()) {
+                    if (users.isNotEmpty()) {
                         binding!!.recyclerView.visibility = View.VISIBLE
                         binding!!.emptyText.visibility = View.GONE
                     } else {

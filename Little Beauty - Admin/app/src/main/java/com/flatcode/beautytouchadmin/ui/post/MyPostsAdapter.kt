@@ -68,10 +68,6 @@ class MyPostsAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
     class ViewHolder(binding: ItemMyPostBinding) : RecyclerView.ViewHolder(binding.root) {
         var image_product: ImageView = binding.imageProduct
         var more: ImageView = binding.more

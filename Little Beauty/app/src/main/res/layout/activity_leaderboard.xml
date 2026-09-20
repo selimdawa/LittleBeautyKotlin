@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:background="?colorOnBackground"
     android:orientation="vertical"
-    tools:ignore="all"
-    tools:context=".Activity.LeaderboardActivity">
+    tools:context=".ui.profile.LeaderboardActivity">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

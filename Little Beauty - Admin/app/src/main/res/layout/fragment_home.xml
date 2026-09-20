@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:background="?colorOnBackground"
     android:fitsSystemWindows="true"
-    android:orientation="vertical"
-    tools:ignore="all">
+    android:orientation="vertical">
 
     <include
         android:id="@+id/toolbar"

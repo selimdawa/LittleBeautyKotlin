@@ -29,7 +29,6 @@ class ShoppingCentersActivity : AppCompatActivity() {
 
     private var binding: ActivityShoppingCentersBinding? = null
     private val context: Context = this@ShoppingCentersActivity
-    private val list = mutableListOf<ShoppingCenter?>()
     private var adapter: ShoppingCentersAdapter? = null
     private val viewModel: ShoppingViewModel by viewModels()
 
@@ -41,7 +40,7 @@ class ShoppingCentersActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.setText(R.string.shopping_centers)
         binding!!.toolbar.back.setOnClickListener { onBackPressed() }
 
-        adapter = ShoppingCentersAdapter(context, list, object : ShoppingCentersAdapter.OnItemClickListener {
+        adapter = ShoppingCentersAdapter(context, object : ShoppingCentersAdapter.OnItemClickListener {
             override fun onMoreClick(item: ShoppingCenter) {
                 showMoreOptions(item)
             }
@@ -91,13 +90,10 @@ class ShoppingCentersActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.centers.collect { centers ->
-                    list.clear()
-                    list.addAll(centers)
-                    adapter?.list = list
-                    adapter?.notifyDataSetChanged()
+                    adapter?.submitList(centers)
 
                     binding!!.bar.visibility = View.GONE
-                    if (list.isNotEmpty()) {
+                    if (centers.isNotEmpty()) {
                         binding!!.recyclerView.visibility = View.VISIBLE
                         binding!!.emptyText.visibility = View.GONE
                     } else {

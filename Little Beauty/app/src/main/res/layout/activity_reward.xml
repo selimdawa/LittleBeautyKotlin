@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:background="?colorOnBackground"
     android:orientation="vertical"
-    tools:ignore="all"
-    tools:context=".Activity.RewardActivity">
+    tools:context=".ui.reward.RewardActivity">
 
     <include
         android:id="@+id/toolbar"

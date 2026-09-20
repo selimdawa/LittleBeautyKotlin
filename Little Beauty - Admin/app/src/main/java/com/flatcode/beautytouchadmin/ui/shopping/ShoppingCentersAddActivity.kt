@@ -1,6 +1,5 @@
 package com.flatcode.beautytouchadmin.ui.shopping
 
-import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
@@ -16,7 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityShoppingCentersAddBinding
-import com.theartofdev.edmodo.cropper.CropImage
+import com.canhub.cropper.CropImageContract
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -34,6 +33,22 @@ class ShoppingCentersAddActivity : AppCompatActivity() {
     private var IMAGE_NUMBER = 0
     private val viewModel: ShoppingActionViewModel by viewModels()
 
+    private val cropImage = registerForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            val uri = result.uriContent
+            if (IMAGE_NUMBER == IMAGE_PIC) {
+                imageUri = uri
+                binding!!.imageOne.setImageURI(imageUri)
+            } else if (IMAGE_NUMBER == IMAGE_MAP) {
+                imageUri2 = uri
+                binding!!.imageTwo.setImageURI(imageUri2)
+            }
+        } else {
+            val error = result.error
+            Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityShoppingCentersAddBinding.inflate(layoutInflater)
@@ -44,11 +59,11 @@ class ShoppingCentersAddActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
 
         binding!!.addImage.setOnClickListener {
-            activity?.cropImageShoppingCenter()
+            cropImage.launch(cropImageShoppingCenterOptions())
             IMAGE_NUMBER = IMAGE_PIC
         }
         binding!!.addImageTwo.setOnClickListener {
-            activity?.cropImageShoppingCenter()
+            cropImage.launch(cropImageShoppingCenterOptions())
             IMAGE_NUMBER = IMAGE_MAP
         }
 
@@ -105,38 +120,6 @@ class ShoppingCentersAddActivity : AppCompatActivity() {
                 imageUri?.getFileExtension(context)!!,
                 imageUri2?.getFileExtension(context)!!
             )
-        }
-    }
-
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
-            val uri = CropImage.getPickImageResultUri(context, data)
-            if (CropImage.isReadExternalStoragePermissionsRequired(context, uri)) {
-                if (IMAGE_NUMBER == IMAGE_PIC) {
-                    imageUri = uri
-                } else if (IMAGE_NUMBER == IMAGE_MAP) {
-                    imageUri2 = uri
-                }
-                requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
-            } else {
-                activity?.cropImageShoppingCenter()
-            }
-        }
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-            if (resultCode == RESULT_OK) {
-                if (IMAGE_NUMBER == IMAGE_PIC) {
-                    imageUri = result.uri
-                    binding!!.imageOne.setImageURI(imageUri)
-                } else if (IMAGE_NUMBER == IMAGE_MAP) {
-                    imageUri2 = result.uri
-                    binding!!.imageTwo.setImageURI(imageUri2)
-                }
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                val error = result.error
-                Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 }

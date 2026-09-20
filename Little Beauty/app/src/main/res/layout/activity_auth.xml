@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Auth.AuthActivity"
-    tools:ignore="all">
+    tools:context=".ui.auth.AuthActivity">
 
     <ImageView
         android:id="@+id/background"

@@ -31,7 +31,6 @@ class LeaderboardAdapter(
     private val pointsKey: String? = null
 ) : ListAdapter<User, LeaderboardAdapter.ViewHolder>(DiffCallback), Filterable {
 
-    var filterList: MutableList<User?> = mutableListOf()
     private var filter: LeaderboardFilter? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -64,13 +63,9 @@ class LeaderboardAdapter(
         }
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
     override fun getFilter(): Filter {
         if (filter == null) {
-            filter = LeaderboardFilter(filterList as ArrayList<User?>, this)
+            filter = LeaderboardFilter(ArrayList(currentList), this)
         }
         return filter!!
     }

@@ -1,6 +1,5 @@
 package com.flatcode.beautytouchadmin.ui.post
 
-import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
@@ -16,10 +15,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.cropImageSquare
+import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
 import com.flatcode.beautytouchadmin.utils.getFileExtension
 import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
-import com.theartofdev.edmodo.cropper.CropImage
+import com.canhub.cropper.CropImageContract
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -33,6 +32,16 @@ class PostAddActivity : AppCompatActivity() {
     private var dialog: ProgressDialog? = null
     private var typePost = DATA.EMPTY
     private val viewModel: PostActionViewModel by viewModels()
+
+    private val cropImage = registerForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            imageUri = result.uriContent
+            binding!!.image.setImageURI(imageUri)
+        } else {
+            val error = result.error
+            Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +66,7 @@ class PostAddActivity : AppCompatActivity() {
             binding!!.typeTwo.text = "Hair Products ✓"
         }
         binding!!.go.setOnClickListener { validateData() }
-        binding!!.layoutImageProfile.setOnClickListener { activity!!.cropImageSquare() }
+        binding!!.layoutImageProfile.setOnClickListener { cropImage.launch(cropImageSquareOptions()) }
 
         observeViewModel()
     }
@@ -103,29 +112,6 @@ class PostAddActivity : AppCompatActivity() {
                 name, indications, howToUse, price, typePost, imageUri!!,
                 imageUri!!.getFileExtension(context)!!
             )
-        }
-    }
-
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
-            val uri = CropImage.getPickImageResultUri(context, data)
-            if (CropImage.isReadExternalStoragePermissionsRequired(context, uri)) {
-                imageUri = uri
-                requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
-            } else {
-                activity!!.cropImageSquare()
-            }
-        }
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-            if (resultCode == RESULT_OK) {
-                imageUri = result.uri
-                binding!!.image.setImageURI(imageUri)
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                val error = result.error
-                Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 }

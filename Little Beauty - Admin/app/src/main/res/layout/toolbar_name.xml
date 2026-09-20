@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.appbar.MaterialToolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="45dp"
     android:background="?mc_bg"
-    android:visibility="visible"
-    tools:ignore="all">
+    android:visibility="visible">
 
     <LinearLayout
         android:layout_width="30dp"
@@ -37,8 +35,8 @@
         android:layout_height="30dp"
         android:layout_gravity="end"
         android:layout_marginEnd="15dp"
-        android:src="@color/image_profile"
         android:contentDescription="@null"
+        android:src="@color/image_profile"
         app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
         app:tint="@color/white" />
 

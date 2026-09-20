@@ -103,5 +103,13 @@
     <string name="save_to_favorites">Save to Favorites</string>
     <string name="like">Like</string>
     <string name="shopping_center_image">Shopping Center Image</string>
+    <string name="close">Close</string>
+    <string name="crop_image">Crop Image</string>
+    <string name="done">Done</string>
+    <string name="email">Email</string>
+    <string name="email_example">example@domain.com</string>
+    <string name="new_user_signup">New user? Register</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint_text">********</string>
 
 </resources>

@@ -47,10 +47,6 @@ class UsersAdapter(private val mContext: Context) :
         }
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
     class ViewHolder(binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
         var image: ImageView = binding.image
         var name: TextView = binding.name

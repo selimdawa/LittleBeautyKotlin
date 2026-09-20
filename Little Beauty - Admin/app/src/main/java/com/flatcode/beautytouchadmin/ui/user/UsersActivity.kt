@@ -30,8 +30,7 @@ class UsersActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.setText(R.string.users)
         binding!!.toolbar.back.setOnClickListener { onBackPressed() }
 
-        val list = ArrayList<User?>()
-        adapter = UsersAdapter(context, list)
+        adapter = UsersAdapter(context)
         binding!!.recyclerView.adapter = adapter
 
         observeViewModel()
@@ -45,11 +44,7 @@ class UsersActivity : AppCompatActivity() {
                     if (users.isNotEmpty()) {
                         binding!!.recyclerView.visibility = View.VISIBLE
                         binding!!.emptyText.visibility = View.GONE
-                        adapter?.let {
-                            val newList = ArrayList<User?>()
-                            newList.addAll(users)
-                            it.list = newList
-                        }
+                        adapter?.submitList(users)
                     } else {
                         binding!!.recyclerView.visibility = View.GONE
                         binding!!.emptyText.visibility = View.VISIBLE

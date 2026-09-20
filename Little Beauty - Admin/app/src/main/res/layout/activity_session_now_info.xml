@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:background="?colorOnBackground"
     android:orientation="vertical"
-    tools:context=".activity.SessionNowInfoActivity"
-    tools:ignore="all">
+    tools:context=".ui.other.SessionNowInfoActivity">
 
     <include
         android:id="@+id/toolbar"

@@ -20,10 +20,10 @@ import coil3.request.placeholder
 import coil3.request.transformations
 import coil3.size.Size
 import coil3.transform.Transformation
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
+import com.canhub.cropper.CropImageView
 import com.flatcode.beautytouchadmin.R
-import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
-
 import java.io.Serializable
 
 inline fun <reified T : Activity> Context.openActivity(
@@ -90,45 +90,61 @@ fun ImageView.glideBlur(isUser: Boolean, url: String?, level: Int) {
     }
 }
 
-fun Activity.cropImageSquare() {
-    CropImage.activity()
-        .setGuidelines(CropImageView.Guidelines.ON)
-        .setMultiTouchEnabled(true)
-        .setMinCropResultSize(DATA.MIN_SQUARE, DATA.MIN_SQUARE)
-        .setAspectRatio(1, 1)
-        .setCropShape(CropImageView.CropShape.OVAL)
-        .start(this)
-}
+fun Activity.cropImageSquareOptions(): CropImageContractOptions = CropImageContractOptions(
+    uri = null,
+    cropImageOptions = CropImageOptions(
+        guidelines = CropImageView.Guidelines.ON,
+        multiTouchEnabled = true,
+        minCropResultWidth = DATA.MIN_SQUARE,
+        minCropResultHeight = DATA.MIN_SQUARE,
+        aspectRatioX = 1,
+        aspectRatioY = 1,
+        fixAspectRatio = true,
+        cropShape = CropImageView.CropShape.OVAL
+    )
+)
 
-fun Activity.cropImageSlider() {
-    CropImage.activity()
-        .setGuidelines(CropImageView.Guidelines.ON)
-        .setMultiTouchEnabled(true)
-        .setMinCropResultSize(DATA.MIX_SLIDER_X, DATA.MIX_SLIDER_Y)
-        .setAspectRatio(16, 9)
-        .setCropShape(CropImageView.CropShape.OVAL)
-        .start(this)
-}
+fun Activity.cropImageSliderOptions(): CropImageContractOptions = CropImageContractOptions(
+    uri = null,
+    cropImageOptions = CropImageOptions(
+        guidelines = CropImageView.Guidelines.ON,
+        multiTouchEnabled = true,
+        minCropResultWidth = DATA.MIX_SLIDER_X,
+        minCropResultHeight = DATA.MIX_SLIDER_Y,
+        aspectRatioX = 16,
+        aspectRatioY = 9,
+        fixAspectRatio = true,
+        cropShape = CropImageView.CropShape.OVAL
+    )
+)
 
-fun Activity.cropImageShoppingCenter() {
-    CropImage.activity()
-        .setGuidelines(CropImageView.Guidelines.ON)
-        .setMultiTouchEnabled(true)
-        .setMinCropResultSize(DATA.MIX_SLIDER_X, DATA.MIX_SLIDER_Y)
-        .setAspectRatio(2, 1)
-        .setCropShape(CropImageView.CropShape.OVAL)
-        .start(this)
-}
+fun Activity.cropImageShoppingCenterOptions(): CropImageContractOptions = CropImageContractOptions(
+    uri = null,
+    cropImageOptions = CropImageOptions(
+        guidelines = CropImageView.Guidelines.ON,
+        multiTouchEnabled = true,
+        minCropResultWidth = DATA.MIX_SLIDER_X,
+        minCropResultHeight = DATA.MIX_SLIDER_Y,
+        aspectRatioX = 2,
+        aspectRatioY = 1,
+        fixAspectRatio = true,
+        cropShape = CropImageView.CropShape.OVAL
+    )
+)
 
-fun Activity.cropImageSession() {
-    CropImage.activity()
-        .setGuidelines(CropImageView.Guidelines.ON)
-        .setMultiTouchEnabled(true)
-        .setMinCropResultSize(DATA.MIN_SQUARE, DATA.MIN_SQUARE)
-        .setAspectRatio(1, 1)
-        .setCropShape(CropImageView.CropShape.OVAL)
-        .start(this)
-}
+fun Activity.cropImageSessionOptions(): CropImageContractOptions = CropImageContractOptions(
+    uri = null,
+    cropImageOptions = CropImageOptions(
+        guidelines = CropImageView.Guidelines.ON,
+        multiTouchEnabled = true,
+        minCropResultWidth = DATA.MIN_SQUARE,
+        minCropResultHeight = DATA.MIN_SQUARE,
+        aspectRatioX = 1,
+        aspectRatioY = 1,
+        fixAspectRatio = true,
+        cropShape = CropImageView.CropShape.OVAL
+    )
+)
 
 fun Uri.getFileExtension(context: Context): String? {
     val cR = context.contentResolver
@@ -186,7 +202,8 @@ class SimpleBlurTransformation(private val radius: Float) : Transformation() {
                 bs += p and 0xff
                 c++
             }
-            blurred[y * w + x] = (0xff shl 24) or ((rs / c).toInt() shl 16) or ((gs / c).toInt() shl 8) or (bs / c).toInt()
+            blurred[y * w + x] =
+                (0xff shl 24) or ((rs / c).toInt() shl 16) or ((gs / c).toInt() shl 8) or (bs / c).toInt()
         }
         for (x in 0 until w) for (y in 0 until h) {
             var rs = 0L
@@ -201,7 +218,8 @@ class SimpleBlurTransformation(private val radius: Float) : Transformation() {
                 bs += p and 0xff
                 c++
             }
-            pix[y * w + x] = (0xff shl 24) or ((rs / c).toInt() shl 16) or ((gs / c).toInt() shl 8) or (bs / c).toInt()
+            pix[y * w + x] =
+                (0xff shl 24) or ((rs / c).toInt() shl 16) or ((gs / c).toInt() shl 8) or (bs / c).toInt()
         }
         val output = createBitmap(w, h, Bitmap.Config.ARGB_8888)
         output.setPixels(pix, 0, w, 0, 0, w, h)

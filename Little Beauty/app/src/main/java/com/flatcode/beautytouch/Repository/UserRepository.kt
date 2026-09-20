@@ -13,7 +13,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.storage.FirebaseStorage
+import com.cloudinary.Cloudinary
+import com.cloudinary.utils.ObjectUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -28,7 +29,7 @@ import javax.inject.Singleton
 class UserRepository @Inject constructor(
     private val database: FirebaseDatabase,
     private val auth: FirebaseAuth,
-    private val storage: FirebaseStorage,
+    private val cloudinary: Cloudinary,
     private val userDao: UserDao,
     private val toolsDao: ToolsDao
 ) {
@@ -124,16 +125,22 @@ class UserRepository @Inject constructor(
         awaitClose()
     }
 
-    fun uploadProfileImage(uri: Uri, extension: String): Flow<Resource<String>> = callbackFlow {
+    fun uploadProfileImage(uri: Uri): Flow<Resource<String>> = callbackFlow {
         trySend(Resource.Loading)
         val uid = auth.currentUser?.uid ?: return@callbackFlow
-        val filePathAndName = "Images/Profile/$uid.$extension"
-        val reference = storage.getReference(filePathAndName)
-        reference.putFile(uri).addOnSuccessListener { taskSnapshot ->
-            taskSnapshot.storage.downloadUrl.addOnSuccessListener { downloadUri ->
-                trySend(Resource.Success(downloadUri.toString()))
-            }.addOnFailureListener { trySend(Resource.Error(it.message ?: "Failed to get download URL")) }
-        }.addOnFailureListener { trySend(Resource.Error(it.message ?: "Upload failed")) }
+        
+        repositoryScope.launch(Dispatchers.IO) {
+            try {
+                val uploadResult = cloudinary.uploader().upload(uri, ObjectUtils.asMap(
+                    "public_id", "Images/Profile/$uid",
+                    "resource_type", "image"
+                ))
+                val downloadUrl = uploadResult["secure_url"].toString()
+                trySend(Resource.Success(downloadUrl))
+            } catch (e: Exception) {
+                trySend(Resource.Error(e.message ?: "Upload failed"))
+            }
+        }
         awaitClose()
     }
 
@@ -178,13 +185,16 @@ class UserRepository @Inject constructor(
                 val list = mutableListOf<User>()
                 for (child in snapshot.children) {
                     if (child.child(orderBy).exists()) {
-                        child.getValue(User::class.java)?.let { list.add(it) }
+                        child.getValue(User::class.java)?.let { user ->
+                            user.points = child.child(orderBy).value?.toString()?.toInt() ?: 0
+                            list.add(user)
+                        }
                     }
                 }
                 repositoryScope.launch {
                     userDao.insertUsers(list)
                 }
-                trySend(Resource.Success(list))
+                trySend(Resource.Success(list.reversed())) // Top users first
             }
 
             override fun onCancelled(error: DatabaseError) {

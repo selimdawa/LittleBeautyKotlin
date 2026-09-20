@@ -1,6 +1,5 @@
 package com.flatcode.beautytouchadmin.ui.other
 
-import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
@@ -17,7 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityToolsBinding
-import com.theartofdev.edmodo.cropper.CropImage
+import com.canhub.cropper.CropImageContract
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -39,6 +38,33 @@ class ToolsActivity : AppCompatActivity() {
     private var IMAGE_NUMBER = 0
     private val viewModel: ToolsViewModel by viewModels()
 
+    private val cropImage = registerForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            val uri = result.uriContent
+            when (IMAGE_NUMBER) {
+                IMAGE_NOW -> {
+                    imageUri = uri
+                    binding!!.imageSessionNow.setImageURI(imageUri)
+                }
+                IMAGE_OLD -> {
+                    imageUri2 = uri
+                    binding!!.imageSessionOld.setImageURI(imageUri2)
+                }
+                LOGO_NOW -> {
+                    imageUri3 = uri
+                    binding!!.logoSessionNow.setImageURI(imageUri3)
+                }
+                LOGO_OLD -> {
+                    imageUri4 = uri
+                    binding!!.logoSessionOld.setImageURI(imageUri4)
+                }
+            }
+        } else {
+            val error = result.error
+            Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityToolsBinding.inflate(layoutInflater)
@@ -49,19 +75,19 @@ class ToolsActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
 
         binding!!.editImageSessionNow.setOnClickListener {
-            activity!!.cropImageSession()
+            cropImage.launch(cropImageSessionOptions())
             IMAGE_NUMBER = IMAGE_NOW
         }
         binding!!.editImageSessionOld.setOnClickListener {
-            activity!!.cropImageSession()
+            cropImage.launch(cropImageSessionOptions())
             IMAGE_NUMBER = IMAGE_OLD
         }
         binding!!.editLogoSessionNow.setOnClickListener {
-            activity!!.cropImageSession()
+            cropImage.launch(cropImageSessionOptions())
             IMAGE_NUMBER = LOGO_NOW
         }
         binding!!.editLogoSessionOld.setOnClickListener {
-            activity!!.cropImageSession()
+            cropImage.launch(cropImageSessionOptions())
             IMAGE_NUMBER = LOGO_OLD
         }
         binding!!.toolbar.nameSpace.setText(R.string.tools)
@@ -130,50 +156,6 @@ class ToolsActivity : AppCompatActivity() {
                 imageUri3?.getFileExtension(context),
                 imageUri4?.getFileExtension(context)
             )
-        }
-    }
-
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == RESULT_OK) {
-            val uri = CropImage.getPickImageResultUri(context, data)
-            if (CropImage.isReadExternalStoragePermissionsRequired(context, uri)) {
-                when (IMAGE_NUMBER) {
-                    IMAGE_NOW -> imageUri = uri
-                    IMAGE_OLD -> imageUri2 = uri
-                    LOGO_NOW -> imageUri3 = uri
-                    LOGO_OLD -> imageUri4 = uri
-                }
-                requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 0)
-            } else {
-                activity!!.cropImageSquare()
-            }
-        }
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            val result = CropImage.getActivityResult(data)
-            if (resultCode == RESULT_OK) {
-                when (IMAGE_NUMBER) {
-                    IMAGE_NOW -> {
-                        imageUri = result.uri
-                        binding!!.imageSessionNow.setImageURI(imageUri)
-                    }
-                    IMAGE_OLD -> {
-                        imageUri2 = result.uri
-                        binding!!.imageSessionOld.setImageURI(imageUri2)
-                    }
-                    LOGO_NOW -> {
-                        imageUri3 = result.uri
-                        binding!!.logoSessionNow.setImageURI(imageUri3)
-                    }
-                    LOGO_OLD -> {
-                        imageUri4 = result.uri
-                        binding!!.logoSessionOld.setImageURI(imageUri4)
-                    }
-                }
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                val error = result.error
-                Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 }

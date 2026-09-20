@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorOnBackground"
-    android:orientation="vertical"
-    tools:ignore="all">
+    android:orientation="vertical">
 
     <include
         android:id="@+id/toolbar"
@@ -38,13 +36,13 @@
                         android:id="@+id/image"
                         android:layout_width="200dp"
                         android:layout_height="200dp"
-                        android:scaleType="centerCrop"
-                        android:contentDescription="@null"
-                        android:src="@color/image_profile"
-                        app:strokeColor="?mc_tick"
-                        app:strokeWidth="5dp"
                         android:background="@color/white"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
+                        android:contentDescription="@null"
+                        android:scaleType="centerCrop"
+                        android:src="@color/image_profile"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
+                        app:strokeColor="?mc_tick"
+                        app:strokeWidth="5dp" />
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/edit_image_icon"
@@ -59,8 +57,8 @@
                         android:padding="5dp"
                         android:src="@drawable/ic_adds"
                         app:layout_constraintDimensionRatio="1:1"
-                        app:tint="@color/white"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
+                        app:tint="@color/white" />
 
                 </FrameLayout>
 

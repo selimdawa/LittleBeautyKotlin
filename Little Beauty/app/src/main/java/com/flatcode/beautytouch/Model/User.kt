@@ -18,7 +18,8 @@ data class User(
     var username: String? = null,
     var city: String? = null,
     var typingTo: String? = null,
-    var mversion: String? = null
+    var mversion: String? = null,
+    var points: Int = 0
 ) : Parcelable {
-    constructor() : this("", "", "", "", "", "", "", "", "", "")
+    constructor() : this("", "", "", "", "", "", "", "", "", "", 0)
 }

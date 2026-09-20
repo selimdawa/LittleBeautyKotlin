@@ -20,9 +20,7 @@ class HotProductActivity : AppCompatActivity() {
 
     private var binding: ActivityHotProductBinding? = null
     private val context: Context = this@HotProductActivity
-    private val hotpostLists = mutableListOf<Post?>()
     private var hotpostAdapter: HotProductRemoveAdapter? = null
-    private val allpostLists = mutableListOf<Post?>()
     private var allpostAdapter: HotProductAddAdapter? = null
     private val viewModel: HotProductViewModel by viewModels()
 
@@ -34,14 +32,14 @@ class HotProductActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.setText(R.string.hot_product)
         binding!!.toolbar.back.setOnClickListener { onBackPressed() }
 
-        hotpostAdapter = HotProductRemoveAdapter(context, hotpostLists, object : HotProductRemoveAdapter.OnItemClickListener {
+        hotpostAdapter = HotProductRemoveAdapter(context, object : HotProductRemoveAdapter.OnItemClickListener {
             override fun onRemoveClick(post: Post) {
                 viewModel.removeHotProduct(post.postid!!)
             }
         })
         binding!!.recyclerView.adapter = hotpostAdapter
 
-        allpostAdapter = HotProductAddAdapter(context, allpostLists, object : HotProductAddAdapter.OnItemClickListener {
+        allpostAdapter = HotProductAddAdapter(context, object : HotProductAddAdapter.OnItemClickListener {
             override fun onAddClick(post: Post) {
                 viewModel.addHotProduct(post.postid!!)
             }
@@ -55,9 +53,7 @@ class HotProductActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.hotPosts.collect { posts ->
-                    hotpostLists.clear()
-                    hotpostLists.addAll(posts)
-                    hotpostAdapter?.notifyDataSetChanged()
+                    hotpostAdapter?.submitList(posts)
                     binding!!.progressBar.visibility = View.GONE
                     binding!!.recyclerView.visibility = View.VISIBLE
                 }
@@ -67,9 +63,7 @@ class HotProductActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.otherPosts.collect { posts ->
-                    allpostLists.clear()
-                    allpostLists.addAll(posts)
-                    allpostAdapter?.notifyDataSetChanged()
+                    allpostAdapter?.submitList(posts)
                     binding!!.progressBar2.visibility = View.GONE
                     binding!!.recyclerView2.visibility = View.VISIBLE
                 }

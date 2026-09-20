@@ -63,10 +63,6 @@ class ShoppingCentersAdapter(
         holder.more.setOnClickListener { listener.onMoreClick(shoppingCenter) }
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
-
     class ViewHolder(binding: ItemShoppingCenterBinding) : RecyclerView.ViewHolder(binding.root) {
         val image_product: ImageView = binding.imageProduct
         val image_product2: ImageView = binding.imageProduct2

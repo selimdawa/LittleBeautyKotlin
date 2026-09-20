@@ -33,8 +33,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.theartofdev.edmodo.cropper.CropImage
-import com.theartofdev.edmodo.cropper.CropImageView
+
 import java.io.Serializable
 
 inline fun <reified T : Activity> Context.openActivity(
@@ -94,14 +93,17 @@ fun ImageView.GlideBlur(isUser: Boolean, context: Context?, Url: String?, level:
     }
 }
 
-fun Activity?.CropImageSquare() {
-    CropImage.activity()
-        .setGuidelines(CropImageView.Guidelines.ON)
-        .setMultiTouchEnabled(true)
-        .setMinCropResultSize(DATA.MIN_SQUARE, DATA.MIN_SQUARE)
-        .setAspectRatio(1, 1)
-        .setCropShape(CropImageView.CropShape.OVAL)
-        .start(this!!)
+fun Context.startCropActivity(
+    uri: Uri, aspectRatioX: Int = 1, aspectRatioY: Int = 1, isOval: Boolean = false
+): Intent {
+    return Intent(this, CropActivity::class.java).apply {
+        putExtra("IMAGE_URI", uri)
+        putExtra("ASPECT_RATIO_X", aspectRatioX)
+        putExtra("ASPECT_RATIO_Y", aspectRatioY)
+        putExtra("IS_OVAL", isOval)
+        putExtra("MIN_WIDTH", DATA.MIN_SQUARE)
+        putExtra("MIN_HEIGHT", DATA.MIN_SQUARE)
+    }
 }
 
 fun AdView.BannerAd(context: Context?, bannerName: String?) {

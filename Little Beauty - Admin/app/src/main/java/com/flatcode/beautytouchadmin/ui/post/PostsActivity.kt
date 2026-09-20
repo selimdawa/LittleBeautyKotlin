@@ -30,7 +30,6 @@ class PostsActivity : AppCompatActivity() {
     private var binding: ActivityPostsBinding? = null
     private val context: Context = this@PostsActivity
     private var adapter: MyPostsAdapter? = null
-    private val list = mutableListOf<Post?>()
     private var type = DATA.ALL
     private val viewModel: PostsViewModel by viewModels()
 
@@ -42,7 +41,7 @@ class PostsActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.text = "My Posts"
         binding!!.toolbar.back.setOnClickListener { onBackPressed() }
 
-        adapter = MyPostsAdapter(context, list, object : MyPostsAdapter.OnItemClickListener {
+        adapter = MyPostsAdapter(context, object : MyPostsAdapter.OnItemClickListener {
             override fun onMoreClick(post: Post) {
                 showMoreOptions(post)
             }
@@ -109,13 +108,10 @@ class PostsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.posts.collect { posts ->
-                    list.clear()
-                    list.addAll(posts)
-                    adapter?.list = list
-                    adapter?.notifyDataSetChanged()
+                    adapter?.submitList(posts)
 
                     binding!!.progress.visibility = View.GONE
-                    if (list.isNotEmpty()) {
+                    if (posts.isNotEmpty()) {
                         binding!!.recyclerView.visibility = View.VISIBLE
                         binding!!.emptyText.visibility = View.GONE
                     } else {

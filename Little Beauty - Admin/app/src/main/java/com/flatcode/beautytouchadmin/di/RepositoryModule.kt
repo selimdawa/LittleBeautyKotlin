@@ -11,7 +11,8 @@ import com.flatcode.beautytouchadmin.repository.ToolsRepository
 import com.flatcode.beautytouchadmin.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
+import com.cloudinary.Cloudinary
+
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,8 +25,8 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(database: FirebaseDatabase, storage: FirebaseStorage): UserRepository {
-        return UserRepository(database, storage)
+    fun provideUserRepository(database: FirebaseDatabase, cloudinary: Cloudinary): UserRepository {
+        return UserRepository(database, cloudinary)
     }
 
     @Provides
@@ -36,8 +37,8 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun providePostRepository(database: FirebaseDatabase, storage: FirebaseStorage): PostRepository {
-        return PostRepository(database, storage)
+    fun providePostRepository(database: FirebaseDatabase, cloudinary: Cloudinary): PostRepository {
+        return PostRepository(database, cloudinary)
     }
 
     @Provides
@@ -48,14 +49,14 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideShoppingRepository(database: FirebaseDatabase, storage: FirebaseStorage): ShoppingRepository {
-        return ShoppingRepository(database, storage)
+    fun provideShoppingRepository(database: FirebaseDatabase, cloudinary: Cloudinary): ShoppingRepository {
+        return ShoppingRepository(database, cloudinary)
     }
 
     @Provides
     @Singleton
-    fun provideToolsRepository(database: FirebaseDatabase, storage: FirebaseStorage): ToolsRepository {
-        return ToolsRepository(database, storage)
+    fun provideToolsRepository(database: FirebaseDatabase, cloudinary: Cloudinary): ToolsRepository {
+        return ToolsRepository(database, cloudinary)
     }
 
     @Provides
@@ -72,7 +73,7 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideSliderRepository(database: FirebaseDatabase, storage: FirebaseStorage): SliderRepository {
-        return SliderRepository(database, storage)
+    fun provideSliderRepository(database: FirebaseDatabase, cloudinary: Cloudinary): SliderRepository {
+        return SliderRepository(database, cloudinary)
     }
 }

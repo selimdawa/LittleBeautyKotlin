@@ -3,11 +3,16 @@ package com.flatcode.beautytouch.ui.profile
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cloudinary.android.MediaManager
+import com.cloudinary.android.callback.ErrorInfo
+import com.cloudinary.android.callback.UploadCallback
+import com.flatcode.beautytouch.model.Reward
 import com.flatcode.beautytouch.model.Tools
 import com.flatcode.beautytouch.model.User
-import com.flatcode.beautytouch.model.Reward
 import com.flatcode.beautytouch.repository.UserRepository
+import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val repository: UserRepository
+    private val repository: UserRepository,
+    private val auth: FirebaseAuth
 ) : ViewModel() {
 
     private val _userInfo = MutableStateFlow<Resource<User>?>(null)
@@ -76,14 +82,38 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    fun uploadProfileImage(uri: Uri, extension: String) {
-        Timber.d("Uploading profile image")
-        viewModelScope.launch {
-            repository.uploadProfileImage(uri, extension).collect {
-                _uploadImageState.value = it
-                Timber.d("Upload image state updated: $it")
-            }
-        }
+    fun uploadProfileImageCloudinary(imageUri: Uri, onComplete: (String?) -> Unit) {
+        val uid = auth.currentUser?.uid ?: return
+        _uploadImageState.value = Resource.Loading
+        val publicId = "${uid}_${System.currentTimeMillis()}"
+
+        MediaManager.get().upload(imageUri)
+            .option("public_id", publicId)
+            .option("folder", "Images/Profile")
+            .unsigned(DATA.CLOUDINARY_UPLOAD_PRESET)
+            .callback(object : UploadCallback {
+                override fun onStart(requestId: String?) {
+                    Timber.d("Cloudinary upload started: $requestId")
+                }
+
+                override fun onProgress(requestId: String?, bytes: Long, totalBytes: Long) {}
+
+                override fun onSuccess(requestId: String?, resultData: Map<*, *>?) {
+                    val imageUrl = resultData?.get("secure_url") as? String ?: ""
+                    Timber.d("Cloudinary upload success: $imageUrl")
+                    _uploadImageState.value = Resource.Success(imageUrl)
+                    onComplete(imageUrl)
+                }
+
+                override fun onError(requestId: String?, error: ErrorInfo?) {
+                    val message = error?.description ?: "Unknown error"
+                    Timber.e("Cloudinary upload error: $message")
+                    _uploadImageState.value = Resource.Error(message)
+                    onComplete(null)
+                }
+
+                override fun onReschedule(requestId: String?, error: ErrorInfo?) {}
+            }).dispatch()
     }
 
     fun loadPoints(year: String, session: String) {

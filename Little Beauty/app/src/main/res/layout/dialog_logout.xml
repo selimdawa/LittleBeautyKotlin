@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
     android:layout_height="wrap_content"
-    tools:ignore="all"
     app:cardBackgroundColor="?mc_tick"
     app:cardCornerRadius="30dp"
     app:cardElevation="3dp"

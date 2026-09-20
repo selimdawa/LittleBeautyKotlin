@@ -7,8 +7,7 @@
     android:layout_height="match_parent"
     android:background="?colorOnBackground"
     android:orientation="vertical"
-    tools:ignore="all"
-    tools:context=".Fragment.HairProductsFragment">
+    tools:context=".ui.post.HairProductsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

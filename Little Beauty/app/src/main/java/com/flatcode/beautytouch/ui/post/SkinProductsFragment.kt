@@ -7,13 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.flatcode.beautytouch.databinding.FragmentSkinProductsBinding
 import com.flatcode.beautytouch.ui.adapter.ProductsStaggeredAdapter
-import com.flatcode.beautytouch.ui.post.PostDetailsActivity
+import com.flatcode.beautytouch.utils.BannerAd
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.extensions.BannerAd
 import com.flatcode.beautytouch.utils.openActivity
-import com.flatcode.beautytouch.databinding.FragmentSkinProductsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -37,8 +36,7 @@ class SkinProductsFragment : Fragment() {
         adapter = ProductsStaggeredAdapter(
             onItemClick = { post -> context?.openActivity<PostDetailsActivity>(DATA.POST_ID to post.postid) },
             onLikeClick = { post -> viewModel.toggleLike(post) },
-            onSaveClick = { post -> viewModel.toggleSave(post) }
-        )
+            onSaveClick = { post -> viewModel.toggleSave(post) })
         binding!!.recyclerView.adapter = adapter
 
         observeViewModel()
