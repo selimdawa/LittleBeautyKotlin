@@ -152,15 +152,17 @@ fun Activity.cropImageSessionOptions(): CropImageContractOptions = CropImageCont
 )
 
 fun Activity.checkStoragePermission(launcher: ActivityResultLauncher<String>, onGranted: () -> Unit) {
-    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-        Manifest.permission.READ_MEDIA_IMAGES
-    else
-        Manifest.permission.READ_EXTERNAL_STORAGE
-
-    if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // On Android 13+ (API 33+) and Android 14+ (API 34+), storage permissions are not required
+        // to pick images using the system Photo Picker / standard GET_CONTENT intent.
         onGranted()
     } else {
-        launcher.launch(permission)
+        val permission = Manifest.permission.READ_EXTERNAL_STORAGE
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+            onGranted()
+        } else {
+            launcher.launch(permission)
+        }
     }
 }
 
