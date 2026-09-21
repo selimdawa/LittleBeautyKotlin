@@ -8,16 +8,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.cropImageSliderOptions
-import com.flatcode.beautytouchadmin.utils.getFileExtension
-import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivitySliderShowBinding
 import com.canhub.cropper.CropImageContract
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,6 +32,20 @@ class SliderShowActivity : AppCompatActivity() {
     private var dialog: ProgressDialog? = null
     private var IMAGE_NUMBER = 0
     private val viewModel: SliderViewModel by viewModels()
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            pickImage()
+        } else {
+            Toast.makeText(this, "Permission denied...", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun pickImage() {
+        cropImage.launch(cropImageSliderOptions())
+    }
 
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
@@ -76,8 +88,8 @@ class SliderShowActivity : AppCompatActivity() {
         )
         buttons.forEachIndexed { index, button ->
             button.setOnClickListener {
-                cropImage.launch(cropImageSliderOptions())
                 IMAGE_NUMBER = index + 1
+                checkStoragePermission(requestPermissionLauncher) { pickImage() }
             }
         }
     }

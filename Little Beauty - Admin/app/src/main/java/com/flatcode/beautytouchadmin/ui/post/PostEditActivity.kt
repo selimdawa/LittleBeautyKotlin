@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -31,6 +32,20 @@ class PostEditActivity : AppCompatActivity() {
     private var dialog: ProgressDialog? = null
     private var typePost: String? = DATA.EMPTY
     private val viewModel: PostActionViewModel by viewModels()
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            pickImage()
+        } else {
+            Toast.makeText(this, "Permission denied...", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun pickImage() {
+        cropImage.launch(cropImageSquareOptions())
+    }
 
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
@@ -70,7 +85,9 @@ class PostEditActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.text = "Edit post"
         binding!!.toolbar.back.setOnClickListener { onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
-        binding!!.layoutImageProfile.setOnClickListener { cropImage.launch(cropImageSquareOptions()) }
+        binding!!.layoutImageProfile.setOnClickListener {
+            checkStoragePermission(requestPermissionLauncher) { pickImage() }
+        }
 
         id?.let { viewModel.loadPost(it) }
         observeViewModel()

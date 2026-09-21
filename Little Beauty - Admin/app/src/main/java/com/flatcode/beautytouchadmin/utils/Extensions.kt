@@ -1,14 +1,19 @@
 package com.flatcode.beautytouchadmin.utils
 
 import android.app.Activity
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import androidx.core.view.ViewCompat
@@ -145,6 +150,19 @@ fun Activity.cropImageSessionOptions(): CropImageContractOptions = CropImageCont
         cropShape = CropImageView.CropShape.OVAL
     )
 )
+
+fun Activity.checkStoragePermission(launcher: ActivityResultLauncher<String>, onGranted: () -> Unit) {
+    val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+        Manifest.permission.READ_MEDIA_IMAGES
+    else
+        Manifest.permission.READ_EXTERNAL_STORAGE
+
+    if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+        onGranted()
+    } else {
+        launcher.launch(permission)
+    }
+}
 
 fun Uri.getFileExtension(context: Context): String? {
     val cR = context.contentResolver

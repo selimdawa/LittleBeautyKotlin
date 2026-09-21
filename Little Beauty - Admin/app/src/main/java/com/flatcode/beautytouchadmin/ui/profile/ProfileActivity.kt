@@ -10,6 +10,7 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -30,6 +31,20 @@ class ProfileActivity : AppCompatActivity() {
     private var imageUri: Uri? = null
     private var dialog: ProgressDialog? = null
     private val viewModel: ProfileViewModel by viewModels()
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            pickImage()
+        } else {
+            Toast.makeText(this, "Permission denied...", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun pickImage() {
+        cropImage.launch(cropImageSquareOptions())
+    }
 
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
@@ -54,7 +69,9 @@ class ProfileActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
 
         binding!!.back.setOnClickListener { onBackPressed() }
-        binding!!.editImageIcon.setOnClickListener { cropImage.launch(cropImageSquareOptions()) }
+        binding!!.editImageIcon.setOnClickListener {
+            checkStoragePermission(requestPermissionLauncher) { pickImage() }
+        }
 
         binding!!.imageEdit.setOnClickListener {
             binding!!.imageEdit.visibility = View.GONE

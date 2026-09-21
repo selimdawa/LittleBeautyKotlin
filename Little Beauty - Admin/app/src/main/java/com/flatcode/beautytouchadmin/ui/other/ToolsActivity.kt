@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -37,6 +38,20 @@ class ToolsActivity : AppCompatActivity() {
     private val LOGO_OLD = 4
     private var IMAGE_NUMBER = 0
     private val viewModel: ToolsViewModel by viewModels()
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            pickImage()
+        } else {
+            Toast.makeText(this, "Permission denied...", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun pickImage() {
+        cropImage.launch(cropImageSessionOptions())
+    }
 
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
@@ -75,20 +90,20 @@ class ToolsActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
 
         binding!!.editImageSessionNow.setOnClickListener {
-            cropImage.launch(cropImageSessionOptions())
             IMAGE_NUMBER = IMAGE_NOW
+            checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
         binding!!.editImageSessionOld.setOnClickListener {
-            cropImage.launch(cropImageSessionOptions())
             IMAGE_NUMBER = IMAGE_OLD
+            checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
         binding!!.editLogoSessionNow.setOnClickListener {
-            cropImage.launch(cropImageSessionOptions())
             IMAGE_NUMBER = LOGO_NOW
+            checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
         binding!!.editLogoSessionOld.setOnClickListener {
-            cropImage.launch(cropImageSessionOptions())
             IMAGE_NUMBER = LOGO_OLD
+            checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
         binding!!.toolbar.nameSpace.setText(R.string.tools)
         binding!!.toolbar.back.setOnClickListener { onBackPressed() }

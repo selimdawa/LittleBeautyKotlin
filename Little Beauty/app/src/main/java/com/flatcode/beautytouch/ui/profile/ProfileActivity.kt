@@ -1,9 +1,12 @@
 package com.flatcode.beautytouch.ui.profile
 
+import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
@@ -12,6 +15,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -56,6 +60,33 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                openGallery()
+            } else {
+                Toast.makeText(context, "Permission Denied! Cannot access gallery.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    private fun checkPermissionAndOpenGallery() {
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
+        if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+            openGallery()
+        } else {
+            requestPermissionLauncher.launch(permission)
+        }
+    }
+
+    private fun openGallery() {
+        pickImageLauncher.launch("image/*")
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -77,7 +108,7 @@ class ProfileActivity : AppCompatActivity() {
 
         binding!!.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding!!.editImageIcon.setOnClickListener {
-            pickImageLauncher.launch("image/*")
+            checkPermissionAndOpenGallery()
         }
 
         binding!!.imageEdit.setOnClickListener {

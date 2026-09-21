@@ -15,6 +15,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -37,6 +38,20 @@ class AboutMeActivity : AppCompatActivity() {
     private var imageUri: Uri? = null
     private var dialog: ProgressDialog? = null
     private val viewModel: ToolsViewModel by viewModels()
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            pickImage()
+        } else {
+            Toast.makeText(this, "Permission denied...", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun pickImage() {
+        cropImage.launch(cropImageSquareOptions())
+    }
 
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
@@ -61,7 +76,9 @@ class AboutMeActivity : AppCompatActivity() {
         binding!!.toolbar.back.setOnClickListener { onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
         binding!!.show.setOnClickListener { showDialogAboutMy() }
-        binding!!.editImageIcon.setOnClickListener { cropImage.launch(cropImageSquareOptions()) }
+        binding!!.editImageIcon.setOnClickListener {
+            checkStoragePermission(requestPermissionLauncher) { pickImage() }
+        }
 
         observeViewModel()
     }

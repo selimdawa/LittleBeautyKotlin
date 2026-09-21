@@ -8,15 +8,14 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
-import com.flatcode.beautytouchadmin.utils.getFileExtension
+import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
 import com.canhub.cropper.CropImageContract
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +31,20 @@ class PostAddActivity : AppCompatActivity() {
     private var dialog: ProgressDialog? = null
     private var typePost = DATA.EMPTY
     private val viewModel: PostActionViewModel by viewModels()
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            pickImage()
+        } else {
+            Toast.makeText(this, "Permission denied...", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun pickImage() {
+        cropImage.launch(cropImageSquareOptions())
+    }
 
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
@@ -66,7 +79,9 @@ class PostAddActivity : AppCompatActivity() {
             binding!!.typeTwo.text = "Hair Products ✓"
         }
         binding!!.go.setOnClickListener { validateData() }
-        binding!!.layoutImageProfile.setOnClickListener { cropImage.launch(cropImageSquareOptions()) }
+        binding!!.layoutImageProfile.setOnClickListener {
+            checkStoragePermission(requestPermissionLauncher) { pickImage() }
+        }
 
         observeViewModel()
     }

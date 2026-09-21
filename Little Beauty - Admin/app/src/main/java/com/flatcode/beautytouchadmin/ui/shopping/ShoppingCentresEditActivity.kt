@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -34,6 +35,20 @@ class ShoppingCentresEditActivity : AppCompatActivity() {
     private val IMAGE_MAP = 2
     private var IMAGE_NUMBER = 0
     private val viewModel: ShoppingActionViewModel by viewModels()
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            pickImage()
+        } else {
+            Toast.makeText(this, "Permission denied...", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun pickImage() {
+        cropImage.launch(cropImageShoppingCenterOptions())
+    }
 
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
@@ -63,12 +78,12 @@ class ShoppingCentresEditActivity : AppCompatActivity() {
         dialog!!.setCanceledOnTouchOutside(false)
 
         binding!!.addImage.setOnClickListener {
-            cropImage.launch(cropImageShoppingCenterOptions())
             IMAGE_NUMBER = IMAGE_PIC
+            checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
         binding!!.addImageTwo.setOnClickListener {
-            cropImage.launch(cropImageShoppingCenterOptions())
             IMAGE_NUMBER = IMAGE_MAP
+            checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
 
         binding!!.toolbar.nameSpace.text = "Edit the shopping center"
