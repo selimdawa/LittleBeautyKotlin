@@ -1,28 +1,21 @@
 <resources>
     <string name="app_name">Little Beauty</string>
 
-    //New
     <string name="welcome_to">Welcome to</string>
-    <string name="number_phone">Number phone</string>
     <string name="login">Login</string>
     <string name="forget_password">Forget Password?</string>
     <string name="register">Register</string>
-    <string name="my_number">01********</string>
     <string name="none_display">There are no items to display</string>
-
     //Post detail
     <string name="Indications">Indications</string>
     <string name="How_to_use">How To Use</string>
     <string name="post_detail">Post Detail</string>
     <string name="favorites">Favorites</string>
-
     //Navigation
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="my_account">My Account</string>
     <string name="messenger">Messenger</string>
-    <string name="default_color">Default Color</string>
-    <string name="dark_mode">Dark Mode</string>
     <string name="about_app">About App</string>
     <string name="share_app">Share App</string>
     <string name="about_my">About My</string>
@@ -31,38 +24,19 @@
     <string name="most_hot">Most Hot</string>
     <string name="show_more">Show More</string>
     <string name="earn_points">Earn points</string>
-
-    //Theme
-    <string name="one_theme">Basic</string>
-    <string name="two_theme">Gradual</string>
-    <string name="three_theme">Blue</string>
-    <string name="four_theme">Orange 1</string>
-    <string name="five_theme">Orange 2</string>
-    <string name="six_theme">Fuchsia</string>
-    <string name="seven_theme">Pink</string>
-    <string name="eight_theme">Brown</string>
-    <string name="nine_theme">Red</string>
-    <string name="teen_theme">Green</string>
-
-    //Night Mode
-    <string name="corner_one">Gradual 1</string>
-    <string name="corner_two">Gradual 2</string>
-    <string name="corner_three">Gradual 3</string>
-    <string name="corner_four">Gradual 4</string>
-    <string name="corner_five">Gradual 5</string>
-    <string name="corner_six">Gradual 6</string>
-
+    <string name="home">Home</string>
+    <string name="skin_products">Skin Products</string>
+    <string name="hair_products">Hair Products</string>
+    <string name="shopping_centers">Shopping Centers</string>
     //About App
     <string name="rate_app">Rate App</string>
     <string name="about_design">Image design : Mohamed Deeb</string>
     <string name="about_programmer">Programming : Selim Dawa</string>
-
     //Dialog
     <string name="no">No</string>
     <string name="yes">Yes</string>
     <string name="logout_text">Do you want to log out?</string>
     <string name="close_text">Do you want to exit the application?</string>
-
     //Login
     <string name="username">Username</string>
     <string name="password">Password</string>
@@ -78,14 +52,12 @@
     <string name="facebook_designer">Facebook for Designer</string>
     <string name="facebook_programmer">Facebook for Programmer</string>
     <string name="open_menu">Open Menu</string>
-
     //Reward
     <string name="best_participants">Best Participants</string>
     <string name="click_to_reward_point">Click to reward point</string>
     <string name="range">Range</string>
     <string name="points">Points</string>
     <string name="plus"> + </string>
-    <string name="go">Go</string>
     <string name="reward_one">Reward One : </string>
     <string name="reward_two">Reward Two : </string>
     <string name="reward_three">Reward Three : </string>
@@ -97,8 +69,7 @@
     <string name="admob_banner_shopping_centres">ca-app-pub-3940256099942544/6300978111</string>
     <string name="admob_interstitial">ca-app-pub-3940256099942544/8691691433</string>
     <string name="admob_reward">ca-app-pub-3940256099942544/5224354917</string>
-
-    <!-- Extracted -->
+    //Extracted
     <string name="product_image">Product Image</string>
     <string name="save_to_favorites">Save to Favorites</string>
     <string name="like">Like</string>
@@ -109,7 +80,4 @@
     <string name="email">Email</string>
     <string name="email_example">example@domain.com</string>
     <string name="new_user_signup">New user? Register</string>
-    <string name="username_hint">Username</string>
-    <string name="password_hint_text">********</string>
-
 </resources>

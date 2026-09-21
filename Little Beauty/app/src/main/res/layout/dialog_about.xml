@@ -23,7 +23,7 @@
             android:scaleType="centerCrop"
             android:src="@color/image_profile" />
 
-        <com.balysv.materialripple.MaterialRippleLayout
+        <io.selimdawa.rippleeffect.MaterialRippleEffect
             style="@style/RippleStyleWhite"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -39,13 +39,13 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-        </com.balysv.materialripple.MaterialRippleLayout>
+        </io.selimdawa.rippleeffect.MaterialRippleEffect>
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="200dp">
 
-            <com.balysv.materialripple.MaterialRippleLayout
+            <io.selimdawa.rippleeffect.MaterialRippleEffect
                 style="@style/RippleStyleWhite"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -62,7 +62,7 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-            </com.balysv.materialripple.MaterialRippleLayout>
+            </io.selimdawa.rippleeffect.MaterialRippleEffect>
 
         </androidx.core.widget.NestedScrollView>
 

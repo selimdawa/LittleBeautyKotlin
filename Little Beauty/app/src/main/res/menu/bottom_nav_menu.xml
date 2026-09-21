@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/skinProductsFragment"
+        android:icon="@drawable/ic_skin"
+        android:title="@string/skin_products" />
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_home"
+        android:title="@string/home" />
+    <item
+        android:id="@+id/hairProductsFragment"
+        android:icon="@drawable/ic_hair"
+        android:title="@string/hair_products" />
+    <item
+        android:id="@+id/shoppingCentersFragment"
+        android:icon="@drawable/ic_shopping_centers"
+        android:title="@string/shopping_centers" />
+</menu>

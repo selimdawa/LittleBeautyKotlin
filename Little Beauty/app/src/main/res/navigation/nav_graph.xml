@@ -8,25 +8,25 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.flatcode.beautytouch.ui.main.HomeFragment"
-        android:label="Home"
+        android:label="@string/home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/skinProductsFragment"
         android:name="com.flatcode.beautytouch.ui.post.SkinProductsFragment"
-        android:label="Skin Products"
+        android:label="@string/skin_products"
         tools:layout="@layout/fragment_skin_products" />
 
     <fragment
         android:id="@+id/hairProductsFragment"
         android:name="com.flatcode.beautytouch.ui.post.HairProductsFragment"
-        android:label="Hair Products"
+        android:label="@string/hair_products"
         tools:layout="@layout/fragment_hair_products" />
 
     <fragment
         android:id="@+id/shoppingCentersFragment"
         android:name="com.flatcode.beautytouch.ui.shopping.ShoppingCentersFragment"
-        android:label="Shopping Centers"
+        android:label="@string/shopping_centers"
         tools:layout="@layout/fragment_shopping_centers" />
 
 </navigation>

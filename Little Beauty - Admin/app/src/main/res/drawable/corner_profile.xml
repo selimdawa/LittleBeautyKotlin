@@ -7,7 +7,7 @@
         android:centerColor="@color/dark"
         android:centerX="0%"
         android:centerY="50%"
-        android:endColor="?mc_tick"
+        android:endColor="?mc_track"
         android:startColor="?colorOnBackground"
         android:type="sweep" />
 

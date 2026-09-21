@@ -48,7 +48,8 @@ import com.flatcode.beautytouch.databinding.DialogLogoutBinding
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.material.navigation.NavigationView
-import com.nafis.bottomnavigation.NafisBottomNavigation
+import io.selimdawa.bubblebottom.BubbleBottomNavigation
+import io.selimdawa.bubblebottom.Model
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -66,7 +67,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     var hair_product = "Hair Products"
     var shopping_center = "Shopping Centers"
     var number_product = DATA.EMPTY
-    var bottomNavigation: NafisBottomNavigation? = null
+    var bottomNavigation: BubbleBottomNavigation? = null
     var publisher: String = DATA.PUBLISHER_NAME
     var aname: String = DATA.APP_NAME
 
@@ -82,7 +83,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             binding.toolbar.root.updatePadding(top = systemBars.top)
-            binding.bottomNavigation?.updatePadding(bottom = systemBars.bottom)
+            binding.bottomNavigation.updatePadding(bottom = systemBars.bottom)
             insets
         }
 
@@ -114,13 +115,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.aboutMy.setOnClickListener { showDialogAboutMy() }
         binding.logout.setOnClickListener { showDialogLogout() }
 
-        bottomNavigation = binding.bottomNavigation
-        bottomNavigation!!.add(NafisBottomNavigation.Model(1, R.drawable.ic_skin))
-        bottomNavigation!!.add(NafisBottomNavigation.Model(2, R.drawable.ic_home))
-        bottomNavigation!!.add(NafisBottomNavigation.Model(3, R.drawable.ic_hair))
-        bottomNavigation!!.add(NafisBottomNavigation.Model(4, R.drawable.ic_shopping_centers))
+        val bottomNavigation = binding.bottomNavigation
+        this.bottomNavigation = bottomNavigation
+        bottomNavigation.add(Model(1, R.drawable.ic_skin))
+        bottomNavigation.add(Model(2, R.drawable.ic_home))
+        bottomNavigation.add(Model(3, R.drawable.ic_hair))
+        bottomNavigation.add(Model(4, R.drawable.ic_shopping_centers))
 
-        bottomNavigation!!.setOnShowListener { item: NafisBottomNavigation.Model ->
+        bottomNavigation.setOnShowListener { item: Model ->
             when (item.id) {
                 1 -> navController.navigate(R.id.skinProductsFragment)
                 2 -> navController.navigate(R.id.homeFragment)
@@ -129,12 +131,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        bottomNavigation!!.setCount(1, number_product)
-        bottomNavigation!!.setCount(3, number_product)
-        bottomNavigation!!.setCount(4, number_product)
-        bottomNavigation!!.show(2, true)
+        bottomNavigation.setCount(1, number_product)
+        bottomNavigation.setCount(3, number_product)
+        bottomNavigation.setCount(4, number_product)
+        bottomNavigation.show(2, true)
 
-        bottomNavigation!!.setOnClickMenuListener { item: NafisBottomNavigation.Model ->
+        bottomNavigation.setOnClickMenuListener { item: Model ->
             when (item.id) {
                 1 -> Toast.makeText(applicationContext, skin_product, Toast.LENGTH_SHORT)
                     .show()
@@ -153,7 +155,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        bottomNavigation!!.setOnReselectListener { item: NafisBottomNavigation.Model ->
+        bottomNavigation.setOnReselectListener { item: Model ->
             when (item.id) {
                 1 -> Toast.makeText(applicationContext, skin_product, Toast.LENGTH_SHORT)
                     .show()
@@ -180,12 +182,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun observeViewModels() {
+        val bottomNavigation = this.bottomNavigation
         lifecycleScope.launch {
             postViewModel.skinCount.collect { resource ->
                 Timber.d("Skin count collected: $resource")
                 if (resource is Resource.Success) {
                     binding.numberProductSkin.text = MessageFormat.format("{0}", resource.data)
-                    bottomNavigation!!.setCount(1, resource.data.toString())
+                    bottomNavigation?.setCount(1, resource.data.toString())
                 }
             }
         }
@@ -194,7 +197,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Timber.d("Hair count collected: $resource")
                 if (resource is Resource.Success) {
                     binding.numberProductHair.text = MessageFormat.format("{0}", resource.data)
-                    bottomNavigation!!.setCount(3, resource.data.toString())
+                    bottomNavigation?.setCount(3, resource.data.toString())
                 }
             }
         }
@@ -203,7 +206,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Timber.d("Shopping count collected: $resource")
                 if (resource is Resource.Success) {
                     binding.numberShoppingCenters.text = MessageFormat.format("{0}", resource.data)
-                    bottomNavigation!!.setCount(4, resource.data.toString())
+                    bottomNavigation?.setCount(4, resource.data.toString())
                 }
             }
         }

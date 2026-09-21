@@ -1,9 +1,5 @@
 <resources>
-
-    <!--genaral spacing-->
     <dimen name="spacing_medium">5dp</dimen>
-    <dimen name="spacing_30">30dp</dimen>
     <dimen name="spacing_xlarge">40dp</dimen>
     <dimen name="spacing_xxlarge">50dp</dimen>
-
 </resources>

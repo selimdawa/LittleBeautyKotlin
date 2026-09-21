@@ -76,7 +76,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     //Other
     implementation(libs.material.ripple)                //Ripple Effect
-    implementation(libs.nafisbottomnav)                 //Nafis Bottom Navigation
+    implementation(libs.bubblebottom)                   //Bottom Navigation
     implementation(libs.play.services.ads)              //ADs Google AdMob
     implementation(libs.timber)
 }
