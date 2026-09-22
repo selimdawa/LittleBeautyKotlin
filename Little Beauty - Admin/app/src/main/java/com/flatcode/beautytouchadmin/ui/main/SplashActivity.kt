@@ -2,15 +2,16 @@ package com.flatcode.beautytouchadmin.ui.main
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouchadmin.ui.auth.LoginActivity
 import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ActivitySplashBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
@@ -27,7 +28,10 @@ class SplashActivity : AppCompatActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        Handler(Looper.getMainLooper()).postDelayed({ checkUser() }, time_final.toLong())
+        lifecycleScope.launch {
+            delay(time_final.toLong())
+            checkUser()
+        }
     }
 
     private fun checkUser() {

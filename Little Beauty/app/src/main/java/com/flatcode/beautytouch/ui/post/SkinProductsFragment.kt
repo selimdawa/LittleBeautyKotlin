@@ -19,28 +19,29 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class SkinProductsFragment : Fragment() {
 
-    private var binding: FragmentSkinProductsBinding? = null
+    private var _binding: FragmentSkinProductsBinding? = null
+    private val binding get() = _binding!!
     private var adapter: ProductsStaggeredAdapter? = null
-    var publisher = DATA.PUBLISHER_NAME
-    var aname = DATA.APP_NAME
+    private val publisher = DATA.PUBLISHER_NAME
+    private val appName = DATA.APP_NAME
 
     private val viewModel: PostViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentSkinProductsBinding.inflate(inflater, container, false)
+    ): View {
+        _binding = FragmentSkinProductsBinding.inflate(inflater, container, false)
 
-        binding!!.adView.bannerAd(context, DATA.BANNER_SKIN)
+        binding.adView.bannerAd(context, DATA.BANNER_SKIN)
 
         adapter = ProductsStaggeredAdapter(
             onItemClick = { post -> context?.openActivity<PostDetailsActivity>(DATA.POST_ID to post.postid) },
             onLikeClick = { post -> viewModel.toggleLike(post) },
             onSaveClick = { post -> viewModel.toggleSave(post) })
-        binding!!.recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         observeViewModel()
-        return binding!!.root
+        return binding.root
     }
 
     private fun observeViewModel() {
@@ -48,26 +49,26 @@ class SkinProductsFragment : Fragment() {
             viewModel.postsByCategory.collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        binding!!.bar.visibility = View.VISIBLE
-                        binding!!.recyclerView.visibility = View.GONE
-                        binding!!.emptyText.visibility = View.GONE
+                        binding.bar.visibility = View.VISIBLE
+                        binding.recyclerView.visibility = View.GONE
+                        binding.emptyText.visibility = View.GONE
                     }
 
                     is Resource.Success -> {
                         val posts = resource.data.reversed()
-                        binding!!.bar.visibility = View.GONE
+                        binding.bar.visibility = View.GONE
                         if (posts.isNotEmpty()) {
-                            binding!!.recyclerView.visibility = View.VISIBLE
-                            binding!!.emptyText.visibility = View.GONE
+                            binding.recyclerView.visibility = View.VISIBLE
+                            binding.emptyText.visibility = View.GONE
                         } else {
-                            binding!!.recyclerView.visibility = View.GONE
-                            binding!!.emptyText.visibility = View.VISIBLE
+                            binding.recyclerView.visibility = View.GONE
+                            binding.emptyText.visibility = View.VISIBLE
                         }
-                        adapter!!.submitList(posts)
+                        adapter?.submitList(posts)
                     }
 
                     is Resource.Error -> {
-                        binding!!.bar.visibility = View.GONE
+                        binding.bar.visibility = View.GONE
                     }
 
                     else -> {}
@@ -77,12 +78,12 @@ class SkinProductsFragment : Fragment() {
     }
 
     override fun onResume() {
-        viewModel.loadPostsByCategory(DATA.SKIN_PRODUCTS, publisher, aname)
+        viewModel.loadPostsByCategory(DATA.SKIN_PRODUCTS, publisher, appName)
         super.onResume()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
+        _binding = null
     }
 }

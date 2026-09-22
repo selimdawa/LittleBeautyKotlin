@@ -19,29 +19,30 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class ShoppingCentersFragment : Fragment() {
 
-    private var binding: FragmentShoppingCentersBinding? = null
+    private var _binding: FragmentShoppingCentersBinding? = null
+    private val binding get() = _binding!!
     private var adapter: ShoppingCentersAdapter? = null
-    var publisher = DATA.PUBLISHER_NAME
-    var aname = DATA.APP_NAME
+    private val publisher = DATA.PUBLISHER_NAME
+    private val appName = DATA.APP_NAME
 
     private val viewModel: PostViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentShoppingCentersBinding.inflate(inflater, container, false)
+    ): View {
+        _binding = FragmentShoppingCentersBinding.inflate(inflater, container, false)
 
-        binding!!.adView.bannerAd(context, DATA.BANNER_SHOPPING_CENTRES)
+        binding.adView.bannerAd(context, DATA.BANNER_SHOPPING_CENTRES)
 
         adapter = ShoppingCentersAdapter(
             onItemClick = { center ->
                 // Handle item click if needed
             }
         )
-        binding!!.recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         observeViewModel()
-        return binding!!.root
+        return binding.root
     }
 
     private fun observeViewModel() {
@@ -49,26 +50,26 @@ class ShoppingCentersFragment : Fragment() {
             viewModel.shoppingCenters.collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        binding!!.bar.visibility = View.VISIBLE
-                        binding!!.recyclerView.visibility = View.GONE
-                        binding!!.emptyText.visibility = View.GONE
+                        binding.bar.visibility = View.VISIBLE
+                        binding.recyclerView.visibility = View.GONE
+                        binding.emptyText.visibility = View.GONE
                     }
 
                     is Resource.Success -> {
                         val items = resource.data.reversed()
-                        binding!!.bar.visibility = View.GONE
+                        binding.bar.visibility = View.GONE
                         if (items.isNotEmpty()) {
-                            binding!!.recyclerView.visibility = View.VISIBLE
-                            binding!!.emptyText.visibility = View.GONE
+                            binding.recyclerView.visibility = View.VISIBLE
+                            binding.emptyText.visibility = View.GONE
                         } else {
-                            binding!!.recyclerView.visibility = View.GONE
-                            binding!!.emptyText.visibility = View.VISIBLE
+                            binding.recyclerView.visibility = View.GONE
+                            binding.emptyText.visibility = View.VISIBLE
                         }
-                        adapter!!.submitList(items)
+                        adapter?.submitList(items)
                     }
 
                     is Resource.Error -> {
-                        binding!!.bar.visibility = View.GONE
+                        binding.bar.visibility = View.GONE
                     }
 
                     else -> {}
@@ -78,12 +79,12 @@ class ShoppingCentersFragment : Fragment() {
     }
 
     override fun onResume() {
-        viewModel.loadShoppingCenters(publisher, aname)
+        viewModel.loadShoppingCenters(publisher, appName)
         super.onResume()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
+        _binding = null
     }
 }

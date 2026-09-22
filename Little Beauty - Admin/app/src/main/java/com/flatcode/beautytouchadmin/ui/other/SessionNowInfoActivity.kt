@@ -28,7 +28,7 @@ class SessionNowInfoActivity : AppCompatActivity() {
         setContentView(binding!!.root)
 
         binding!!.toolbar.nameSpace.text = "Session Now"
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         observeViewModel()
         viewModel.loadSessionInfo(false)

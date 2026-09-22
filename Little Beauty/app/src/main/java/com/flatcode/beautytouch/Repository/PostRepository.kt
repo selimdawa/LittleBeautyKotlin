@@ -31,7 +31,7 @@ class PostRepository @Inject constructor(
 
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
 
-    fun getCategoryCount(category: String, publisher: String, aname: String): Flow<Resource<Int>> = callbackFlow {
+    fun getCategoryCount(category: String, publisher: String, appName: String): Flow<Resource<Int>> = callbackFlow {
         trySend(Resource.Loading)
         val reference = database.getReference(DATA.POSTS)
         val listener = object : ValueEventListener {
@@ -42,7 +42,7 @@ class PostRepository @Inject constructor(
                     val post = child.getValue(Post::class.java)
                     if (post != null) {
                         posts.add(post)
-                        if (post.category == category && post.publisher == publisher && post.aname == aname) {
+                        if (post.category == category && post.publisher == publisher && post.appName == appName) {
                             count++
                         }
                     }
@@ -61,11 +61,11 @@ class PostRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    fun getAllPosts(publisher: String, aname: String): Flow<Resource<List<Post>>> = callbackFlow {
+    fun getAllPosts(publisher: String, appName: String): Flow<Resource<List<Post>>> = callbackFlow {
         trySend(Resource.Loading)
 
         repositoryScope.launch {
-            val localPosts = postDao.getPostsByPublisher(publisher, aname).first()
+            val localPosts = postDao.getPostsByPublisher(publisher, appName).first()
             if (localPosts.isNotEmpty()) {
                 trySend(Resource.Success(localPosts))
             }
@@ -103,7 +103,7 @@ class PostRepository @Inject constructor(
                                     postDao.insertPosts(enrichedList)
                                 }
 
-                                val filteredList = enrichedList.filter { it.publisher == publisher && it.aname == aname }
+                                val filteredList = enrichedList.filter { it.publisher == publisher && it.appName == appName }
                                 trySend(Resource.Success(filteredList))
                             }
                             override fun onCancelled(error: DatabaseError) { trySend(Resource.Error(error.message)) }
@@ -121,11 +121,11 @@ class PostRepository @Inject constructor(
         awaitClose { postsRef.removeEventListener(listener) }
     }
 
-    fun getHotProducts(publisher: String, aname: String): Flow<Resource<List<Post>>> = callbackFlow {
+    fun getHotProducts(publisher: String, appName: String): Flow<Resource<List<Post>>> = callbackFlow {
         trySend(Resource.Loading)
 
         repositoryScope.launch {
-            val localPosts = postDao.getPostsByPublisher(publisher, aname).first()
+            val localPosts = postDao.getPostsByPublisher(publisher, appName).first()
             if (localPosts.isNotEmpty()) {
                 trySend(Resource.Success(localPosts))
             }
@@ -162,7 +162,7 @@ class PostRepository @Inject constructor(
                                     postDao.insertPosts(enrichedList)
                                 }
 
-                                val filteredList = enrichedList.filter { it.publisher == publisher && it.aname == aname }
+                                val filteredList = enrichedList.filter { it.publisher == publisher && it.appName == appName }
                                 trySend(Resource.Success(filteredList))
                             }
                             override fun onCancelled(error: DatabaseError) { trySend(Resource.Error(error.message)) }
@@ -180,7 +180,7 @@ class PostRepository @Inject constructor(
         awaitClose { postsRef.removeEventListener(listener) }
     }
 
-    fun getFavoritePosts(publisher: String, aname: String): Flow<Resource<List<Post>>> = callbackFlow {
+    fun getFavoritePosts(publisher: String, appName: String): Flow<Resource<List<Post>>> = callbackFlow {
         trySend(Resource.Loading)
         val uid = auth.currentUser?.uid
         if (uid == null) {
@@ -205,7 +205,7 @@ class PostRepository @Inject constructor(
                                 postDao.insertPosts(enrichedPosts)
                             }
                             val filteredPosts = enrichedPosts.filter { 
-                                it.publisher == publisher && it.aname == aname && it.postid in saveIds 
+                                it.publisher == publisher && it.appName == appName && it.postid in saveIds 
                             }
                             trySend(Resource.Success(filteredPosts))
                         }
@@ -225,7 +225,7 @@ class PostRepository @Inject constructor(
         awaitClose { savesRef.removeEventListener(listener) }
     }
 
-    fun getTopVotedPosts(publisher: String, aname: String): Flow<Resource<List<Post>>> = callbackFlow {
+    fun getTopVotedPosts(publisher: String, appName: String): Flow<Resource<List<Post>>> = callbackFlow {
         trySend(Resource.Loading)
         val reference = database.getReference(DATA.POSTS).orderByChild(DATA.VIEWS_COUNT)
         val listener = object : ValueEventListener {
@@ -239,7 +239,7 @@ class PostRepository @Inject constructor(
                     repositoryScope.launch {
                         postDao.insertPosts(enrichedList)
                     }
-                    val filteredList = enrichedList.filter { it.publisher == publisher && it.aname == aname }
+                    val filteredList = enrichedList.filter { it.publisher == publisher && it.appName == appName }
                     trySend(Resource.Success(filteredList.reversed()))
                 }
             }
@@ -252,11 +252,11 @@ class PostRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    fun getPostsByCategory(category: String, publisher: String, aname: String): Flow<Resource<List<Post>>> = callbackFlow {
+    fun getPostsByCategory(category: String, publisher: String, appName: String): Flow<Resource<List<Post>>> = callbackFlow {
         trySend(Resource.Loading)
 
         repositoryScope.launch {
-            val localPosts = postDao.getPostsByCategory(category, publisher, aname).first()
+            val localPosts = postDao.getPostsByCategory(category, publisher, appName).first()
             if (localPosts.isNotEmpty()) {
                 trySend(Resource.Success(localPosts))
             }
@@ -274,7 +274,7 @@ class PostRepository @Inject constructor(
                     repositoryScope.launch {
                         postDao.insertPosts(enrichedList)
                     }
-                    val filteredList = enrichedList.filter { it.category == category && it.publisher == publisher && it.aname == aname }
+                    val filteredList = enrichedList.filter { it.category == category && it.publisher == publisher && it.appName == appName }
                     trySend(Resource.Success(filteredList))
                 }
             }
@@ -287,7 +287,7 @@ class PostRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    fun getPostsBySearch(query: String, publisher: String, aname: String): Flow<Resource<List<Post>>> = callbackFlow {
+    fun getPostsBySearch(query: String, publisher: String, appName: String): Flow<Resource<List<Post>>> = callbackFlow {
         trySend(Resource.Loading)
         val reference = database.getReference(DATA.POSTS)
         val listener = object : ValueEventListener {
@@ -302,7 +302,7 @@ class PostRepository @Inject constructor(
                         postDao.insertPosts(enrichedList)
                     }
                     val filteredList = enrichedList.filter { 
-                        it.publisher == publisher && it.aname == aname &&
+                        it.publisher == publisher && it.appName == appName &&
                         (it.name?.contains(query, ignoreCase = true) == true)
                     }
                     trySend(Resource.Success(filteredList))
@@ -365,11 +365,11 @@ class PostRepository @Inject constructor(
         awaitClose { postRef.removeEventListener(listener) }
     }
 
-    fun getShoppingCenters(publisher: String, aname: String): Flow<Resource<List<ShoppingCenter>>> = callbackFlow {
+    fun getShoppingCenters(publisher: String, appName: String): Flow<Resource<List<ShoppingCenter>>> = callbackFlow {
         trySend(Resource.Loading)
 
         repositoryScope.launch {
-            val localCenters = shoppingCenterDao.getShoppingCenters(publisher, aname).first()
+            val localCenters = shoppingCenterDao.getShoppingCenters(publisher, appName).first()
             if (localCenters.isNotEmpty()) {
                 trySend(Resource.Success(localCenters))
             }
@@ -389,7 +389,7 @@ class PostRepository @Inject constructor(
                     shoppingCenterDao.insertShoppingCenters(list)
                 }
 
-                val filteredList = list.filter { it.publisher == publisher && it.aname == aname }
+                val filteredList = list.filter { it.publisher == publisher && it.appName == appName }
                 trySend(Resource.Success(filteredList))
             }
 

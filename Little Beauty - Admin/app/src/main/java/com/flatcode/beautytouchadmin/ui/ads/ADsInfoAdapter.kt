@@ -10,11 +10,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.flatcode.beautytouchadmin.filter.ADsInfoFilter
 import com.flatcode.beautytouchadmin.model.ADs
-import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.databinding.ItemInfoAdsBinding
-import java.text.MessageFormat
 
 class ADsInfoAdapter(private val context: Context, initialList: MutableList<ADs?>, var isUser: Boolean) :
     ListAdapter<ADs, ADsInfoAdapter.ViewHolder>(DiffCallback), Filterable {
@@ -44,15 +41,36 @@ class ADsInfoAdapter(private val context: Context, initialList: MutableList<ADs?
         val adsLoadedCount = item.adsLoadedCount
         val adsClickedCount = item.adsClickedCount
         holder.name.text = name
-        holder.numberADsLoad.text = MessageFormat.format("{0}{1}", DATA.EMPTY, adsLoadedCount)
-        holder.numberADsClick.text = MessageFormat.format("{0}{1}", DATA.EMPTY, adsClickedCount)
+        holder.numberADsLoad.text = "$adsLoadedCount"
+        holder.numberADsClick.text = "$adsClickedCount"
     }
 
     override fun getFilter(): Filter {
-        if (filter == null) {
-            filter = ADsInfoFilter(filterList, this)
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val results = FilterResults()
+                if (constraint != null && constraint.isNotEmpty()) {
+                    val constraintStr = constraint.toString().uppercase()
+                    val filter = mutableListOf<ADs?>()
+                    for (item in filterList) {
+                        if (item?.name?.uppercase()?.contains(constraintStr) == true) {
+                            filter.add(item)
+                        }
+                    }
+                    results.count = filter.size
+                    results.values = filter
+                } else {
+                    results.count = filterList.size
+                    results.values = filterList
+                }
+                return results
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults) {
+                @Suppress("UNCHECKED_CAST")
+                submitList(results.values as MutableList<ADs>)
+            }
         }
-        return filter!!
     }
 
     class ViewHolder(binding: ItemInfoAdsBinding) : RecyclerView.ViewHolder(binding.root) {

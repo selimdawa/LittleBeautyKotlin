@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.Parcelable
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
@@ -29,7 +30,10 @@ inline fun <reified T : Activity> Context.openActivity(
             when (value) {
                 is String -> putExtra(key, value)
                 is Int -> putExtra(key, value)
+                is Long -> putExtra(key, value)
+                is Double -> putExtra(key, value)
                 is Boolean -> putExtra(key, value)
+                is Parcelable -> putExtra(key, value)
                 is Serializable -> putExtra(key, value)
             }
         }

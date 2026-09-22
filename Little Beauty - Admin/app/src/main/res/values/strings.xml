@@ -82,6 +82,7 @@
     <string name="about_me">About Me</string>
     <string name="show_sheet">Show Sheet</string>
     <string name="about_my">Who Am I</string>
+    <string name="loading">Please wait...</string>
     <!-- Crop Strings -->
     <string name="close">Close</string>
     <string name="crop_image">Crop Image</string>

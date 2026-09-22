@@ -1,7 +1,6 @@
 package com.flatcode.beautytouch.ui.reward
 
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.View
@@ -20,6 +19,7 @@ import com.flatcode.beautytouch.ui.profile.UserViewModel
 import com.flatcode.beautytouch.ui.profile.LeaderboardActivity
 import com.flatcode.beautytouch.ui.profile.LeaderboardOldActivity
 import com.flatcode.beautytouch.databinding.ActivityRewardBinding
+import com.flatcode.beautytouch.utils.LoadingDialog
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -30,18 +30,17 @@ import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.text.MessageFormat
 
 @AndroidEntryPoint
 class RewardActivity : AppCompatActivity() {
 
-    private var activity: Activity? = null
-    private val context: Context = also { activity = it }
-    private var binding: ActivityRewardBinding? = null
+    private val context: Context = this
+    private lateinit var binding: ActivityRewardBinding
 
     private val viewModel: UserViewModel by viewModels()
+    private val dialog by lazy { LoadingDialog(this) }
 
-    var mRewardedAd: RewardedAd? = null
+    private var mRewardedAd: RewardedAd? = null
     private var currentYear = ""
     private var currentSession = ""
 
@@ -49,20 +48,19 @@ class RewardActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityRewardBinding.inflate(layoutInflater)
-        val view = binding!!.root
-        setContentView(view)
+        setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.updatePadding(top = systemBars.top, bottom = systemBars.bottom)
             insets
         }
 
-        binding!!.toolbar.nameSpace.setText(R.string.earn_points)
-        binding!!.leaderboardCard.setOnClickListener {
+        binding.toolbar.nameSpace.setText(R.string.earn_points)
+        binding.leaderboardCard.setOnClickListener {
             context.openActivity<LeaderboardActivity>()
         }
-        binding!!.leaderboardCardOld.setOnClickListener {
+        binding.leaderboardCardOld.setOnClickListener {
             context.openActivity<LeaderboardOldActivity>()
         }
         MobileAds.initialize(context) { }
@@ -76,17 +74,19 @@ class RewardActivity : AppCompatActivity() {
             viewModel.appTools.collect { resource ->
                 if (resource is Resource.Success) {
                     val tools = resource.data
-                    currentYear = tools.year!!
-                    currentSession = tools.sessionNumber!!
+                    currentYear = tools.year.orEmpty()
+                    currentSession = tools.sessionNumber.orEmpty()
                     val oldYear = tools.oldYear
                     val oldSession = tools.oldSessionNumber
-                    if (currentSession != oldSession || currentYear != oldYear) binding!!.leaderboardCardOld.visibility =
-                        View.VISIBLE else binding!!.leaderboardCardOld.visibility = View.GONE
-                    binding!!.sessionInfo.text = MessageFormat.format("{0} | {1}", currentYear, currentSession)
-                    binding!!.sessionInfoOld.text =
-                        MessageFormat.format("{0} | {1}", oldYear, oldSession)
+                    if (currentSession != oldSession || currentYear != oldYear) {
+                        binding.leaderboardCardOld.visibility = View.VISIBLE
+                    } else {
+                        binding.leaderboardCardOld.visibility = View.GONE
+                    }
+                    binding.sessionInfo.text = "$currentYear | $currentSession"
+                    binding.sessionInfoOld.text = "$oldYear | $oldSession"
                     viewModel.loadPoints(currentYear, currentSession)
-                    binding!!.rewardCard.setOnClickListener {
+                    binding.rewardCard.setOnClickListener {
                         loadAndShowRewardedAd()
                         Toast.makeText(
                             context, "The ad is loaded, click again if it does not appear",
@@ -99,7 +99,7 @@ class RewardActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.points.collect { resource ->
                 if (resource is Resource.Success) {
-                    binding!!.myPoints.text = MessageFormat.format("My Points : {0}", resource.data)
+                    binding.myPoints.text = "My Points : ${resource.data}"
                 }
             }
         }
@@ -122,8 +122,8 @@ class RewardActivity : AppCompatActivity() {
     }
 
     private fun showRewardedAd() {
-        if (mRewardedAd != null) {
-            mRewardedAd!!.fullScreenContentCallback = object : FullScreenContentCallback() {
+        mRewardedAd?.let { ad ->
+            ad.fullScreenContentCallback = object : FullScreenContentCallback() {
                 override fun onAdDismissedFullScreenContent() {
                     super.onAdDismissedFullScreenContent()
                     mRewardedAd = null
@@ -136,16 +136,12 @@ class RewardActivity : AppCompatActivity() {
                     mRewardedAd = null
                 }
             }
-            mRewardedAd!!.show(activity!!) { rewardItem: RewardItem? -> }
+            ad.show(this) { rewardItem: RewardItem? -> }
         }
     }
 
     private fun loadAndShowRewardedAd() {
-        val dialog = ProgressDialog(context)
-        dialog.setTitle("Please wait")
-        dialog.setMessage("Loading Rewarded Ad")
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.show()
+        dialog.show("Loading Rewarded Ad")
         RewardedAd.load(
             context, resources.getString(R.string.admob_reward), AdRequest.Builder().build(),
             object : RewardedAdLoadCallback() {

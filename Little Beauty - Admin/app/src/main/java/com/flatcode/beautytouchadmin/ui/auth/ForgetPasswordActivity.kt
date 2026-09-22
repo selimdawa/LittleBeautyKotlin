@@ -1,9 +1,8 @@
 package com.flatcode.beautytouchadmin.ui.auth
 
-import android.app.ProgressDialog
+import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -11,7 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 import com.flatcode.beautytouchadmin.utils.openActivity
+import com.flatcode.beautytouchadmin.utils.setMessage
 import com.flatcode.beautytouchadmin.databinding.ActivityForgetPasswordBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -21,7 +22,7 @@ class ForgetPasswordActivity : AppCompatActivity() {
 
     private var binding: ActivityForgetPasswordBinding? = null
     private val context: Context = this@ForgetPasswordActivity
-    private var dialog: ProgressDialog? = null
+    private var dialog: Dialog? = null
     private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,9 +30,7 @@ class ForgetPasswordActivity : AppCompatActivity() {
         binding = ActivityForgetPasswordBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        dialog = ProgressDialog(this)
-        dialog!!.setTitle("Please wait...")
-        dialog!!.setCanceledOnTouchOutside(false)
+        dialog = MyDialog.loadingDialog(context)
 
         binding!!.login.setOnClickListener {
             openActivity<LoginActivity>()

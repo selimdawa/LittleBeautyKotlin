@@ -25,10 +25,10 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    var hotpostAdapter: PostHotAdapter? = null
-    var allpostAdapter: PostLinearAdapter? = null
-    var publisher = DATA.PUBLISHER_NAME
-    var aname = DATA.APP_NAME
+    private var hotpostAdapter: PostHotAdapter? = null
+    private var allpostAdapter: PostLinearAdapter? = null
+    private val publisher = DATA.PUBLISHER_NAME
+    private val appName = DATA.APP_NAME
 
     private val viewModel: HomeViewModel by viewModels()
 
@@ -74,7 +74,7 @@ class HomeFragment : Fragment() {
                     }
 
                     is Resource.Success -> {
-                        hotpostAdapter!!.submitList(resource.data)
+                        hotpostAdapter?.submitList(resource.data)
                         binding.progressCircular.visibility = View.GONE
                         binding.recyclerView.visibility = View.VISIBLE
                     }
@@ -98,7 +98,7 @@ class HomeFragment : Fragment() {
                     }
 
                     is Resource.Success -> {
-                        allpostAdapter!!.submitList(resource.data)
+                        allpostAdapter?.submitList(resource.data)
                         binding.progressCircular2.visibility = View.GONE
                         binding.recyclerView2.visibility = View.VISIBLE
                     }
@@ -115,7 +115,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onResume() {
-        viewModel.loadHomeData(publisher, aname)
+        viewModel.loadHomeData(publisher, appName)
         super.onResume()
     }
 

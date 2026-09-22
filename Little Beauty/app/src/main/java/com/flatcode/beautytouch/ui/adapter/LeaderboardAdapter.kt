@@ -9,17 +9,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouch.databinding.ItemLeaderboardBinding
-import com.flatcode.beautytouch.filter.LeaderboardFilter
 import com.flatcode.beautytouch.model.User
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.loadImage
-import java.text.MessageFormat
+import java.util.Locale
 
 class LeaderboardAdapter(
     private val onItemClick: (User) -> Unit
 ) : ListAdapter<User, LeaderboardAdapter.ViewHolder>(UserDiffCallback()), Filterable {
 
-    var filterList: ArrayList<User?> = ArrayList()
+    var filterList: List<User> = emptyList()
     private var filter: LeaderboardFilter? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -29,28 +28,47 @@ class LeaderboardAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user = getItem(position) ?: return
-        val context = holder.itemView.context
         val rank = position + 1 // Displaying actual rank instead of reverse position which was confusing
 
         with(holder.binding) {
-            range.text = MessageFormat.format("{0}", rank)
+            range.text = "$rank"
             imageProfile.loadImage(true, user.imageurl)
 
             username.apply {
                 visibility = if (user.username == DATA.EMPTY) View.GONE else View.VISIBLE
                 text = user.username
             }
-            points.text = MessageFormat.format("{0}", user.points)
+            points.text = "${user.points}"
             
             root.setOnClickListener { onItemClick(user) }
         }
     }
 
     override fun getFilter(): Filter {
-        if (filter == null) {
-            filter = LeaderboardFilter(filterList, this)
+        return filter ?: LeaderboardFilter(filterList, this).also { filter = it }
+    }
+
+    inner class LeaderboardFilter(var list: List<User>, var adapter: LeaderboardAdapter) : Filter() {
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
+            val results = FilterResults()
+            if (!constraint.isNullOrEmpty()) {
+                val constraintStr = constraint.toString().uppercase(Locale.getDefault())
+                val filterResults = list.filter {
+                    it.username?.uppercase(Locale.getDefault())?.contains(constraintStr) == true
+                }
+                results.count = filterResults.size
+                results.values = filterResults
+            } else {
+                results.count = list.size
+                results.values = list
+            }
+            return results
         }
-        return filter!!
+
+        @Suppress("UNCHECKED_CAST")
+        override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+            adapter.submitList(results?.values as? List<User>)
+        }
     }
 
     class ViewHolder(val binding: ItemLeaderboardBinding) : RecyclerView.ViewHolder(binding.root)

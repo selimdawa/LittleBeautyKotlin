@@ -34,7 +34,7 @@ class ADsInfoActivity : AppCompatActivity() {
         profileId = intent.getStringExtra(DATA.PROFILE_ID)
 
         binding!!.toolbar.nameSpace.setText(R.string.info_ads)
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         adapter = ADsInfoAdapter(context, list, true)
         binding!!.recyclerView.adapter = adapter

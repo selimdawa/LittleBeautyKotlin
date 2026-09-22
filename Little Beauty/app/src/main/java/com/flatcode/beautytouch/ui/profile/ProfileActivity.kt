@@ -2,13 +2,11 @@ package com.flatcode.beautytouch.ui.profile
 
 import android.Manifest
 import android.app.Activity
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -24,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import coil3.load
 import com.flatcode.beautytouch.databinding.ActivityProfileBinding
 import com.flatcode.beautytouch.utils.DATA
+import com.flatcode.beautytouch.utils.LoadingDialog
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.startCropActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,11 +32,9 @@ import timber.log.Timber
 @AndroidEntryPoint
 class ProfileActivity : AppCompatActivity() {
 
-    private var binding: ActivityProfileBinding? = null
-    var activity: Activity? = null
-    var context: Context = also { activity = it }
+    private lateinit var binding: ActivityProfileBinding
     private var imageUri: Uri? = null
-    private var dialog: ProgressDialog? = null
+    private val dialog by lazy { LoadingDialog(this) }
 
     private val viewModel: UserViewModel by viewModels()
 
@@ -47,16 +44,16 @@ class ProfileActivity : AppCompatActivity() {
                 imageUri = result.data?.let { intent ->
                     IntentCompat.getParcelableExtra(intent, "CROP_RESULT_URI", Uri::class.java)
                 }
-                binding?.image?.setImageURI(null)
-                binding?.image?.setImageURI(imageUri)
-                binding?.imageTrue?.visibility = View.VISIBLE
+                binding.image.setImageURI(null)
+                binding.image.setImageURI(imageUri)
+                binding.imageTrue.visibility = View.VISIBLE
             }
         }
 
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                cropImageLauncher.launch(context.startCropActivity(it, 1, 1, true))
+                cropImageLauncher.launch(startCropActivity(it, 1, 1, true))
             }
         }
 
@@ -65,7 +62,7 @@ class ProfileActivity : AppCompatActivity() {
             if (isGranted) {
                 openGallery()
             } else {
-                Toast.makeText(context, "Permission Denied! Cannot access gallery.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Permission Denied! Cannot access gallery.", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -76,7 +73,7 @@ class ProfileActivity : AppCompatActivity() {
             Manifest.permission.READ_EXTERNAL_STORAGE
         }
 
-        if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
             openGallery()
         } else {
             requestPermissionLauncher.launch(permission)
@@ -91,51 +88,44 @@ class ProfileActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
-        val view = binding!!.root
-        setContentView(view)
+        setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.updatePadding(top = systemBars.top, bottom = systemBars.bottom)
             insets
         }
 
-        @Suppress("DEPRECATION")
-        dialog = ProgressDialog(context).apply {
-            setTitle("Please wait...")
-            setCanceledOnTouchOutside(false)
-        }
-
-        binding!!.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
-        binding!!.editImageIcon.setOnClickListener {
+        binding.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        binding.editImageIcon.setOnClickListener {
             checkPermissionAndOpenGallery()
         }
 
-        binding!!.imageEdit.setOnClickListener {
-            binding!!.imageEdit.visibility = View.GONE
-            binding!!.imageClose.visibility = View.VISIBLE
-            binding!!.imageTrue.visibility = View.VISIBLE
-            binding!!.name.visibility = View.GONE
-            binding!!.nameEdit.visibility = View.VISIBLE
+        binding.imageEdit.setOnClickListener {
+            binding.imageEdit.visibility = View.GONE
+            binding.imageClose.visibility = View.VISIBLE
+            binding.imageTrue.visibility = View.VISIBLE
+            binding.name.visibility = View.GONE
+            binding.nameEdit.visibility = View.VISIBLE
         }
-        binding!!.imageClose.setOnClickListener {
-            binding!!.imageEdit.visibility = View.VISIBLE
-            binding!!.imageClose.visibility = View.GONE
+        binding.imageClose.setOnClickListener {
+            binding.imageEdit.visibility = View.VISIBLE
+            binding.imageClose.visibility = View.GONE
             if (imageUri != null) {
-                binding!!.imageTrue.visibility = View.VISIBLE
+                binding.imageTrue.visibility = View.VISIBLE
             } else {
-                binding!!.imageTrue.visibility = View.GONE
+                binding.imageTrue.visibility = View.GONE
             }
-            binding!!.name.visibility = View.VISIBLE
-            binding!!.nameEdit.visibility = View.GONE
+            binding.name.visibility = View.VISIBLE
+            binding.nameEdit.visibility = View.GONE
         }
-        binding!!.imageTrue.setOnClickListener {
-            binding!!.imageClose.visibility = View.GONE
-            binding!!.imageEdit.visibility = View.VISIBLE
-            binding!!.imageTrue.visibility = View.GONE
-            binding!!.name.visibility = View.VISIBLE
-            binding!!.name.text = binding!!.nameEdit.text.toString()
-            binding!!.nameEdit.visibility = View.GONE
+        binding.imageTrue.setOnClickListener {
+            binding.imageClose.visibility = View.GONE
+            binding.imageEdit.visibility = View.VISIBLE
+            binding.imageTrue.visibility = View.GONE
+            binding.name.visibility = View.VISIBLE
+            binding.name.text = binding.nameEdit.text.toString()
+            binding.nameEdit.visibility = View.GONE
             validateData()
         }
 
@@ -148,9 +138,9 @@ class ProfileActivity : AppCompatActivity() {
                 Timber.d("User info collected: $resource")
                 if (resource is Resource.Success) {
                     val user = resource.data
-                    binding!!.image.load(user.imageurl)
-                    binding!!.name.text = user.username
-                    binding!!.nameEdit.setText(user.username)
+                    binding.image.load(user.imageurl)
+                    binding.name.text = user.username
+                    binding.nameEdit.setText(user.username)
                 }
             }
         }
@@ -159,16 +149,15 @@ class ProfileActivity : AppCompatActivity() {
                 Timber.d("Upload image state collected: $resource")
                 when (resource) {
                     is Resource.Loading -> {
-                        dialog?.setMessage("The image is uploading...")
-                        dialog?.show()
+                        dialog.show("The image is uploading...")
                     }
                     is Resource.Success -> {
-                        dialog?.dismiss()
+                        dialog.dismiss()
                     }
                     is Resource.Error -> {
-                        dialog?.dismiss()
+                        dialog.dismiss()
                         Timber.e("Upload image error: ${resource.message}")
-                        Toast.makeText(context, resource.message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@ProfileActivity, resource.message, Toast.LENGTH_SHORT).show()
                     }
                     else -> {}
                 }
@@ -179,18 +168,17 @@ class ProfileActivity : AppCompatActivity() {
                 Timber.d("Update profile state collected: $resource")
                 when (resource) {
                     is Resource.Loading -> {
-                        dialog?.setMessage("Saving changes...")
-                        dialog?.show()
+                        dialog.show("Saving changes...")
                     }
                     is Resource.Success -> {
-                        dialog?.dismiss()
-                        Toast.makeText(context, "Profile Updated", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                        Toast.makeText(this@ProfileActivity, "Profile Updated", Toast.LENGTH_SHORT).show()
                         imageUri = null
                     }
                     is Resource.Error -> {
-                        dialog?.dismiss()
+                        dialog.dismiss()
                         Timber.e("Update profile error: ${resource.message}")
-                        Toast.makeText(context, resource.message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@ProfileActivity, resource.message, Toast.LENGTH_SHORT).show()
                     }
                     else -> {}
                 }
@@ -198,24 +186,22 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
-    private var username = DATA.EMPTY
     private fun validateData() {
-        username = binding!!.nameEdit.text.toString().trim()
-        if (TextUtils.isEmpty(username)) {
-            Toast.makeText(context, "Please enter the name", Toast.LENGTH_SHORT).show()
+        val username = binding.nameEdit.text.toString().trim()
+        if (username.isEmpty()) {
+            Toast.makeText(this, "Please enter the name", Toast.LENGTH_SHORT).show()
         } else {
             val uri = imageUri
             if (uri == null) {
                 viewModel.updateProfile(username)
             } else {
-                dialog?.setMessage("Uploading image...")
-                dialog?.show()
+                dialog.show("Uploading image...")
                 viewModel.uploadProfileImageCloudinary(uri) { uploadedUrl ->
                     if (uploadedUrl != null) {
                         viewModel.updateProfile(username, uploadedUrl)
                     } else {
-                        dialog?.dismiss()
-                        Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                        Toast.makeText(this, "Failed to upload image", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -229,7 +215,6 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        dialog?.dismiss()
-        binding = null
+        dialog.dismiss()
     }
 }

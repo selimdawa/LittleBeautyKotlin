@@ -1,12 +1,11 @@
 package com.flatcode.beautytouchadmin.ui.post
 
 import android.app.Activity
-import android.app.ProgressDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.TextUtils
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -16,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.*
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
 import com.canhub.cropper.CropImageContract
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +29,7 @@ class PostEditActivity : AppCompatActivity() {
     private var context: Context = also { activity = it }
     private var id: String? = null
     private var imageUri: Uri? = null
-    private var dialog: ProgressDialog? = null
+    private var dialog: Dialog? = null
     private var typePost: String? = DATA.EMPTY
     private val viewModel: PostActionViewModel by viewModels()
 
@@ -64,12 +64,10 @@ class PostEditActivity : AppCompatActivity() {
 
         id = intent.getStringExtra(DATA.POST_ID)
 
-        dialog = ProgressDialog(context)
-        dialog!!.setTitle("Please wait...")
-        dialog!!.setCanceledOnTouchOutside(false)
+        dialog = MyDialog.loadingDialog(context)
 
         binding!!.toolbar.nameSpace.setText(R.string.add_post)
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         binding!!.typeOne.setOnClickListener {
             typePost = "Skin Products"
@@ -83,7 +81,7 @@ class PostEditActivity : AppCompatActivity() {
         }
 
         binding!!.toolbar.nameSpace.text = "Edit post"
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
         binding!!.layoutImageProfile.setOnClickListener {
             checkStoragePermission(requestPermissionLauncher) { pickImage() }
@@ -137,13 +135,13 @@ class PostEditActivity : AppCompatActivity() {
         val howToUse = binding!!.howToUse.text.toString().trim()
         val price = binding!!.price.text.toString().trim()
 
-        if (TextUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             Toast.makeText(context, "Enter a name", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(indications)) {
+        } else if (indications.isEmpty()) {
             Toast.makeText(context, "Enter the indications", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(howToUse)) {
+        } else if (howToUse.isEmpty()) {
             Toast.makeText(context, "Enter how to use", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(price)) {
+        } else if (price.isEmpty()) {
             Toast.makeText(context, "Enter a price", Toast.LENGTH_SHORT).show()
         } else {
             dialog!!.setMessage("Post is updating")

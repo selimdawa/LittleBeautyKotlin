@@ -26,16 +26,16 @@ class HomeViewModel @Inject constructor(
     private val _sliderImages = MutableStateFlow<Resource<List<String>>?>(null)
     val sliderImages: StateFlow<Resource<List<String>>?> = _sliderImages
 
-    fun loadHomeData(publisher: String, aname: String) {
-        Timber.d("Loading home data for publisher: $publisher, aname: $aname")
+    fun loadHomeData(publisher: String, appName: String) {
+        Timber.d("Loading home data for publisher: $publisher, appName: $appName")
         viewModelScope.launch {
-            repository.getHotProducts(publisher, aname).collect {
+            repository.getHotProducts(publisher, appName).collect {
                 _hotProducts.value = it
                 Timber.d("Hot products state updated: $it")
             }
         }
         viewModelScope.launch {
-            repository.getAllPosts(publisher, aname).collect {
+            repository.getAllPosts(publisher, appName).collect {
                 _allPosts.value = it
                 Timber.d("All posts state updated: $it")
             }

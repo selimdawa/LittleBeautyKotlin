@@ -1,12 +1,11 @@
 package com.flatcode.beautytouchadmin.ui.shopping
 
 import android.app.Activity
-import android.app.ProgressDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.TextUtils
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -16,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.model.ShoppingCenter
 import com.flatcode.beautytouchadmin.utils.*
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 import com.flatcode.beautytouchadmin.databinding.ActivityShoppingCentersAddBinding
 import com.canhub.cropper.CropImageContract
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,7 +30,7 @@ class ShoppingCentresEditActivity : AppCompatActivity() {
     private var id: String? = null
     private var imageUri: Uri? = null
     private var imageUri2: Uri? = null
-    private var dialog: ProgressDialog? = null
+    private var dialog: Dialog? = null
     private val IMAGE_PIC = 1
     private val IMAGE_MAP = 2
     private var IMAGE_NUMBER = 0
@@ -73,9 +73,7 @@ class ShoppingCentresEditActivity : AppCompatActivity() {
 
         id = intent.getStringExtra(DATA.SHOPPING_CENTER_ID)
 
-        dialog = ProgressDialog(context)
-        dialog!!.setTitle("Please wait...")
-        dialog!!.setCanceledOnTouchOutside(false)
+        dialog = MyDialog.loadingDialog(context)
 
         binding!!.addImage.setOnClickListener {
             IMAGE_NUMBER = IMAGE_PIC
@@ -87,7 +85,7 @@ class ShoppingCentresEditActivity : AppCompatActivity() {
         }
 
         binding!!.toolbar.nameSpace.text = "Edit the shopping center"
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
 
         id?.let { viewModel.loadCenter(it) }
@@ -133,15 +131,15 @@ class ShoppingCentresEditActivity : AppCompatActivity() {
         val locationThree = binding!!.location3.text.toString().trim()
         val numberPhone = binding!!.numberPhone.text.toString().trim()
 
-        if (TextUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             Toast.makeText(context, "Enter the name of the center", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(locationOne)) {
+        } else if (locationOne.isEmpty()) {
             Toast.makeText(context, "Enter the city name", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(locationTwo)) {
+        } else if (locationTwo.isEmpty()) {
             Toast.makeText(context, "Enter the name of the neighborhood", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(locationThree)) {
+        } else if (locationThree.isEmpty()) {
             Toast.makeText(context, "Enter the street name", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(numberPhone)) {
+        } else if (numberPhone.isEmpty()) {
             Toast.makeText(context, "Enter a phone number", Toast.LENGTH_SHORT).show()
         } else {
             dialog!!.setMessage("Editing....")

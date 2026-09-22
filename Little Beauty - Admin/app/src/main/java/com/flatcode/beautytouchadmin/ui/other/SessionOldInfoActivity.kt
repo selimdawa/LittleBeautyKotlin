@@ -29,7 +29,7 @@ class SessionOldInfoActivity : AppCompatActivity() {
         setContentView(binding!!.root)
 
         binding!!.toolbar.nameSpace.text = "Session Old"
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         observeViewModel()
         viewModel.loadSessionInfo(true)

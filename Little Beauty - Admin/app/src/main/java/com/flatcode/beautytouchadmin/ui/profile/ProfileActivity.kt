@@ -1,12 +1,11 @@
 package com.flatcode.beautytouchadmin.ui.profile
 
 import android.app.Activity
-import android.app.ProgressDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -17,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.utils.*
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 import com.flatcode.beautytouchadmin.databinding.ActivityProfileBinding
 import com.canhub.cropper.CropImageContract
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +29,7 @@ class ProfileActivity : AppCompatActivity() {
     private var activity: Activity? = null
     private var context: Context = also { activity = it }
     private var imageUri: Uri? = null
-    private var dialog: ProgressDialog? = null
+    private var dialog: Dialog? = null
     private val viewModel: ProfileViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -64,11 +64,9 @@ class ProfileActivity : AppCompatActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        dialog = ProgressDialog(context)
-        dialog!!.setTitle("Please wait...")
-        dialog!!.setCanceledOnTouchOutside(false)
+        dialog = MyDialog.loadingDialog(context)
 
-        binding!!.back.setOnClickListener { onBackPressed() }
+        binding!!.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding!!.editImageIcon.setOnClickListener {
             checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
@@ -130,7 +128,7 @@ class ProfileActivity : AppCompatActivity() {
 
     private fun validateData() {
         val username = binding!!.nameEdit.text.toString().trim()
-        if (TextUtils.isEmpty(username)) {
+        if (username.isEmpty()) {
             Toast.makeText(context, "Please enter the name", Toast.LENGTH_SHORT).show()
         } else {
             dialog!!.setMessage("Modifications are loaded...")

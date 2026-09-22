@@ -39,7 +39,7 @@ class PostsActivity : AppCompatActivity() {
         setContentView(binding!!.root)
 
         binding!!.toolbar.nameSpace.text = "My Posts"
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         adapter = MyPostsAdapter(context, object : MyPostsAdapter.OnItemClickListener {
             override fun onMoreClick(post: Post) {

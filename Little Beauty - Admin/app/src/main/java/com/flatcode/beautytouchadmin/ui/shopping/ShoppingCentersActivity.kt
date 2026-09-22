@@ -32,7 +32,7 @@ class ShoppingCentersActivity : AppCompatActivity() {
         setContentView(binding!!.root)
 
         binding!!.toolbar.nameSpace.setText(R.string.shopping_centers)
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         adapter = ShoppingCentersAdapter(context, object : ShoppingCentersAdapter.OnItemClickListener {
             override fun onMoreClick(item: ShoppingCenter) {

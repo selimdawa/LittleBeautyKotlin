@@ -12,7 +12,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.flatcode.beautytouchadmin.filter.LeaderboardOldFilter
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.ui.ads.ADsInfoActivity
 import com.flatcode.beautytouchadmin.utils.DATA
@@ -24,6 +23,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.text.MessageFormat
+import java.util.Locale
 
 class LeaderboardOldAdapter(
     private val mContext: Context, 
@@ -76,10 +76,31 @@ class LeaderboardOldAdapter(
     }
 
     override fun getFilter(): Filter {
-        if (filter == null) {
-            filter = LeaderboardOldFilter(filterList, this)
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val results = FilterResults()
+                if (constraint != null && constraint.isNotEmpty()) {
+                    val constraintStr = constraint.toString().uppercase(Locale.getDefault())
+                    val filter = mutableListOf<User?>()
+                    for (item in filterList) {
+                        if (item?.username?.uppercase(Locale.getDefault())?.contains(constraintStr) == true) {
+                            filter.add(item)
+                        }
+                    }
+                    results.count = filter.size
+                    results.values = filter
+                } else {
+                    results.count = filterList.size
+                    results.values = filterList
+                }
+                return results
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults) {
+                @Suppress("UNCHECKED_CAST")
+                submitList(results.values as MutableList<User>)
+            }
         }
-        return filter!!
     }
 
     class ViewHolder(binding: ItemLeaderboradBinding) : RecyclerView.ViewHolder(binding.root) {

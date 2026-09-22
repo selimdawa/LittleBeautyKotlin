@@ -28,7 +28,7 @@ class UsersActivity : AppCompatActivity() {
         setContentView(binding!!.root)
 
         binding!!.toolbar.nameSpace.setText(R.string.users)
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         adapter = UsersAdapter(context)
         binding!!.recyclerView.adapter = adapter

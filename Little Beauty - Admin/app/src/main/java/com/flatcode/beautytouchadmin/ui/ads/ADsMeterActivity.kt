@@ -31,7 +31,7 @@ class ADsMeterActivity : AppCompatActivity() {
         setContentView(binding!!.root)
 
         binding!!.toolbar.nameSpace.setText(R.string.users_ads)
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         adapter = ADsUserAdapter(context, list, true)
         binding!!.recyclerView.adapter = adapter

@@ -1,7 +1,5 @@
 package com.flatcode.beautytouch.utils
 
-import com.google.firebase.auth.FirebaseAuth
-
 object DATA {
     //Database
     var USERS = "Users"
@@ -53,9 +51,6 @@ object DATA {
 
     //Other
     var DOT = "."
-    val AUTH = FirebaseAuth.getInstance()
-    val FIREBASE_USER = AUTH.currentUser
-    val FirebaseUserUid = FIREBASE_USER!!.uid
 
     //Cloudinary
     const val CLOUDINARY_CLOUD_NAME = "j8jsphcf"

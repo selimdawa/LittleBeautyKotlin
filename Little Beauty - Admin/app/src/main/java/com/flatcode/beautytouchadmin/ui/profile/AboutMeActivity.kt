@@ -2,14 +2,12 @@ package com.flatcode.beautytouchadmin.ui.profile
 
 import android.app.Activity
 import android.app.Dialog
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageView
@@ -23,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.*
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 import com.flatcode.beautytouchadmin.ui.other.ToolsViewModel
 import com.flatcode.beautytouchadmin.databinding.ActivityAboutMeBinding
 import com.canhub.cropper.CropImageContract
@@ -36,7 +35,7 @@ class AboutMeActivity : AppCompatActivity() {
     private var activity: Activity? = null
     private val context: Context = also { activity = it }
     private var imageUri: Uri? = null
-    private var dialog: ProgressDialog? = null
+    private var dialog: Dialog? = null
     private val viewModel: ToolsViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -68,12 +67,10 @@ class AboutMeActivity : AppCompatActivity() {
         binding = ActivityAboutMeBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        dialog = ProgressDialog(context)
-        dialog!!.setTitle("Please wait...")
-        dialog!!.setCanceledOnTouchOutside(false)
+        dialog = MyDialog.loadingDialog(context)
 
         binding!!.toolbar.nameSpace.text = "About Me"
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
         binding!!.show.setOnClickListener { showDialogAboutMy() }
         binding!!.editImageIcon.setOnClickListener {
@@ -112,7 +109,7 @@ class AboutMeActivity : AppCompatActivity() {
     private fun validateData() {
         val name = binding!!.name.text.toString().trim()
 
-        if (TextUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             Toast.makeText(context, "Enter a name", Toast.LENGTH_SHORT).show()
         } else {
             dialog!!.setMessage("Image is being updated...")

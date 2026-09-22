@@ -1,8 +1,7 @@
 package com.flatcode.beautytouchadmin.ui.auth
 
-import android.app.ProgressDialog
+import android.app.Dialog
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +14,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
+import com.flatcode.beautytouchadmin.utils.setMessage
 import com.flatcode.beautytouchadmin.databinding.ActivityLoginBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -23,7 +24,7 @@ import kotlinx.coroutines.launch
 class LoginFragment : Fragment() {
 
     private var binding: ActivityLoginBinding? = null
-    private var dialog: ProgressDialog? = null
+    private var dialog: Dialog? = null
     private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreateView(
@@ -36,9 +37,7 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dialog = ProgressDialog(requireContext())
-        dialog!!.setTitle("Please wait...")
-        dialog!!.setCanceledOnTouchOutside(false)
+        dialog = MyDialog.loadingDialog(requireContext())
 
         binding!!.forget.setOnClickListener {
             // TODO: Navigate to Forget Password Fragment when created
@@ -67,9 +66,9 @@ class LoginFragment : Fragment() {
         val number = binding!!.phoneEt.text.toString().trim()
         val password = binding!!.passwordEt.text.toString().trim()
 
-        if (TextUtils.isEmpty(password)) {
+        if (password.isEmpty()) {
             Toast.makeText(requireContext(), "Password entry error!", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(number)) {
+        } else if (number.isEmpty()) {
             Toast.makeText(requireContext(), "Error entering the phone number!", Toast.LENGTH_SHORT).show()
         } else if (number.length != 10) {
             Toast.makeText(requireContext(), "Please enter a valid phone number!", Toast.LENGTH_SHORT).show()

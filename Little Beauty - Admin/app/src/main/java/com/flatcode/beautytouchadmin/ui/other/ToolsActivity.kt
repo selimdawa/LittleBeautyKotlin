@@ -1,12 +1,11 @@
 package com.flatcode.beautytouchadmin.ui.other
 
 import android.app.Activity
-import android.app.ProgressDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.text.TextUtils
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -16,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.*
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 import com.flatcode.beautytouchadmin.databinding.ActivityToolsBinding
 import com.canhub.cropper.CropImageContract
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,7 +31,7 @@ class ToolsActivity : AppCompatActivity() {
     private var imageUri2: Uri? = null
     private var imageUri3: Uri? = null
     private var imageUri4: Uri? = null
-    private var dialog: ProgressDialog? = null
+    private var dialog: Dialog? = null
     private val IMAGE_NOW = 1
     private val IMAGE_OLD = 2
     private val LOGO_NOW = 3
@@ -85,9 +85,7 @@ class ToolsActivity : AppCompatActivity() {
         binding = ActivityToolsBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        dialog = ProgressDialog(context)
-        dialog!!.setTitle("Please wait...")
-        dialog!!.setCanceledOnTouchOutside(false)
+        dialog = MyDialog.loadingDialog(context)
 
         binding!!.editImageSessionNow.setOnClickListener {
             IMAGE_NUMBER = IMAGE_NOW
@@ -106,7 +104,7 @@ class ToolsActivity : AppCompatActivity() {
             checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
         binding!!.toolbar.nameSpace.setText(R.string.tools)
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
 
         observeViewModel()
@@ -154,11 +152,11 @@ class ToolsActivity : AppCompatActivity() {
         val yearNow = binding!!.yearNow.text.toString().trim()
         val yearOld = binding!!.yearOld.text.toString().trim()
 
-        if (TextUtils.isEmpty(sessionNow)) {
+        if (sessionNow.isEmpty()) {
             Toast.makeText(context, "Enter the Session number", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(sessionNumberNow)) {
+        } else if (sessionNumberNow.isEmpty()) {
             Toast.makeText(context, "Enter the Session name", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(yearNow)) {
+        } else if (yearNow.isEmpty()) {
             Toast.makeText(context, "Enter the year", Toast.LENGTH_SHORT).show()
         } else {
             dialog!!.setMessage("Editing....")

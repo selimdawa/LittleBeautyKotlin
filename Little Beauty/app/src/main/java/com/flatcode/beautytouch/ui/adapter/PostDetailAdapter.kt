@@ -11,7 +11,6 @@ import com.flatcode.beautytouch.databinding.ItemPostDetailBinding
 import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.loadImage
-import java.text.MessageFormat
 
 class PostDetailAdapter(
     private val onLikeClick: (Post) -> Unit,
@@ -55,7 +54,7 @@ class PostDetailAdapter(
             }
             priceProduct.apply {
                 visibility = if (post.price == DATA.EMPTY) View.GONE else View.VISIBLE
-                text = MessageFormat.format("{0} SYP", post.price)
+                text = "${post.price} SYP"
             }
             
             linearIndications.visibility = if (post.indications == DATA.EMPTY) View.GONE else View.VISIBLE
@@ -81,7 +80,7 @@ class PostDetailAdapter(
             save.setImageResource(if (post.isSaved) R.drawable.ic_favorites_selected else R.drawable.ic_favorites_unselected)
             save.tag = if (post.isSaved) "saved" else "save"
             
-            likeNumber.text = MessageFormat.format("{0}", post.nrLikes)
+            likeNumber.text = "${post.nrLikes}"
 
             like.setOnClickListener { onLikeClick(post) }
             save.setOnClickListener { onSaveClick(post) }

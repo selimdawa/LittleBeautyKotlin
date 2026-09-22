@@ -2,12 +2,15 @@ package com.flatcode.beautytouchadmin.di
 
 import android.content.Context
 import androidx.room.Room
-import com.flatcode.beautytouchadmin.db.*
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
-import com.cloudinary.Cloudinary
-import com.cloudinary.utils.ObjectUtils
-
+import com.flatcode.beautytouchadmin.db.ADsDao
+import com.flatcode.beautytouchadmin.db.AppDatabase
+import com.flatcode.beautytouchadmin.db.MainDao
+import com.flatcode.beautytouchadmin.db.PointsDao
+import com.flatcode.beautytouchadmin.db.PostDao
+import com.flatcode.beautytouchadmin.db.RewardDao
+import com.flatcode.beautytouchadmin.db.ShoppingCenterDao
+import com.flatcode.beautytouchadmin.db.ToolsDao
+import com.flatcode.beautytouchadmin.db.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,29 +24,9 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
-
-    @Provides
-    @Singleton
-    fun provideFirebaseDatabase(): FirebaseDatabase = FirebaseDatabase.getInstance()
-
-    @Provides
-    @Singleton
-    fun provideCloudinary(): Cloudinary = Cloudinary(
-        ObjectUtils.asMap(
-            "cloud_name", "YOUR_CLOUD_NAME",
-            "api_key", "YOUR_API_KEY",
-            "api_secret", "YOUR_API_SECRET"
-        )
-    )
-
-    @Provides
-    @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "beauty_touch_admin_db"
+            context, AppDatabase::class.java, "beauty_touch_admin_db"
         ).build()
     }
 

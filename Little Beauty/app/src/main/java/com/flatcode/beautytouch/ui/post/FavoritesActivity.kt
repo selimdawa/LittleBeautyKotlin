@@ -25,10 +25,10 @@ import timber.log.Timber
 class FavoritesActivity : AppCompatActivity() {
 
     private val context: Context = this@FavoritesActivity
-    private var binding: ActivityFavoritesBinding? = null
+    private lateinit var binding: ActivityFavoritesBinding
     private var adapter: ProductsStaggeredAdapter? = null
-    var publisher = DATA.PUBLISHER_NAME
-    var aname = DATA.APP_NAME
+    private val publisher = DATA.PUBLISHER_NAME
+    private val appName = DATA.APP_NAME
 
     private val viewModel: PostViewModel by viewModels()
 
@@ -36,23 +36,22 @@ class FavoritesActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityFavoritesBinding.inflate(layoutInflater)
-        val view = binding!!.root
-        setContentView(view)
+        setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.updatePadding(top = systemBars.top, bottom = systemBars.bottom)
             insets
         }
 
-        binding!!.toolbar.nameSpace.setText(R.string.favorites)
-        binding!!.adView.bannerAd(applicationContext, DATA.BANNER_FAVORITES)
+        binding.toolbar.nameSpace.setText(R.string.favorites)
+        binding.adView.bannerAd(applicationContext, DATA.BANNER_FAVORITES)
 
         adapter = ProductsStaggeredAdapter(
             onItemClick = { post -> context.openActivity<PostDetailsActivity>(DATA.POST_ID to post.postid) },
             onLikeClick = { post -> viewModel.toggleLike(post) },
             onSaveClick = { post -> viewModel.toggleSave(post) })
-        binding!!.recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         observeViewModel()
     }
@@ -63,26 +62,26 @@ class FavoritesActivity : AppCompatActivity() {
                 Timber.d("Favorite posts collected: $resource")
                 when (resource) {
                     is Resource.Loading -> {
-                        binding!!.bar.visibility = View.VISIBLE
-                        binding!!.recyclerView.visibility = View.GONE
-                        binding!!.emptyText.visibility = View.GONE
+                        binding.bar.visibility = View.VISIBLE
+                        binding.recyclerView.visibility = View.GONE
+                        binding.emptyText.visibility = View.GONE
                     }
 
                     is Resource.Success -> {
                         val posts = resource.data.reversed()
-                        binding!!.bar.visibility = View.GONE
+                        binding.bar.visibility = View.GONE
                         if (posts.isNotEmpty()) {
-                            binding!!.recyclerView.visibility = View.VISIBLE
-                            binding!!.emptyText.visibility = View.GONE
+                            binding.recyclerView.visibility = View.VISIBLE
+                            binding.emptyText.visibility = View.GONE
                         } else {
-                            binding!!.recyclerView.visibility = View.GONE
-                            binding!!.emptyText.visibility = View.VISIBLE
+                            binding.recyclerView.visibility = View.GONE
+                            binding.emptyText.visibility = View.VISIBLE
                         }
-                        adapter!!.submitList(posts)
+                        adapter?.submitList(posts)
                     }
 
                     is Resource.Error -> {
-                        binding!!.bar.visibility = View.GONE
+                        binding.bar.visibility = View.GONE
                         Timber.e("Favorite posts error: ${resource.message}")
                     }
 
@@ -93,7 +92,7 @@ class FavoritesActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        viewModel.loadFavoritePosts(publisher, aname)
+        viewModel.loadFavoritePosts(publisher, appName)
         super.onResume()
     }
 }

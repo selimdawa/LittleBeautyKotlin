@@ -13,17 +13,16 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.Application
-import com.flatcode.beautytouchadmin.filter.ADsUserFilter
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.ui.ads.ADsInfoActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemAdsUserBinding
-import java.text.MessageFormat
 
-class ADsUserAdapter(private val context: Context, initialList: MutableList<User?>, var isUser: Boolean) :
-    ListAdapter<User, ADsUserAdapter.ViewHolder>(DiffCallback), Filterable {
+class ADsUserAdapter(
+    private val context: Context, initialList: MutableList<User?>, var isUser: Boolean
+) : ListAdapter<User, ADsUserAdapter.ViewHolder>(DiffCallback), Filterable {
 
     var list: MutableList<User?> = initialList
         set(value) {
@@ -45,16 +44,16 @@ class ADsUserAdapter(private val context: Context, initialList: MutableList<User
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list[position] ?: return
-        val userId = DATA.EMPTY + item.id
-        val username = DATA.EMPTY + item.username
-        val profileImage = DATA.EMPTY + item.imageurl
-        val timestamp = DATA.EMPTY + item.started
-        val adLoaded = DATA.EMPTY + item.adLoad
-        val adClicked = DATA.EMPTY + item.adClick
-        val formattedDate: String = Application.formatTimestamp(timestamp.toLong())
+        val userId = item.id ?: ""
+        val username = item.username ?: ""
+        val profileImage = item.imageurl ?: ""
+        val timestamp = item.started?.toLongOrNull() ?: 0L
+        val adLoaded = item.adLoad
+        val adClicked = item.adClick
+        val formattedDate: String = Application.formatTimestamp(timestamp)
 
         holder.profileImage.loadImage(true, profileImage)
-        if (username == DATA.EMPTY) {
+        if (username.isEmpty()) {
             holder.username.visibility = View.GONE
         } else {
             holder.username.visibility = View.VISIBLE
@@ -63,9 +62,9 @@ class ADsUserAdapter(private val context: Context, initialList: MutableList<User
 
         val rankValue = list.size - position
         holder.time.text = formattedDate
-        holder.rank.text = MessageFormat.format("{0}", rankValue)
-        holder.numberADsLoad.text = MessageFormat.format("{0}{1}", DATA.EMPTY, adLoaded)
-        holder.numberADsClick.text = MessageFormat.format("{0}{1}", DATA.EMPTY, adClicked)
+        holder.rank.text = "$rankValue"
+        holder.numberADsLoad.text = "$adLoaded"
+        holder.numberADsClick.text = "$adClicked"
 
         holder.item.setOnClickListener {
             context.openActivity<ADsInfoActivity>(DATA.PROFILE_ID to userId)
@@ -73,10 +72,30 @@ class ADsUserAdapter(private val context: Context, initialList: MutableList<User
     }
 
     override fun getFilter(): Filter {
-        if (filter == null) {
-            filter = ADsUserFilter(filterList, this)
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val results = FilterResults()
+                if (constraint != null && constraint.isNotEmpty()) {
+                    val constraintStr = constraint.toString().uppercase()
+                    val filter = mutableListOf<User?>()
+                    for (item in filterList) {
+                        if (item?.username?.uppercase()?.contains(constraintStr) == true) {
+                            filter.add(item)
+                        }
+                    }
+                    results.count = filter.size
+                    results.values = filter
+                } else {
+                    results.count = filterList.size
+                    results.values = filterList
+                }
+                return results
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults) {
+                @Suppress("UNCHECKED_CAST") submitList(results.values as MutableList<User>)
+            }
         }
-        return filter!!
     }
 
     class ViewHolder(binding: ItemAdsUserBinding) : RecyclerView.ViewHolder(binding.root) {

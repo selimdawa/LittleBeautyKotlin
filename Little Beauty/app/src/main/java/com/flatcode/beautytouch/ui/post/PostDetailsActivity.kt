@@ -21,10 +21,10 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class PostDetailsActivity : AppCompatActivity() {
 
-    var context: Context = this@PostDetailsActivity
-    private var binding: ActivityPostDetailBinding? = null
+    private val context: Context = this@PostDetailsActivity
+    private lateinit var binding: ActivityPostDetailBinding
     private var adapter: PostDetailAdapter? = null
-    var postId: String? = null
+    private var postId: String? = null
 
     private val viewModel: PostDetailsViewModel by viewModels()
 
@@ -32,24 +32,22 @@ class PostDetailsActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityPostDetailBinding.inflate(layoutInflater)
-        val view = binding!!.root
-        setContentView(view)
+        setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.updatePadding(top = systemBars.top, bottom = systemBars.bottom)
             insets
         }
 
-        val intent = intent
         postId = intent.getStringExtra(DATA.POST_ID)
-        binding!!.toolbar.nameSpace.setText(R.string.post_detail)
+        binding.toolbar.nameSpace.setText(R.string.post_detail)
 
         adapter = PostDetailAdapter(
             onLikeClick = { post -> viewModel.toggleLike(post) },
             onSaveClick = { post -> viewModel.toggleSave(post) }
         )
-        binding!!.recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         observeViewModel()
     }
@@ -59,7 +57,7 @@ class PostDetailsActivity : AppCompatActivity() {
             viewModel.postDetails.collect { resource ->
                 when (resource) {
                     is Resource.Success -> {
-                        adapter!!.submitList(listOf(resource.data))
+                        adapter?.submitList(listOf(resource.data))
                     }
                     else -> {}
                 }
@@ -68,9 +66,7 @@ class PostDetailsActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        if (postId != null) {
-            viewModel.loadPostDetails(postId!!)
-        }
+        postId?.let { viewModel.loadPostDetails(it) }
         super.onResume()
     }
 }

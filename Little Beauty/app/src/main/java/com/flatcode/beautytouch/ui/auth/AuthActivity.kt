@@ -12,23 +12,22 @@ import com.flatcode.beautytouch.databinding.ActivityAuthBinding
 
 class AuthActivity : AppCompatActivity() {
 
-    private var binding: ActivityAuthBinding? = null
-    var context: Context = this@AuthActivity
+    private lateinit var binding: ActivityAuthBinding
+    private val context: Context = this@AuthActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityAuthBinding.inflate(layoutInflater)
-        val view = binding!!.root
-        setContentView(view)
+        setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.updatePadding(top = systemBars.top, bottom = systemBars.bottom)
             insets
         }
 
-        binding!!.loginBtn.setOnClickListener { context.openActivity<LoginActivity>() }
-        binding!!.skipBtn.setOnClickListener { context.openActivity<RegisterActivity>() }
+        binding.loginBtn.setOnClickListener { context.openActivity<LoginActivity>() }
+        binding.skipBtn.setOnClickListener { context.openActivity<RegisterActivity>() }
     }
 }

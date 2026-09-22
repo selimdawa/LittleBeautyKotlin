@@ -1,18 +1,19 @@
 package com.flatcode.beautytouch.ui.main
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -25,51 +26,49 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import coil3.load
-import com.flatcode.beautytouch.ui.auth.LoginActivity
-import com.flatcode.beautytouch.ui.profile.ProfileActivity
-import com.flatcode.beautytouch.ui.profile.UserViewModel
-import com.flatcode.beautytouch.ui.post.PostViewModel
-import com.flatcode.beautytouch.ui.post.FavoritesActivity
-import com.flatcode.beautytouch.ui.reward.RewardActivity
 import com.flatcode.beautytouch.BuildConfig
 import com.flatcode.beautytouch.R
-import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.openActivity
-import com.flatcode.beautytouch.utils.interstitialAd
-import com.flatcode.beautytouch.utils.interstitialShow
-import com.flatcode.beautytouch.utils.loadImage
-import com.flatcode.beautytouch.utils.rateUs
 import com.flatcode.beautytouch.databinding.ActivityMainBinding
 import com.flatcode.beautytouch.databinding.DialogAboutBinding
 import com.flatcode.beautytouch.databinding.DialogAppBinding
 import com.flatcode.beautytouch.databinding.DialogCloseappBinding
 import com.flatcode.beautytouch.databinding.DialogLogoutBinding
+import com.flatcode.beautytouch.ui.auth.LoginActivity
+import com.flatcode.beautytouch.ui.post.FavoritesActivity
+import com.flatcode.beautytouch.ui.post.PostViewModel
+import com.flatcode.beautytouch.ui.profile.ProfileActivity
+import com.flatcode.beautytouch.ui.profile.UserViewModel
+import com.flatcode.beautytouch.ui.reward.RewardActivity
+import com.flatcode.beautytouch.utils.DATA
+import com.flatcode.beautytouch.utils.Resource
+import com.flatcode.beautytouch.utils.interstitialAd
+import com.flatcode.beautytouch.utils.interstitialShow
+import com.flatcode.beautytouch.utils.loadImage
+import com.flatcode.beautytouch.utils.openActivity
+import com.flatcode.beautytouch.utils.rateUs
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.material.navigation.NavigationView
+import dagger.hilt.android.AndroidEntryPoint
 import io.selimdawa.bubblebottom.BubbleBottomNavigation
 import io.selimdawa.bubblebottom.Model
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.text.MessageFormat
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    var activity: Activity? = null
-    var context: Context = also { activity = it }
-    var home = "Home Page"
-    var skin_product = "Skin Products"
-    var hair_product = "Hair Products"
-    var shopping_center = "Shopping Centers"
-    var number_product = DATA.EMPTY
-    var bottomNavigation: BubbleBottomNavigation? = null
-    var publisher: String = DATA.PUBLISHER_NAME
-    var aname: String = DATA.APP_NAME
+    private val context: Context = this
+    private val home = "Home Page"
+    private val skinProduct = "Skin Products"
+    private val hairProduct = "Hair Products"
+    private val shoppingCenter = "Shopping Centers"
+    private val numberProduct = DATA.EMPTY
+    private var bottomNavigation: BubbleBottomNavigation? = null
+    private val publisher: String = DATA.PUBLISHER_NAME
+    private val appName: String = DATA.APP_NAME
 
     private val userViewModel: UserViewModel by viewModels()
     private val postViewModel: PostViewModel by viewModels()
@@ -87,8 +86,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             insets
         }
 
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    showCloseAppDialog()
+                }
+            }
+        })
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
         binding.toolbar.image.setOnClickListener { context.openActivity<ProfileActivity>() }
@@ -97,7 +106,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         MobileAds.initialize(this) { }
-        activity!!.interstitialAd()
+        interstitialAd()
 
         binding.myProfile.setOnClickListener {
             context.openActivity<ProfileActivity>()
@@ -111,7 +120,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         binding.reward.setOnClickListener { context.openActivity<RewardActivity>() }
         binding.aboutApp.setOnClickListener { showDialogAboutApp() }
-        binding.shareApp.setOnClickListener { ShareApp() }
+        binding.shareApp.setOnClickListener { shareApp() }
         binding.aboutMy.setOnClickListener { showDialogAboutMy() }
         binding.logout.setOnClickListener { showDialogLogout() }
 
@@ -131,53 +140,51 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        bottomNavigation.setCount(1, number_product)
-        bottomNavigation.setCount(3, number_product)
-        bottomNavigation.setCount(4, number_product)
+        bottomNavigation.setCount(1, numberProduct)
+        bottomNavigation.setCount(3, numberProduct)
+        bottomNavigation.setCount(4, numberProduct)
         bottomNavigation.show(2, true)
 
         bottomNavigation.setOnClickMenuListener { item: Model ->
             when (item.id) {
-                1 -> Toast.makeText(applicationContext, skin_product, Toast.LENGTH_SHORT)
-                    .show()
+                1 -> Toast.makeText(applicationContext, skinProduct, Toast.LENGTH_SHORT).show()
 
                 2 -> {
                     Toast.makeText(applicationContext, home, Toast.LENGTH_SHORT).show()
                 }
 
-                3 -> Toast.makeText(applicationContext, hair_product, Toast.LENGTH_SHORT)
-                    .show()
+                3 -> Toast.makeText(applicationContext, hairProduct, Toast.LENGTH_SHORT).show()
 
                 4 -> {
-                    Toast.makeText(applicationContext, shopping_center, Toast.LENGTH_SHORT)
-                        .show()
-                    activity!!.interstitialShow(DATA.INTERSTITIAL_HOME)
+                    Toast.makeText(applicationContext, shoppingCenter, Toast.LENGTH_SHORT).show()
+                    interstitialShow(DATA.INTERSTITIAL_HOME)
                 }
             }
         }
         bottomNavigation.setOnReselectListener { item: Model ->
             when (item.id) {
-                1 -> Toast.makeText(applicationContext, skin_product, Toast.LENGTH_SHORT)
-                    .show()
+                1 -> Toast.makeText(applicationContext, skinProduct, Toast.LENGTH_SHORT).show()
 
                 2 -> Toast.makeText(applicationContext, home, Toast.LENGTH_SHORT).show()
-                3 -> Toast.makeText(applicationContext, hair_product, Toast.LENGTH_SHORT)
-                    .show()
+                3 -> Toast.makeText(applicationContext, hairProduct, Toast.LENGTH_SHORT).show()
 
-                4 -> Toast.makeText(applicationContext, shopping_center, Toast.LENGTH_SHORT)
-                    .show()
+                4 -> Toast.makeText(applicationContext, shoppingCenter, Toast.LENGTH_SHORT).show()
             }
         }
         val toggle = ActionBarDrawerToggle(
-            this, binding.drawerLayout,
-            R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            this,
+            binding.drawerLayout,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
         )
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         binding.imageDrawer.setOnClickListener { context.openActivity<ProfileActivity>() }
 
         observeViewModels()
-        postViewModel.loadCategoryCounts(publisher, aname, DATA.SKIN_PRODUCTS, DATA.HAIR_PRODUCTS, DATA.SHOPPING_CENTERS)
+        postViewModel.loadCategoryCounts(
+            publisher, appName, DATA.SKIN_PRODUCTS, DATA.HAIR_PRODUCTS, DATA.SHOPPING_CENTERS
+        )
         userViewModel.loadUserInfo()
     }
 
@@ -187,7 +194,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             postViewModel.skinCount.collect { resource ->
                 Timber.d("Skin count collected: $resource")
                 if (resource is Resource.Success) {
-                    binding.numberProductSkin.text = MessageFormat.format("{0}", resource.data)
+                    binding.numberProductSkin.text = "${resource.data}"
                     bottomNavigation?.setCount(1, resource.data.toString())
                 }
             }
@@ -196,7 +203,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             postViewModel.hairCount.collect { resource ->
                 Timber.d("Hair count collected: $resource")
                 if (resource is Resource.Success) {
-                    binding.numberProductHair.text = MessageFormat.format("{0}", resource.data)
+                    binding.numberProductHair.text = "${resource.data}"
                     bottomNavigation?.setCount(3, resource.data.toString())
                 }
             }
@@ -205,7 +212,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             postViewModel.shoppingCount.collect { resource ->
                 Timber.d("Shopping count collected: $resource")
                 if (resource is Resource.Success) {
-                    binding.numberShoppingCenters.text = MessageFormat.format("{0}", resource.data)
+                    binding.numberShoppingCenters.text = "${resource.data}"
                     bottomNavigation?.setCount(4, resource.data.toString())
                 }
             }
@@ -223,25 +230,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    override fun onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            val dialogBinding = DialogCloseappBinding.inflate(layoutInflater)
-            val dialog = Dialog(this)
-            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            dialog.setContentView(dialogBinding.root)
-            dialog.setCancelable(true)
-            dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            val lp: WindowManager.LayoutParams = WindowManager.LayoutParams()
-            lp.copyFrom(dialog.window!!.attributes)
-            lp.width = WindowManager.LayoutParams.WRAP_CONTENT
-            lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-            dialogBinding.yes.setOnClickListener { finish() }
-            dialogBinding.no.setOnClickListener { dialog.cancel() }
-            dialog.show()
-            dialog.window!!.attributes = lp
-        }
+    private fun showCloseAppDialog() {
+        val dialogBinding = DialogCloseappBinding.inflate(layoutInflater)
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(dialogBinding.root)
+        dialog.setCancelable(true)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val lp = WindowManager.LayoutParams()
+        lp.copyFrom(dialog.window?.attributes)
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
+        dialogBinding.yes.setOnClickListener { finish() }
+        dialogBinding.no.setOnClickListener { dialog.cancel() }
+        dialog.show()
+        dialog.window?.attributes = lp
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -249,7 +252,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
-    private fun ShareApp() {
+    private fun shareApp() {
         val shareIntent = Intent(Intent.ACTION_SEND)
         shareIntent.type = "text/plain"
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "share app")
@@ -266,9 +269,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(dialogBinding.root)
         dialog.setCancelable(true)
-        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val lp: WindowManager.LayoutParams = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window!!.attributes)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val lp = WindowManager.LayoutParams()
+        lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.WRAP_CONTENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
 
@@ -284,7 +287,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         userViewModel.loadAppTools()
 
         dialog.show()
-        dialog.window!!.attributes = lp
+        dialog.window?.attributes = lp
     }
 
     private fun showDialogAboutApp() {
@@ -293,40 +296,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(dialogBinding.root)
         dialog.setCancelable(true)
-        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val lp: WindowManager.LayoutParams = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window!!.attributes)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val lp = WindowManager.LayoutParams()
+        lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.WRAP_CONTENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialogBinding.linearRate.setOnClickListener { activity!!.rateUs() }
-        dialogBinding.facebookDesign.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View) {
-                startActivity(openFacebookIntent)
-            }
-
-            val openFacebookIntent: Intent
-                get() = try {
-                    getPackageManager().getPackageInfo("com.facebook.katana", 0)
-                    Intent(Intent.ACTION_VIEW, Uri.parse(DATA.FB_DESINGER))
-                } catch (e: Exception) {
-                    Intent(Intent.ACTION_VIEW, Uri.parse(DATA.FB_DESINGER_2))
-                }
-        })
-        dialogBinding.facebookProgrammer.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View) {
-                startActivity(openFacebookIntent)
-            }
-
-            val openFacebookIntent: Intent
-                get() = try {
-                    getPackageManager().getPackageInfo("com.facebook.katana", 0)
-                    Intent(Intent.ACTION_VIEW, Uri.parse(DATA.FB_PROGRAMMER))
-                } catch (e: Exception) {
-                    Intent(Intent.ACTION_VIEW, Uri.parse(DATA.FB_PROGRAMMER_2))
-                }
-        })
+        dialogBinding.linearRate.setOnClickListener { rateUs() }
+        dialogBinding.facebookDesign.setOnClickListener {
+            startActivity(getOpenFacebookIntent(DATA.FB_DESINGER, DATA.FB_DESINGER_2))
+        }
+        dialogBinding.facebookProgrammer.setOnClickListener {
+            startActivity(getOpenFacebookIntent(DATA.FB_PROGRAMMER, DATA.FB_PROGRAMMER_2))
+        }
         dialog.show()
-        dialog.window!!.attributes = lp
+        dialog.window?.attributes = lp
+    }
+
+    private fun getOpenFacebookIntent(url: String, fallbackUrl: String): Intent {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.getPackageInfo(
+                    "com.facebook.katana", PackageManager.PackageInfoFlags.of(0)
+                )
+            } else {
+                packageManager.getPackageInfo("com.facebook.katana", 0)
+            }
+            Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        } catch (e: Exception) {
+            Intent(Intent.ACTION_VIEW, Uri.parse(fallbackUrl))
+        }
     }
 
     private fun showDialogLogout() {
@@ -335,9 +333,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(dialogBinding.root)
         dialog.setCancelable(true)
-        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val lp: WindowManager.LayoutParams = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window!!.attributes)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val lp = WindowManager.LayoutParams()
+        lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.WRAP_CONTENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialogBinding.yes.setOnClickListener {
@@ -347,7 +345,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         dialogBinding.no.setOnClickListener { dialog.cancel() }
         dialog.show()
-        dialog.window!!.attributes = lp
+        dialog.window?.attributes = lp
     }
 
     companion object {

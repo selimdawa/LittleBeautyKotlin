@@ -18,7 +18,7 @@ data class ShoppingCenter(
     var location3: String? = null,
     var numberPhone: String? = null,
     var publisher: String? = null,
-    var aname: String? = null
+    var appName: String? = null
 ) : Parcelable {
     constructor() : this("", "", "", "", "", "", "", "", "", "")
 }

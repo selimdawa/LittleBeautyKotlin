@@ -30,7 +30,7 @@ class HotProductActivity : AppCompatActivity() {
         setContentView(binding!!.root)
 
         binding!!.toolbar.nameSpace.setText(R.string.hot_product)
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         hotpostAdapter = HotProductRemoveAdapter(context, object : HotProductRemoveAdapter.OnItemClickListener {
             override fun onRemoveClick(post: Post) {

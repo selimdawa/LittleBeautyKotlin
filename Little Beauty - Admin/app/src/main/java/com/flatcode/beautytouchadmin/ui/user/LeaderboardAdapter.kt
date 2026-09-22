@@ -12,7 +12,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.flatcode.beautytouchadmin.filter.LeaderboardFilter
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.ui.ads.ADsInfoActivity
 import com.flatcode.beautytouchadmin.utils.DATA
@@ -24,6 +23,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.text.MessageFormat
+import java.util.Locale
 
 class LeaderboardAdapter(
     private val mContext: Context, 
@@ -31,7 +31,7 @@ class LeaderboardAdapter(
     private val pointsKey: String? = null
 ) : ListAdapter<User, LeaderboardAdapter.ViewHolder>(DiffCallback), Filterable {
 
-    private var filter: LeaderboardFilter? = null
+    private var originalList: List<User> = currentList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemLeaderboradBinding.inflate(LayoutInflater.from(mContext), parent, false)
@@ -57,17 +57,42 @@ class LeaderboardAdapter(
         if (pointsKey != null) {
             fetchPoints(pointsKey, holder.numberADsLoad, id)
         }
-        
+
         holder.item.setOnClickListener {
             mContext.openActivity<ADsInfoActivity>(DATA.PROFILE_ID to id)
         }
     }
 
     override fun getFilter(): Filter {
-        if (filter == null) {
-            filter = LeaderboardFilter(ArrayList(currentList), this)
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val results = FilterResults()
+                if (originalList.isEmpty() && currentList.isNotEmpty()) {
+                    originalList = ArrayList(currentList)
+                }
+                
+                if (constraint != null && constraint.isNotEmpty()) {
+                    val constraintStr = constraint.toString().uppercase(Locale.getDefault())
+                    val filter = mutableListOf<User>()
+                    for (item in originalList) {
+                        if (item.username?.uppercase(Locale.getDefault())?.contains(constraintStr) == true) {
+                            filter.add(item)
+                        }
+                    }
+                    results.count = filter.size
+                    results.values = filter
+                } else {
+                    results.count = originalList.size
+                    results.values = originalList
+                }
+                return results
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults) {
+                @Suppress("UNCHECKED_CAST")
+                submitList(results.values as MutableList<User>)
+            }
         }
-        return filter!!
     }
 
     class ViewHolder(binding: ItemLeaderboradBinding) : RecyclerView.ViewHolder(binding.root) {

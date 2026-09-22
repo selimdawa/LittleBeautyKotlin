@@ -26,7 +26,7 @@ data class Post(
     var indications: String? = null,
     var use: String? = null,
     var publisher: String? = null,
-    var aname: String? = null,
+    var appName: String? = null,
     var isLiked: Boolean = false,
     var isSaved: Boolean = false,
     var nrLikes: Int = 0

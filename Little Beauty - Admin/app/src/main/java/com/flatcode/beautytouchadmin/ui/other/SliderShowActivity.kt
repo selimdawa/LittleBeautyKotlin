@@ -1,7 +1,7 @@
 package com.flatcode.beautytouchadmin.ui.other
 
 import android.app.Activity
-import android.app.ProgressDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -16,11 +16,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.*
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 import com.flatcode.beautytouchadmin.databinding.ActivitySliderShowBinding
 import com.canhub.cropper.CropImageContract
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.text.MessageFormat
 
 @AndroidEntryPoint
 class SliderShowActivity : AppCompatActivity() {
@@ -29,7 +29,7 @@ class SliderShowActivity : AppCompatActivity() {
     private var activity: Activity? = null
     private val context: Context = also { activity = it }
     private var imageUri: Uri? = null
-    private var dialog: ProgressDialog? = null
+    private var dialog: Dialog? = null
     private var IMAGE_NUMBER = 0
     private val viewModel: SliderViewModel by viewModels()
 
@@ -68,11 +68,9 @@ class SliderShowActivity : AppCompatActivity() {
         setContentView(binding!!.root)
 
         binding!!.toolbar.nameSpace.setText(R.string.slider_show)
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        dialog = ProgressDialog(context)
-        dialog!!.setTitle("Please wait...")
-        dialog!!.setCanceledOnTouchOutside(false)
+        dialog = MyDialog.loadingDialog(context)
 
         setupClickListeners()
         observeViewModel()
@@ -119,7 +117,7 @@ class SliderShowActivity : AppCompatActivity() {
 
     private fun updateUI(sliders: Map<String, String>) {
         val count = sliders.size
-        binding!!.toolbar.nameSpace.text = MessageFormat.format("Slider Show ( {0} )", count)
+        binding!!.toolbar.nameSpace.text = "Slider Show ( $count )"
         
         val images = listOf(
             binding!!.imageOne, binding!!.imageTwo, binding!!.imageThree, binding!!.imageFour, binding!!.imageFive,

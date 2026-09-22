@@ -26,8 +26,8 @@ import timber.log.Timber
 @AndroidEntryPoint
 class LeaderboardOldActivity : AppCompatActivity() {
 
-    private var binding: ActivityLeaderboardBinding? = null
-    var context: Context = this@LeaderboardOldActivity
+    private lateinit var binding: ActivityLeaderboardBinding
+    private val context: Context = this
     private var adapter: LeaderboardOldAdapter? = null
 
     private val viewModel: UserViewModel by viewModels()
@@ -35,15 +35,14 @@ class LeaderboardOldActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLeaderboardBinding.inflate(layoutInflater)
-        val view = binding!!.root
-        setContentView(view)
+        setContentView(binding.root)
 
         adapter = LeaderboardOldAdapter(
             onItemClick = { user ->
                 // Handle item click if needed
             }
         )
-        binding!!.recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         observeViewModel()
     }
@@ -54,10 +53,10 @@ class LeaderboardOldActivity : AppCompatActivity() {
                 Timber.d("App tools collected: $resource")
                 if (resource is Resource.Success) {
                     val tools = resource.data
-                    binding!!.imageSession.loadImage(false, tools.oldImageSession)
-                    binding!!.imageLogo.loadImage(false, tools.oldImageLogo)
-                    binding!!.sessionNumber.text = tools.oldSession
-                    val key = tools.oldYear + "_" + tools.oldSessionNumber
+                    binding.imageSession.loadImage(false, tools.oldImageSession)
+                    binding.imageLogo.loadImage(false, tools.oldImageLogo)
+                    binding.sessionNumber.text = tools.oldSession
+                    val key = "${tools.oldYear}_${tools.oldSessionNumber}"
                     viewModel.loadLeaderboard(key)
                     viewModel.loadRewards()
                 }
@@ -67,8 +66,8 @@ class LeaderboardOldActivity : AppCompatActivity() {
             viewModel.leaderboard.collect { resource ->
                 Timber.d("Leaderboard collected: $resource")
                 if (resource is Resource.Success) {
-                    adapter!!.submitList(resource.data)
-                    adapter!!.filterList = ArrayList(resource.data)
+                    adapter?.submitList(resource.data)
+                    adapter?.filterList = resource.data
                 }
             }
         }
@@ -77,27 +76,27 @@ class LeaderboardOldActivity : AppCompatActivity() {
                 Timber.d("Rewards collected: $resource")
                 if (resource is Resource.Success) {
                     val reward = resource.data
-                    reward.reward?.let { ReadReward(it, binding!!.reward) }
-                    reward.reward2?.let { ReadReward(it, binding!!.reward2) }
-                    reward.reward3?.let { ReadReward(it, binding!!.reward3) }
-                    reward.reward4?.let { ReadReward(it, binding!!.reward4) }
-                    reward.reward5?.let { ReadReward(it, binding!!.reward5) }
-                    reward.reward6?.let { ReadReward(it, binding!!.reward6) }
+                    reward.reward?.let { readReward(it, binding.reward) }
+                    reward.reward2?.let { readReward(it, binding.reward2) }
+                    reward.reward3?.let { readReward(it, binding.reward3) }
+                    reward.reward4?.let { readReward(it, binding.reward4) }
+                    reward.reward5?.let { readReward(it, binding.reward5) }
+                    reward.reward6?.let { readReward(it, binding.reward6) }
                 }
             }
         }
     }
 
-    private fun ReadReward(R: String, Reward: ImageView) {
-        if (R != DATA.EMPTY) {
-            val reference = FirebaseDatabase.getInstance().getReference(DATA.POSTS).child(R)
+    private fun readReward(rewardId: String, rewardImage: ImageView) {
+        if (rewardId != DATA.EMPTY) {
+            val reference = FirebaseDatabase.getInstance().getReference(DATA.POSTS).child(rewardId)
             reference.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val post = dataSnapshot.getValue(Post::class.java)
-                    if (post?.postid == R) {
-                        Reward.loadImage(false, post.postimage)
-                        Reward.setOnClickListener {
-                            context.openActivity<PostDetailsActivity>(DATA.POST_ID to R)
+                    if (post?.postid == rewardId) {
+                        rewardImage.loadImage(false, post.postimage)
+                        rewardImage.setOnClickListener {
+                            context.openActivity<PostDetailsActivity>(DATA.POST_ID to rewardId)
                         }
                     }
                 }

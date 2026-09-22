@@ -1,9 +1,7 @@
 package com.flatcode.beautytouch.ui.auth
 
-import android.app.ProgressDialog
 import android.content.Context
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -17,6 +15,7 @@ import com.flatcode.beautytouch.ui.main.MainActivity
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.openActivity
 import com.flatcode.beautytouch.databinding.ActivityRegisterBinding
+import com.flatcode.beautytouch.utils.LoadingDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -24,34 +23,29 @@ import timber.log.Timber
 @AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
 
-    private var binding: ActivityRegisterBinding? = null
-    var context: Context = this@RegisterActivity
+    private lateinit var binding: ActivityRegisterBinding
+    private val context: Context = this@RegisterActivity
     private val viewModel: AuthViewModel by viewModels()
-    private var dialog: ProgressDialog? = null
+    private val dialog by lazy { LoadingDialog(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
-        val view = binding!!.root
-        setContentView(view)
+        setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.updatePadding(top = systemBars.top, bottom = systemBars.bottom)
             insets
         }
 
-        dialog = ProgressDialog(this)
-        dialog!!.setTitle("Please wait...")
-        dialog!!.setCanceledOnTouchOutside(false)
-
-        binding!!.login.setOnClickListener {
+        binding.login.setOnClickListener {
             context.openActivity<LoginActivity>()
             finish()
         }
-        binding!!.forget.setOnClickListener { context.openActivity<ForgetPasswordActivity>() }
-        binding!!.go.setOnClickListener { validateData() }
+        binding.forget.setOnClickListener { context.openActivity<ForgetPasswordActivity>() }
+        binding.go.setOnClickListener { validateData() }
 
         observeViewModel()
     }
@@ -62,19 +56,18 @@ class RegisterActivity : AppCompatActivity() {
                 Timber.d("Register state collected: $resource")
                 when (resource) {
                     is Resource.Loading -> {
-                        dialog!!.setMessage("The account is created")
-                        dialog!!.show()
+                        dialog.show("The account is created")
                     }
 
                     is Resource.Success -> {
-                        dialog!!.dismiss()
+                        dialog.dismiss()
                         Toast.makeText(context, "Account created", Toast.LENGTH_SHORT).show()
                         context.openActivity<MainActivity>(clear = true)
                         finish()
                     }
 
                     is Resource.Error -> {
-                        dialog!!.dismiss()
+                        dialog.dismiss()
                         Timber.e("Register error: ${resource.message}")
                         Toast.makeText(context, resource.message, Toast.LENGTH_SHORT).show()
                     }
@@ -92,33 +85,33 @@ class RegisterActivity : AppCompatActivity() {
     private fun validateData() {
 
         //get data
-        name = binding!!.nameEt.text.toString().trim { it <= ' ' }
-        number = binding!!.emailEt.text.toString().trim { it <= ' ' }
-        email = binding!!.emailEt.text.toString().trim { it <= ' ' } + "@flatcodetest.com"
-        password = binding!!.passwordEt.text.toString().trim { it <= ' ' }
-        val cPassword = binding!!.cPasswordEt.text.toString().trim { it <= ' ' }
+        name = binding.nameEt.text.toString().trim()
+        number = binding.emailEt.text.toString().trim()
+        email = binding.emailEt.text.toString().trim() + "@flatcodetest.com"
+        password = binding.passwordEt.text.toString().trim()
+        val cPassword = binding.cPasswordEt.text.toString().trim()
 
         //validate data
-        if (TextUtils.isEmpty(name)) {
+        if (name.isEmpty()) {
             Toast.makeText(context, "Enter the username!", Toast.LENGTH_SHORT).show()
         } else if (!Patterns.PHONE.matcher(number).matches()) {
             Toast.makeText(context, "Enter the Phone number!", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(password)) {
+        } else if (password.isEmpty()) {
             Toast.makeText(context, "Enter the password!", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(cPassword)) {
+        } else if (cPassword.isEmpty()) {
             Toast.makeText(context, "Confirm password!", Toast.LENGTH_SHORT).show()
         } else if (password != cPassword) {
             Toast.makeText(context, "Password does not match!", Toast.LENGTH_SHORT).show()
-        } else if (TextUtils.isEmpty(number)) {
+        } else if (number.isEmpty()) {
             Toast.makeText(context, "Error entering the number!", Toast.LENGTH_SHORT).show()
         } else if (number.length != 10) {
             Toast.makeText(context, "Please enter a 10 digit number!", Toast.LENGTH_SHORT).show()
         } else if (number == "0111111111") {
             Toast.makeText(context, "Please enter a valid number!", Toast.LENGTH_SHORT).show()
         } else {
-            val digit = number[0].toString().toInt()
-            val digit2 = number[1].toString().toInt()
-            val digit3 = number[2].toString().toInt()
+            val digit = number[0].toString().toIntOrNull() ?: -1
+            val digit2 = number[1].toString().toIntOrNull() ?: -1
+            val digit3 = number[2].toString().toIntOrNull() ?: -1
             if (digit == 0 && digit2 == 9 && (digit3 == 3 || digit3 == 4 || digit3 == 5 || digit3 == 6 || digit3 == 8 || digit3 == 9)) {
                 viewModel.register(name, email, password, number)
             } else {

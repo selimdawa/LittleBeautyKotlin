@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ShoppingCenterDao {
-    @Query("SELECT * FROM shopping_centers WHERE publisher = :publisher AND aname = :aname")
-    fun getShoppingCenters(publisher: String, aname: String): Flow<List<ShoppingCenter>>
+    @Query("SELECT * FROM shopping_centers WHERE publisher = :publisher AND appName = :appName")
+    fun getShoppingCenters(publisher: String, appName: String): Flow<List<ShoppingCenter>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertShoppingCenters(centers: List<ShoppingCenter>)

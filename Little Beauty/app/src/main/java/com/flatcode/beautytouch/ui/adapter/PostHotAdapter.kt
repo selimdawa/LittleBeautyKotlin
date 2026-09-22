@@ -11,7 +11,6 @@ import com.flatcode.beautytouch.databinding.ItemProductLinearBinding
 import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.loadImage
-import java.text.MessageFormat
 
 class PostHotAdapter(
     private val onItemClick: (Post) -> Unit,
@@ -37,7 +36,7 @@ class PostHotAdapter(
             }
             price.apply {
                 visibility = if (post.price == DATA.EMPTY) View.GONE else View.VISIBLE
-                text = MessageFormat.format("{0} SYP", post.price)
+                text = "${post.price} SYP"
             }
 
             // Bind status from model
@@ -47,7 +46,7 @@ class PostHotAdapter(
             save.setImageResource(if (post.isSaved) R.drawable.ic_favorites_selected else R.drawable.ic_favorites_unselected)
             save.tag = if (post.isSaved) "saved" else "save"
             
-            likes.text = MessageFormat.format("{0}", post.nrLikes)
+            likes.text = "${post.nrLikes}"
 
             like.setOnClickListener { onLikeClick(post) }
             save.setOnClickListener { onSaveClick(post) }

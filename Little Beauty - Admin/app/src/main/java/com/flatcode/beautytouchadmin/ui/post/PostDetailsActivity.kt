@@ -34,7 +34,7 @@ class PostDetailsActivity : AppCompatActivity() {
         postId = intent.getStringExtra(DATA.POST_ID)
 
         binding!!.toolbar.nameSpace.setText(R.string.post_detail)
-        binding!!.toolbar.back.setOnClickListener { onBackPressed() }
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         adapter = PostDetailAdapter(context, list, object : PostDetailAdapter.OnItemClickListener {
             override fun onLikeClick(post: Post) {

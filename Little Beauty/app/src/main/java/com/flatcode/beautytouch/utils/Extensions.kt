@@ -25,6 +25,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.firebase.auth.FirebaseAuth
 import java.io.Serializable
 
 inline fun <reified T : Activity> Context.openActivity(
@@ -84,13 +85,13 @@ fun AdView.bannerAd(context: Context?, bannerName: String?) {
     this.loadAd(adRequest)
     this.adListener = object : AdListener() {
         override fun onAdLoaded() {
-            DATA.FirebaseUserUid.adUserCount(DATA.AD_LOAD, 1)
-            DATA.FirebaseUserUid.adCount(bannerName, DATA.ADS_LOADED_COUNT)
+            FirebaseAuth.getInstance().currentUser?.uid.adUserCount(DATA.AD_LOAD, 1)
+            FirebaseAuth.getInstance().currentUser?.uid.adCount(bannerName, DATA.ADS_LOADED_COUNT)
         }
 
         override fun onAdOpened() {
-            DATA.FirebaseUserUid.adUserCount(DATA.AD_CLICK, 1)
-            DATA.FirebaseUserUid.adCount(bannerName, DATA.ADS_CLICKED_COUNT)
+            FirebaseAuth.getInstance().currentUser?.uid.adUserCount(DATA.AD_CLICK, 1)
+            FirebaseAuth.getInstance().currentUser?.uid.adCount(bannerName, DATA.ADS_CLICKED_COUNT)
         }
     }
 }
@@ -113,8 +114,8 @@ fun Activity.interstitialAd() {
 }
 
 fun Activity.interstitialShow(interstitialName: String?) {
-    if (mInterstitialAd != null) {
-        mInterstitialAd!!.fullScreenContentCallback = object : FullScreenContentCallback() {
+    mInterstitialAd?.let { ad ->
+        ad.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdFailedToShowFullScreenContent(adError: AdError) {
                 mInterstitialAd = null
             }
@@ -125,16 +126,16 @@ fun Activity.interstitialShow(interstitialName: String?) {
             }
 
             override fun onAdImpression() {
-                DATA.FirebaseUserUid.adUserCount(DATA.AD_LOAD, 1)
-                DATA.FirebaseUserUid.adCount(interstitialName, DATA.ADS_LOADED_COUNT)
+                FirebaseAuth.getInstance().currentUser?.uid.adUserCount(DATA.AD_LOAD, 1)
+                FirebaseAuth.getInstance().currentUser?.uid.adCount(interstitialName, DATA.ADS_LOADED_COUNT)
             }
 
             override fun onAdClicked() {
-                DATA.FirebaseUserUid.adUserCount(DATA.AD_CLICK, 1)
-                DATA.FirebaseUserUid.adCount(interstitialName, DATA.ADS_CLICKED_COUNT)
+                FirebaseAuth.getInstance().currentUser?.uid.adUserCount(DATA.AD_CLICK, 1)
+                FirebaseAuth.getInstance().currentUser?.uid.adCount(interstitialName, DATA.ADS_CLICKED_COUNT)
             }
         }
-        mInterstitialAd!!.show(this)
+        ad.show(this)
     }
 }
 

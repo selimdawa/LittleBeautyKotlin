@@ -36,52 +36,52 @@ class PostViewModel @Inject constructor(
     private val _favoritePosts = MutableStateFlow<Resource<List<Post>>?>(null)
     val favoritePosts: StateFlow<Resource<List<Post>>?> = _favoritePosts
 
-    fun loadPostsByCategory(category: String, publisher: String, aname: String) {
+    fun loadPostsByCategory(category: String, publisher: String, appName: String) {
         Timber.d("Loading posts for category: $category, publisher: $publisher")
         viewModelScope.launch {
-            repository.getPostsByCategory(category, publisher, aname).collect {
+            repository.getPostsByCategory(category, publisher, appName).collect {
                 _postsByCategory.value = it
                 Timber.d("Posts by category state updated: $it")
             }
         }
     }
 
-    fun loadCategoryCounts(publisher: String, aname: String, skinCat: String, hairCat: String, shoppingCat: String) {
+    fun loadCategoryCounts(publisher: String, appName: String, skinCat: String, hairCat: String, shoppingCat: String) {
         Timber.d("Loading category counts for publisher: $publisher")
         viewModelScope.launch {
-            repository.getCategoryCount(skinCat, publisher, aname).collect {
+            repository.getCategoryCount(skinCat, publisher, appName).collect {
                 _skinCount.value = it
                 Timber.d("Skin count state updated: $it")
             }
         }
         viewModelScope.launch {
-            repository.getCategoryCount(hairCat, publisher, aname).collect {
+            repository.getCategoryCount(hairCat, publisher, appName).collect {
                 _hairCount.value = it
                 Timber.d("Hair count state updated: $it")
             }
         }
         viewModelScope.launch {
-            repository.getCategoryCount(shoppingCat, publisher, aname).collect {
+            repository.getCategoryCount(shoppingCat, publisher, appName).collect {
                 _shoppingCount.value = it
                 Timber.d("Shopping count state updated: $it")
             }
         }
     }
 
-    fun loadShoppingCenters(publisher: String, aname: String) {
+    fun loadShoppingCenters(publisher: String, appName: String) {
         Timber.d("Loading shopping centers for publisher: $publisher")
         viewModelScope.launch {
-            repository.getShoppingCenters(publisher, aname).collect {
+            repository.getShoppingCenters(publisher, appName).collect {
                 _shoppingCenters.value = it
                 Timber.d("Shopping centers state updated: $it")
             }
         }
     }
 
-    fun loadFavoritePosts(publisher: String, aname: String) {
+    fun loadFavoritePosts(publisher: String, appName: String) {
         Timber.d("Loading favorite posts for publisher: $publisher")
         viewModelScope.launch {
-            repository.getFavoritePosts(publisher, aname).collect {
+            repository.getFavoritePosts(publisher, appName).collect {
                 _favoritePosts.value = it
                 Timber.d("Favorite posts state updated: $it")
             }
