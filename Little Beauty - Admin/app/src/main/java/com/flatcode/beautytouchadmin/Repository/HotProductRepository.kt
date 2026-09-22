@@ -24,7 +24,10 @@ class HotProductRepository @Inject constructor(private val database: FirebaseDat
                 }
                 trySend(list)
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
@@ -43,7 +46,10 @@ class HotProductRepository @Inject constructor(private val database: FirebaseDat
                 }
                 trySend(list)
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }

@@ -1,23 +1,23 @@
 package com.flatcode.beautytouchadmin.repository
 
 import android.net.Uri
+import com.cloudinary.Cloudinary
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.cloudinary.Cloudinary
-
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PostRepository @Inject constructor(
-    private val database: FirebaseDatabase,
-    private val cloudinary: Cloudinary
+    private val database: FirebaseDatabase, private val cloudinary: Cloudinary
 ) {
 
     fun getPosts(type: String): Flow<List<Post>> = callbackFlow {
@@ -61,10 +61,19 @@ class PostRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    suspend fun uploadImage(postId: String, imageUri: Uri, extension: String): String {
-        // TODO: Replace with Cloudinary implementation
-        return ""
-    }
+    suspend fun uploadImage(postId: String, imageUri: Uri): String =
+        withContext(Dispatchers.IO) {
+            try {
+                val options = mapOf(
+                    "public_id" to postId,
+                    "folder" to "Posts"
+                )
+                val result = cloudinary.uploader().upload(imageUri.toString(), options)
+                result["secure_url"] as String
+            } catch (_: Exception) {
+                ""
+            }
+        }
 
     suspend fun addPost(postData: Map<String, Any?>) {
         val ref = database.getReference(DATA.POSTS)
@@ -89,7 +98,10 @@ class PostRepository @Inject constructor(
                 }
                 trySend(list)
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
@@ -106,7 +118,10 @@ class PostRepository @Inject constructor(
                 }
                 trySend(list)
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
@@ -118,7 +133,10 @@ class PostRepository @Inject constructor(
             override fun onDataChange(snapshot: DataSnapshot) {
                 trySend(snapshot.childrenCount)
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
@@ -130,7 +148,10 @@ class PostRepository @Inject constructor(
             override fun onDataChange(snapshot: DataSnapshot) {
                 trySend(snapshot.exists())
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }

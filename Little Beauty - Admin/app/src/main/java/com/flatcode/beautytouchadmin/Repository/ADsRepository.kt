@@ -25,7 +25,10 @@ class ADsRepository @Inject constructor(private val database: FirebaseDatabase) 
                 }
                 trySend(list)
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
@@ -44,7 +47,10 @@ class ADsRepository @Inject constructor(private val database: FirebaseDatabase) 
                 }
                 trySend(list)
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }

@@ -7,11 +7,12 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.cloudinary.Cloudinary
-
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SliderRepository @Inject constructor(
@@ -35,10 +36,19 @@ class SliderRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    suspend fun uploadSliderImage(name: String, imageUri: Uri, extension: String): String {
-        // TODO: Replace with Cloudinary implementation
-        return ""
-    }
+    suspend fun uploadSliderImage(name: String, imageUri: Uri, extension: String): String =
+        withContext(Dispatchers.IO) {
+            try {
+                val options = mapOf(
+                    "public_id" to name,
+                    "folder" to "Sliders"
+                )
+                val result = cloudinary.uploader().upload(imageUri.toString(), options)
+                result["secure_url"] as String
+            } catch (e: Exception) {
+                ""
+            }
+        }
 
     suspend fun updateSlider(data: Map<String, Any?>) {
         database.getReference(DATA.SLIDER_SHOW).updateChildren(data).await()

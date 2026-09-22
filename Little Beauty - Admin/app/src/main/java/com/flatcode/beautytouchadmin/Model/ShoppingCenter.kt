@@ -1,3 +1,5 @@
+@file:Suppress("SpellCheckingInspection")
+
 package com.flatcode.beautytouchadmin.model
 
 import android.os.Parcelable
@@ -8,8 +10,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity(tableName = "shopping_centers")
 data class ShoppingCenter(
-    @PrimaryKey
-    var id: String = "",
+    @PrimaryKey var id: String = "",
     var name: String? = null,
     var imageurl: String? = null,
     var imageurl2: String? = null,

@@ -8,8 +8,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity(tableName = "tools")
 data class Tools(
-    @PrimaryKey
-    var session: String = "",
+    @PrimaryKey var session: String = "",
     var imageLogo: String? = null,
     var oldImageLogo: String? = null,
     var imageSession: String? = null,

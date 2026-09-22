@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.ADs
 import com.flatcode.beautytouchadmin.databinding.ItemInfoAdsBinding
 
-class ADsInfoAdapter(private val context: Context, initialList: MutableList<ADs?>, var isUser: Boolean) :
+class ADsInfoAdapter(private val context: Context, initialList: MutableList<ADs?>) :
     ListAdapter<ADs, ADsInfoAdapter.ViewHolder>(DiffCallback), Filterable {
 
     var list: MutableList<ADs?> = initialList
@@ -48,7 +48,7 @@ class ADsInfoAdapter(private val context: Context, initialList: MutableList<ADs?
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val results = FilterResults()
-                if (constraint != null && constraint.isNotEmpty()) {
+                if (!constraint.isNullOrEmpty()) {
                     val constraintStr = constraint.toString().uppercase()
                     val filter = mutableListOf<ADs?>()
                     for (item in filterList) {

@@ -25,7 +25,10 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
                 }
                 trySend(count - 1)
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
@@ -37,7 +40,10 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
             override fun onDataChange(snapshot: DataSnapshot) {
                 trySend(snapshot.childrenCount.toInt())
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
@@ -54,7 +60,10 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
                 }
                 trySend(count)
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
@@ -71,7 +80,10 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
                 }
                 trySend(count)
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
@@ -83,7 +95,10 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
             override fun onDataChange(snapshot: DataSnapshot) {
                 trySend(snapshot.childrenCount.toInt())
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
@@ -95,7 +110,10 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
             override fun onDataChange(snapshot: DataSnapshot) {
                 trySend(snapshot.getValue(User::class.java))
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }

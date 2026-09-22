@@ -21,7 +21,7 @@ import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemAdsUserBinding
 
 class ADsUserAdapter(
-    private val context: Context, initialList: MutableList<User?>, var isUser: Boolean
+    private val context: Context, initialList: MutableList<User?>
 ) : ListAdapter<User, ADsUserAdapter.ViewHolder>(DiffCallback), Filterable {
 
     var list: MutableList<User?> = initialList
@@ -31,7 +31,6 @@ class ADsUserAdapter(
         }
 
     var filterList: MutableList<User?> = initialList
-    private var filter: ADsUserFilter? = null
 
     init {
         submitList(initialList.filterNotNull())
@@ -44,7 +43,7 @@ class ADsUserAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list[position] ?: return
-        val userId = item.id ?: ""
+        val userId = item.id
         val username = item.username ?: ""
         val profileImage = item.imageurl ?: ""
         val timestamp = item.started?.toLongOrNull() ?: 0L
@@ -53,7 +52,7 @@ class ADsUserAdapter(
         val formattedDate: String = Application.formatTimestamp(timestamp)
 
         holder.profileImage.loadImage(true, profileImage)
-        if (username.isEmpty()) {
+        if (username.isNullOrEmpty()) {
             holder.username.visibility = View.GONE
         } else {
             holder.username.visibility = View.VISIBLE
@@ -75,7 +74,7 @@ class ADsUserAdapter(
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val results = FilterResults()
-                if (constraint != null && constraint.isNotEmpty()) {
+                if (!constraint.isNullOrEmpty()) {
                     val constraintStr = constraint.toString().uppercase()
                     val filter = mutableListOf<User?>()
                     for (item in filterList) {

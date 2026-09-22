@@ -19,8 +19,7 @@ class SplashFragment : Fragment() {
 
     private var binding: ActivitySplashBinding? = null
     private val viewModel: SplashViewModel by viewModels()
-    private val time_per_second = 2
-    private val time_final = 1000 * time_per_second
+    private val timeFinal = 2000L
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -32,7 +31,7 @@ class SplashFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch {
-            delay(time_final.toLong())
+            delay(timeFinal)
             checkUser()
         }
     }

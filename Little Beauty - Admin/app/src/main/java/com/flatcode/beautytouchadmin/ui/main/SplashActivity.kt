@@ -17,9 +17,7 @@ import kotlinx.coroutines.launch
 class SplashActivity : AppCompatActivity() {
 
     private var binding: ActivitySplashBinding? = null
-    private val context: Context = this@SplashActivity
-    private val time_per_second = 2
-    private val time_final = time_per_millis * time_per_second
+    private val timeFinal = 2000L
     private val viewModel: SplashViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +27,7 @@ class SplashActivity : AppCompatActivity() {
         setContentView(binding!!.root)
 
         lifecycleScope.launch {
-            delay(time_final.toLong())
+            delay(timeFinal)
             checkUser()
         }
     }
@@ -41,9 +39,5 @@ class SplashActivity : AppCompatActivity() {
             openActivity<MainActivity>()
         }
         finish()
-    }
-
-    companion object {
-        const val time_per_millis = 1000
     }
 }
