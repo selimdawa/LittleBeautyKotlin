@@ -24,10 +24,8 @@ import com.flatcode.beautytouchadmin.ui.profile.AboutMeActivity
 import com.flatcode.beautytouchadmin.ui.shopping.ShoppingCentersActivity
 import com.flatcode.beautytouchadmin.ui.shopping.ShoppingCentersAddActivity
 import com.flatcode.beautytouchadmin.ui.user.UsersActivity
-import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemMainBinding
-import java.text.MessageFormat
 
 class MainAdapter(private val context: Context) :
     ListAdapter<Main, MainAdapter.ViewHolder>(DiffCallback) {
@@ -46,7 +44,7 @@ class MainAdapter(private val context: Context) :
         if (image != 0) holder.image.setImageResource(image) else holder.image.setImageResource(R.drawable.ic_load)
         if (number != 0) {
             holder.number.visibility = View.VISIBLE
-            holder.number.text = MessageFormat.format("{0}{1}", DATA.EMPTY, number)
+            holder.number.text = "$number"
         } else {
             holder.number.visibility = View.GONE
         }

@@ -19,13 +19,13 @@ class PostHotAdapter(
 ) : ListAdapter<Post, PostHotAdapter.ViewHolder>(PostDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemProductLinearBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemProductLinearBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = getItem(position) ?: return
-        val context = holder.itemView.context
 
         with(holder.binding) {
             imageProduct.loadImage(false, post.postimage)
@@ -42,10 +42,10 @@ class PostHotAdapter(
             // Bind status from model
             like.setImageResource(if (post.isLiked) R.drawable.ic_heart_selected else R.drawable.ic_heart_unselected)
             like.tag = if (post.isLiked) "liked" else "like"
-            
+
             save.setImageResource(if (post.isSaved) R.drawable.ic_favorites_selected else R.drawable.ic_favorites_unselected)
             save.tag = if (post.isSaved) "saved" else "save"
-            
+
             likes.text = "${post.nrLikes}"
 
             like.setOnClickListener { onLikeClick(post) }

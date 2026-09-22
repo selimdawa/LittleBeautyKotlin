@@ -10,15 +10,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
-import com.flatcode.beautytouch.ui.adapter.LeaderboardAdapter
+import com.flatcode.beautytouch.databinding.ActivityLeaderboardBinding
 import com.flatcode.beautytouch.model.Post
-import com.flatcode.beautytouch.model.User
+import com.flatcode.beautytouch.ui.adapter.LeaderboardAdapter
+import com.flatcode.beautytouch.ui.post.PostDetailsActivity
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.loadImage
 import com.flatcode.beautytouch.utils.openActivity
-import com.flatcode.beautytouch.ui.post.PostDetailsActivity
-import com.flatcode.beautytouch.databinding.ActivityLeaderboardBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -49,10 +48,9 @@ class LeaderboardActivity : AppCompatActivity() {
         }
 
         adapter = LeaderboardAdapter(
-            onItemClick = { user ->
+            onItemClick = { _ ->
                 // Handle item click if needed, e.g., open user profile
-            }
-        )
+            })
         binding.recyclerView.adapter = adapter
 
         observeViewModel()

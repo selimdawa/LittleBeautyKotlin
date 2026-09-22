@@ -23,7 +23,6 @@ class ADsInfoAdapter(private val context: Context, initialList: MutableList<ADs?
         }
 
     var filterList: MutableList<ADs?> = initialList
-    private var filter: ADsInfoFilter? = null
 
     init {
         submitList(initialList.filterNotNull())

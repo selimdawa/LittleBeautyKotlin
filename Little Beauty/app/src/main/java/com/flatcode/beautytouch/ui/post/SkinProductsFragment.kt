@@ -9,9 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.databinding.FragmentSkinProductsBinding
 import com.flatcode.beautytouch.ui.adapter.ProductsStaggeredAdapter
-import com.flatcode.beautytouch.utils.bannerAd
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
+import com.flatcode.beautytouch.utils.bannerAd
 import com.flatcode.beautytouch.utils.openActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

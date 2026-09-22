@@ -20,7 +20,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import java.text.MessageFormat
 
 class MyPostsAdapter(
     private val mContext: Context, 
@@ -47,11 +46,11 @@ class MyPostsAdapter(
             holder.name.visibility = View.VISIBLE
             holder.name.text = post.name
         }
-        if (post.price == DATA.EMPTY) {
+        if (post.price.isNullOrEmpty()) {
             holder.price.visibility = View.GONE
         } else {
             holder.price.visibility = View.VISIBLE
-            holder.price.text = MessageFormat.format("{0} $", post.price)
+            holder.price.text = "${post.price} $"
         }
 
         nrLikes(holder.likes, post.postid)
@@ -82,7 +81,7 @@ class MyPostsAdapter(
         val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId!!)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                likes.text = MessageFormat.format("{0}", dataSnapshot.childrenCount)
+                likes.text = "${dataSnapshot.childrenCount}"
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}

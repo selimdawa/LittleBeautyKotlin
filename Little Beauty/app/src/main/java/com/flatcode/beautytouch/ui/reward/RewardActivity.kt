@@ -1,6 +1,5 @@
 package com.flatcode.beautytouch.ui.reward
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.View
@@ -13,13 +12,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.R
-import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.openActivity
-import com.flatcode.beautytouch.ui.profile.UserViewModel
+import com.flatcode.beautytouch.databinding.ActivityRewardBinding
 import com.flatcode.beautytouch.ui.profile.LeaderboardActivity
 import com.flatcode.beautytouch.ui.profile.LeaderboardOldActivity
-import com.flatcode.beautytouch.databinding.ActivityRewardBinding
+import com.flatcode.beautytouch.ui.profile.UserViewModel
 import com.flatcode.beautytouch.utils.LoadingDialog
+import com.flatcode.beautytouch.utils.Resource
+import com.flatcode.beautytouch.utils.openActivity
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -89,7 +88,8 @@ class RewardActivity : AppCompatActivity() {
                     binding.rewardCard.setOnClickListener {
                         loadAndShowRewardedAd()
                         Toast.makeText(
-                            context, "The ad is loaded, click again if it does not appear",
+                            context,
+                            "The ad is loaded, click again if it does not appear",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -107,7 +107,9 @@ class RewardActivity : AppCompatActivity() {
 
     private fun loadRewardedAd() {
         RewardedAd.load(
-            context, resources.getString(R.string.admob_reward), AdRequest.Builder().build(),
+            context,
+            resources.getString(R.string.admob_reward),
+            AdRequest.Builder().build(),
             object : RewardedAdLoadCallback() {
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     super.onAdFailedToLoad(loadAdError)
@@ -136,14 +138,16 @@ class RewardActivity : AppCompatActivity() {
                     mRewardedAd = null
                 }
             }
-            ad.show(this) { rewardItem: RewardItem? -> }
+            ad.show(this) { _ -> }
         }
     }
 
     private fun loadAndShowRewardedAd() {
         dialog.show("Loading Rewarded Ad")
         RewardedAd.load(
-            context, resources.getString(R.string.admob_reward), AdRequest.Builder().build(),
+            context,
+            resources.getString(R.string.admob_reward),
+            AdRequest.Builder().build(),
             object : RewardedAdLoadCallback() {
                 override fun onAdLoaded(rewardedAd: RewardedAd) {
                     super.onAdLoaded(rewardedAd)

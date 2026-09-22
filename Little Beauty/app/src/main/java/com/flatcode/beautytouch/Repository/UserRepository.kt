@@ -1,11 +1,10 @@
 package com.flatcode.beautytouch.repository
 
-import android.net.Uri
+import com.flatcode.beautytouch.db.ToolsDao
+import com.flatcode.beautytouch.db.UserDao
 import com.flatcode.beautytouch.model.Reward
 import com.flatcode.beautytouch.model.Tools
 import com.flatcode.beautytouch.model.User
-import com.flatcode.beautytouch.db.ToolsDao
-import com.flatcode.beautytouch.db.UserDao
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
 import com.google.firebase.auth.FirebaseAuth
@@ -13,8 +12,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.cloudinary.Cloudinary
-import com.cloudinary.utils.ObjectUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -29,7 +26,6 @@ import javax.inject.Singleton
 class UserRepository @Inject constructor(
     private val database: FirebaseDatabase,
     private val auth: FirebaseAuth,
-    private val cloudinary: Cloudinary,
     private val userDao: UserDao,
     private val toolsDao: ToolsDao
 ) {
@@ -116,31 +112,10 @@ class UserRepository @Inject constructor(
         if (imageUrl != null) {
             hashMap[DATA.IMAGE_URL] = imageUrl
         }
-        database.getReference(DATA.USERS).child(uid).updateChildren(hashMap)
-            .addOnSuccessListener { 
-                trySend(Resource.Success(true))
-                // Local update will be triggered by ValueEventListener in getUserInfo
-            }
-            .addOnFailureListener { trySend(Resource.Error(it.message ?: "Update failed")) }
-        awaitClose()
-    }
-
-    fun uploadProfileImage(uri: Uri): Flow<Resource<String>> = callbackFlow {
-        trySend(Resource.Loading)
-        val uid = auth.currentUser?.uid ?: return@callbackFlow
-        
-        repositoryScope.launch(Dispatchers.IO) {
-            try {
-                val uploadResult = cloudinary.uploader().upload(uri, ObjectUtils.asMap(
-                    "public_id", "Images/Profile/$uid",
-                    "resource_type", "image"
-                ))
-                val downloadUrl = uploadResult["secure_url"].toString()
-                trySend(Resource.Success(downloadUrl))
-            } catch (e: Exception) {
-                trySend(Resource.Error(e.message ?: "Upload failed"))
-            }
-        }
+        database.getReference(DATA.USERS).child(uid).updateChildren(hashMap).addOnSuccessListener {
+            trySend(Resource.Success(true))
+            // Local update will be triggered by ValueEventListener in getUserInfo
+        }.addOnFailureListener { trySend(Resource.Error(it.message ?: "Update failed")) }
         awaitClose()
     }
 

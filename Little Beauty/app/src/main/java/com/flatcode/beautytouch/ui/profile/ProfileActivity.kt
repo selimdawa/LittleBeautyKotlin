@@ -1,8 +1,6 @@
 package com.flatcode.beautytouch.ui.profile
 
 import android.Manifest
-import android.app.Activity
-import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -21,7 +19,6 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import coil3.load
 import com.flatcode.beautytouch.databinding.ActivityProfileBinding
-import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.LoadingDialog
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.startCropActivity
@@ -62,7 +59,9 @@ class ProfileActivity : AppCompatActivity() {
             if (isGranted) {
                 openGallery()
             } else {
-                Toast.makeText(this, "Permission Denied! Cannot access gallery.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this, "Permission Denied! Cannot access gallery.", Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -73,7 +72,10 @@ class ProfileActivity : AppCompatActivity() {
             Manifest.permission.READ_EXTERNAL_STORAGE
         }
 
-        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this, permission
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             openGallery()
         } else {
             requestPermissionLauncher.launch(permission)
@@ -151,14 +153,18 @@ class ProfileActivity : AppCompatActivity() {
                     is Resource.Loading -> {
                         dialog.show("The image is uploading...")
                     }
+
                     is Resource.Success -> {
                         dialog.dismiss()
                     }
+
                     is Resource.Error -> {
                         dialog.dismiss()
                         Timber.e("Upload image error: ${resource.message}")
-                        Toast.makeText(this@ProfileActivity, resource.message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@ProfileActivity, resource.message, Toast.LENGTH_SHORT)
+                            .show()
                     }
+
                     else -> {}
                 }
             }
@@ -170,16 +176,21 @@ class ProfileActivity : AppCompatActivity() {
                     is Resource.Loading -> {
                         dialog.show("Saving changes...")
                     }
+
                     is Resource.Success -> {
                         dialog.dismiss()
-                        Toast.makeText(this@ProfileActivity, "Profile Updated", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@ProfileActivity, "Profile Updated", Toast.LENGTH_SHORT)
+                            .show()
                         imageUri = null
                     }
+
                     is Resource.Error -> {
                         dialog.dismiss()
                         Timber.e("Update profile error: ${resource.message}")
-                        Toast.makeText(this@ProfileActivity, resource.message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@ProfileActivity, resource.message, Toast.LENGTH_SHORT)
+                            .show()
                     }
+
                     else -> {}
                 }
             }

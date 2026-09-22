@@ -8,11 +8,8 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity(tableName = "points")
 data class Points(
-    @PrimaryKey
-    var id: String = "",
+    @PrimaryKey var id: String = "",
     var rewardCount: Int = 0,
     var publisher: String? = null,
     var appName: String? = null
-) : Parcelable {
-    constructor() : this("", 0, "", "")
-}
+) : Parcelable

@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             binding.toolbar.root.updatePadding(top = systemBars.top)
             binding.bottomNavigation.updatePadding(bottom = systemBars.bottom)
@@ -303,7 +303,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialogBinding.linearRate.setOnClickListener { rateUs() }
         dialogBinding.facebookDesign.setOnClickListener {
-            startActivity(getOpenFacebookIntent(DATA.FB_DESINGER, DATA.FB_DESINGER_2))
+            startActivity(getOpenFacebookIntent(DATA.FB_DESIGNER, DATA.FB_DESIGNER_2))
         }
         dialogBinding.facebookProgrammer.setOnClickListener {
             startActivity(getOpenFacebookIntent(DATA.FB_PROGRAMMER, DATA.FB_PROGRAMMER_2))
@@ -322,7 +322,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 packageManager.getPackageInfo("com.facebook.katana", 0)
             }
             Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Intent(Intent.ACTION_VIEW, Uri.parse(fallbackUrl))
         }
     }

@@ -19,13 +19,13 @@ class ProductsStaggeredAdapter(
 ) : ListAdapter<Post, ProductsStaggeredAdapter.ViewHolder>(PostDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemProductGridBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemProductGridBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = getItem(position) ?: return
-        val context = holder.itemView.context
 
         with(holder.binding) {
             imageProduct.loadImage(false, post.postimage)
@@ -56,7 +56,9 @@ class ProductsStaggeredAdapter(
     class ViewHolder(val binding: ItemProductGridBinding) : RecyclerView.ViewHolder(binding.root)
 
     class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
-        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean = oldItem.postid == newItem.postid
+        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean =
+            oldItem.postid == newItem.postid
+
         override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean = oldItem == newItem
     }
 }

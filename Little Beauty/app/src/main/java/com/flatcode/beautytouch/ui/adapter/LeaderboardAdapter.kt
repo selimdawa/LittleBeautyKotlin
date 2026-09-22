@@ -22,13 +22,15 @@ class LeaderboardAdapter(
     private var filter: LeaderboardFilter? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemLeaderboardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemLeaderboardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user = getItem(position) ?: return
-        val rank = position + 1 // Displaying actual rank instead of reverse position which was confusing
+        val rank =
+            position + 1 // Displaying actual rank instead of reverse position which was confusing
 
         with(holder.binding) {
             range.text = "$rank"
@@ -39,7 +41,7 @@ class LeaderboardAdapter(
                 text = user.username
             }
             points.text = "${user.points}"
-            
+
             root.setOnClickListener { onItemClick(user) }
         }
     }
@@ -48,7 +50,8 @@ class LeaderboardAdapter(
         return filter ?: LeaderboardFilter(filterList, this).also { filter = it }
     }
 
-    inner class LeaderboardFilter(var list: List<User>, var adapter: LeaderboardAdapter) : Filter() {
+    inner class LeaderboardFilter(var list: List<User>, var adapter: LeaderboardAdapter) :
+        Filter() {
         override fun performFiltering(constraint: CharSequence?): FilterResults {
             val results = FilterResults()
             if (!constraint.isNullOrEmpty()) {

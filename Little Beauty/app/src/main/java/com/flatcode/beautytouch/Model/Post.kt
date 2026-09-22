@@ -1,3 +1,5 @@
+@file:Suppress("SpellCheckingInspection")
+
 package com.flatcode.beautytouch.model
 
 import android.os.Parcelable
@@ -10,8 +12,7 @@ import kotlinx.parcelize.Parcelize
 data class Post(
     var category: String? = null,
     var name: String? = null,
-    @PrimaryKey
-    var postid: String = "",
+    @PrimaryKey var postid: String = "",
     var postimage: String? = null,
     var postimage2: String? = null,
     var postimage3: String? = null,
@@ -30,6 +31,4 @@ data class Post(
     var isLiked: Boolean = false,
     var isSaved: Boolean = false,
     var nrLikes: Int = 0
-) : Parcelable {
-    constructor() : this("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", false, false, 0)
-}
+) : Parcelable

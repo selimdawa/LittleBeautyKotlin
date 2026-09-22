@@ -22,7 +22,8 @@ class LeaderboardOldAdapter(
     private var filter: LeaderboardOldFilter? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemLeaderboardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemLeaderboardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
@@ -39,7 +40,7 @@ class LeaderboardOldAdapter(
                 text = user.username
             }
             points.text = "${user.points}"
-            
+
             root.setOnClickListener { onItemClick(user) }
         }
     }

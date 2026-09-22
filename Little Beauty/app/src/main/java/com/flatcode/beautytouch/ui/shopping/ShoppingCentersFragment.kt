@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.flatcode.beautytouch.ui.post.PostViewModel
+import com.flatcode.beautytouch.databinding.FragmentShoppingCentersBinding
 import com.flatcode.beautytouch.ui.adapter.ShoppingCentersAdapter
+import com.flatcode.beautytouch.ui.post.PostViewModel
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.bannerAd
-import com.flatcode.beautytouch.databinding.FragmentShoppingCentersBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -35,10 +35,9 @@ class ShoppingCentersFragment : Fragment() {
         binding.adView.bannerAd(context, DATA.BANNER_SHOPPING_CENTRES)
 
         adapter = ShoppingCentersAdapter(
-            onItemClick = { center ->
+            onItemClick = { _ ->
                 // Handle item click if needed
-            }
-        )
+            })
         binding.recyclerView.adapter = adapter
 
         observeViewModel()

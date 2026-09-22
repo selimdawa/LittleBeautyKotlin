@@ -22,8 +22,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel @Inject constructor(
-    private val repository: UserRepository,
-    private val auth: FirebaseAuth
+    private val repository: UserRepository, private val auth: FirebaseAuth
 ) : ViewModel() {
 
     private val _userInfo = MutableStateFlow<Resource<User>?>(null)
@@ -87,10 +86,8 @@ class UserViewModel @Inject constructor(
         _uploadImageState.value = Resource.Loading
         val publicId = "${uid}_${System.currentTimeMillis()}"
 
-        MediaManager.get().upload(imageUri)
-            .option("public_id", publicId)
-            .option("folder", "Images/Profile")
-            .unsigned(DATA.CLOUDINARY_UPLOAD_PRESET)
+        MediaManager.get().upload(imageUri).option("public_id", publicId)
+            .option("folder", "Images/Profile").unsigned(DATA.CLOUDINARY_UPLOAD_PRESET)
             .callback(object : UploadCallback {
                 override fun onStart(requestId: String?) {
                     Timber.d("Cloudinary upload started: $requestId")

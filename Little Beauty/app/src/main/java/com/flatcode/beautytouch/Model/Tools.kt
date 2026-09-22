@@ -8,8 +8,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity(tableName = "tools")
 data class Tools(
-    @PrimaryKey
-    var id: Int = 0,
+    @PrimaryKey var id: Int = 0,
     var imageLogo: String? = null,
     var oldImageLogo: String? = null,
     var imageSession: String? = null,
@@ -22,6 +21,4 @@ data class Tools(
     var oldYear: String? = null,
     var aboutMe: String? = null,
     var imageMe: String? = null
-) : Parcelable {
-    constructor() : this(0, "", "", "", "", "", "", "", "", "", "", "", "")
-}
+) : Parcelable

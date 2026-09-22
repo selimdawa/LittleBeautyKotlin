@@ -11,11 +11,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import com.flatcode.beautytouch.databinding.ActivityRegisterBinding
 import com.flatcode.beautytouch.ui.main.MainActivity
+import com.flatcode.beautytouch.utils.LoadingDialog
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.openActivity
-import com.flatcode.beautytouch.databinding.ActivityRegisterBinding
-import com.flatcode.beautytouch.utils.LoadingDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber

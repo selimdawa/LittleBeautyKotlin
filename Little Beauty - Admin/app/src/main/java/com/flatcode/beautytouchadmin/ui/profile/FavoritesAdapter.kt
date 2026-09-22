@@ -20,7 +20,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import java.text.MessageFormat
 
 class FavoritesAdapter(private val mContext: Context, initialList: MutableList<Post?>) :
     ListAdapter<Post, FavoritesAdapter.ViewHolder>(DiffCallback) {
@@ -42,20 +41,20 @@ class FavoritesAdapter(private val mContext: Context, initialList: MutableList<P
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = getItem(position) ?: return
-        val id = DATA.EMPTY + post.postid
+        val id = post.postid ?: ""
 
         holder.image_product.loadImage(true, post.postimage)
-        if (post.name == DATA.EMPTY) {
+        if (post.name.isNullOrEmpty()) {
             holder.name.visibility = View.GONE
         } else {
             holder.name.visibility = View.VISIBLE
             holder.name.text = post.name
         }
-        if (post.price == DATA.EMPTY) {
+        if (post.price.isNullOrEmpty()) {
             holder.price.visibility = View.GONE
         } else {
             holder.price.visibility = View.VISIBLE
-            holder.price.text = MessageFormat.format("{0} $", post.price)
+            holder.price.text = "${post.price} $"
         }
 
         nrLikes(holder.likes, post.postid)
@@ -78,7 +77,7 @@ class FavoritesAdapter(private val mContext: Context, initialList: MutableList<P
         val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId!!)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                likes.text = MessageFormat.format("{0}", dataSnapshot.childrenCount)
+                likes.text = "${dataSnapshot.childrenCount}"
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}

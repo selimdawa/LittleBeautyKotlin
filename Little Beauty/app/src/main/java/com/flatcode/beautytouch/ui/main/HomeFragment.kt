@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.flatcode.beautytouch.databinding.FragmentHomeBinding
 import com.flatcode.beautytouch.ui.adapter.ImageSliderAdapter
 import com.flatcode.beautytouch.ui.adapter.PostHotAdapter
 import com.flatcode.beautytouch.ui.adapter.PostLinearAdapter
@@ -14,7 +15,6 @@ import com.flatcode.beautytouch.ui.post.PostDetailsActivity
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.openActivity
-import com.flatcode.beautytouch.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -40,15 +40,13 @@ class HomeFragment : Fragment() {
         hotpostAdapter = PostHotAdapter(
             onItemClick = { post -> context?.openActivity<PostDetailsActivity>(DATA.POST_ID to post.postid) },
             onLikeClick = { post -> viewModel.toggleLike(post) },
-            onSaveClick = { post -> viewModel.toggleSave(post) }
-        )
+            onSaveClick = { post -> viewModel.toggleSave(post) })
         binding.recyclerView.adapter = hotpostAdapter
 
         allpostAdapter = PostLinearAdapter(
             onItemClick = { post -> context?.openActivity<PostDetailsActivity>(DATA.POST_ID to post.postid) },
             onLikeClick = { post -> viewModel.toggleLike(post) },
-            onSaveClick = { post -> viewModel.toggleSave(post) }
-        )
+            onSaveClick = { post -> viewModel.toggleSave(post) })
         binding.recyclerView2.adapter = allpostAdapter
 
         observeViewModel()

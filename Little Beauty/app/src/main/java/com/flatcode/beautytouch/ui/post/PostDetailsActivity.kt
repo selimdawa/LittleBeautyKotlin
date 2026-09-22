@@ -1,6 +1,5 @@
 package com.flatcode.beautytouch.ui.post
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -9,19 +8,17 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
-import com.flatcode.beautytouch.ui.adapter.PostDetailAdapter
-import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.R
+import com.flatcode.beautytouch.databinding.ActivityPostDetailBinding
+import com.flatcode.beautytouch.ui.adapter.PostDetailAdapter
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.databinding.ActivityPostDetailBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class PostDetailsActivity : AppCompatActivity() {
 
-    private val context: Context = this@PostDetailsActivity
     private lateinit var binding: ActivityPostDetailBinding
     private var adapter: PostDetailAdapter? = null
     private var postId: String? = null
@@ -45,8 +42,7 @@ class PostDetailsActivity : AppCompatActivity() {
 
         adapter = PostDetailAdapter(
             onLikeClick = { post -> viewModel.toggleLike(post) },
-            onSaveClick = { post -> viewModel.toggleSave(post) }
-        )
+            onSaveClick = { post -> viewModel.toggleSave(post) })
         binding.recyclerView.adapter = adapter
 
         observeViewModel()
@@ -59,6 +55,7 @@ class PostDetailsActivity : AppCompatActivity() {
                     is Resource.Success -> {
                         adapter?.submitList(listOf(resource.data))
                     }
+
                     else -> {}
                 }
             }

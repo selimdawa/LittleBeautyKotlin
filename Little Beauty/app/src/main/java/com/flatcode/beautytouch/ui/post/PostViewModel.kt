@@ -46,7 +46,9 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun loadCategoryCounts(publisher: String, appName: String, skinCat: String, hairCat: String, shoppingCat: String) {
+    fun loadCategoryCounts(
+        publisher: String, appName: String, skinCat: String, hairCat: String, shoppingCat: String
+    ) {
         Timber.d("Loading category counts for publisher: $publisher")
         viewModelScope.launch {
             repository.getCategoryCount(skinCat, publisher, appName).collect {

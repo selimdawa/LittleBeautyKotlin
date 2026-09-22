@@ -16,7 +16,6 @@ import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.databinding.ItemPostDetailBinding
-import java.text.MessageFormat
 
 class PostDetailAdapter(
     private val mContext: Context, 
@@ -71,37 +70,38 @@ class PostDetailAdapter(
         holder.image_product_10.loadImage(false, post.postimage10)
 
         // Visibility logic
-        holder.image_product_2.visibility = if (post.postimage2 == DATA.EMPTY) View.GONE else View.VISIBLE
-        holder.image_product_3.visibility = if (post.postimage3 == DATA.EMPTY) View.GONE else View.VISIBLE
-        holder.image_product_4.visibility = if (post.postimage4 == DATA.EMPTY) View.GONE else View.VISIBLE
-        holder.image_product_5.visibility = if (post.postimage5 == DATA.EMPTY) View.GONE else View.VISIBLE
-        holder.image_product_6.visibility = if (post.postimage6 == DATA.EMPTY) View.GONE else View.VISIBLE
-        holder.image_product_7.visibility = if (post.postimage7 == DATA.EMPTY) View.GONE else View.VISIBLE
-        holder.image_product_8.visibility = if (post.postimage8 == DATA.EMPTY) View.GONE else View.VISIBLE
-        holder.image_product_9.visibility = if (post.postimage9 == DATA.EMPTY) View.GONE else View.VISIBLE
-        holder.image_product_10.visibility = if (post.postimage10 == DATA.EMPTY) View.GONE else View.VISIBLE
+        holder.image_product_2.visibility = if (post.postimage2.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_3.visibility = if (post.postimage3.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_4.visibility = if (post.postimage4.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_5.visibility = if (post.postimage5.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_6.visibility = if (post.postimage6.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_7.visibility = if (post.postimage7.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_8.visibility = if (post.postimage8.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_9.visibility = if (post.postimage9.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_10.visibility = if (post.postimage10.isNullOrEmpty()) View.GONE else View.VISIBLE
 
-        if (post.postimage2 == DATA.EMPTY && post.postimage3 == DATA.EMPTY && post.postimage4 == DATA.EMPTY 
-            && post.postimage5 == DATA.EMPTY && post.postimage6 == DATA.EMPTY && post.postimage7 == DATA.EMPTY 
-            && post.postimage8 == DATA.EMPTY && post.postimage9 == DATA.EMPTY && post.postimage10 == DATA.EMPTY) {
+        if (post.postimage2.isNullOrEmpty() && post.postimage3.isNullOrEmpty() && post.postimage4.isNullOrEmpty()
+            && post.postimage5.isNullOrEmpty() && post.postimage6.isNullOrEmpty() && post.postimage7.isNullOrEmpty()
+            && post.postimage8.isNullOrEmpty() && post.postimage9.isNullOrEmpty() && post.postimage10.isNullOrEmpty()
+        ) {
             holder.scroll_image.visibility = View.GONE
         } else {
             holder.scroll_image.visibility = View.VISIBLE
         }
 
-        if (post.name == DATA.EMPTY) {
+        if (post.name.isNullOrEmpty()) {
             holder.product_name.visibility = View.GONE
         } else {
             holder.product_name.visibility = View.VISIBLE
             holder.product_name.text = post.name
         }
-        if (post.price == DATA.EMPTY) {
+        if (post.price.isNullOrEmpty()) {
             holder.price_product.visibility = View.GONE
         } else {
             holder.price_product.visibility = View.VISIBLE
-            holder.price_product.text = MessageFormat.format("{0} $", post.price)
+            holder.price_product.text = "${post.price} $"
         }
-        if (post.indications == DATA.EMPTY) {
+        if (post.indications.isNullOrEmpty()) {
             holder.linear_indications.visibility = View.GONE
             holder.linear_indications2.visibility = View.GONE
         } else {
@@ -111,7 +111,7 @@ class PostDetailAdapter(
             holder.indications.visibility = View.VISIBLE
             holder.indications.text = post.indications
         }
-        if (post.use == DATA.EMPTY) {
+        if (post.use.isNullOrEmpty()) {
             holder.linear_how_to_use.visibility = View.GONE
             holder.linear_how_to_use2.visibility = View.GONE
         } else {
@@ -125,7 +125,7 @@ class PostDetailAdapter(
         // Like/Save States
         holder.like.setImageResource(if (isLiked) R.drawable.ic_heart_selected else R.drawable.ic_heart_unselected)
         holder.save.setImageResource(if (isSaved) R.drawable.ic_favorites_selected else R.drawable.ic_favorites_unselected)
-        holder.like_number.text = MessageFormat.format("{0}", likesCount)
+        holder.like_number.text = "$likesCount"
 
         holder.like.setOnClickListener { listener.onLikeClick(post) }
         holder.save.setOnClickListener { listener.onSaveClick(post) }

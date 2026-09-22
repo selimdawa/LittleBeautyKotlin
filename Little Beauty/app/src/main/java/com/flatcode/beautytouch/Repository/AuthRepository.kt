@@ -1,3 +1,5 @@
+@file:Suppress("SpellCheckingInspection")
+
 package com.flatcode.beautytouch.repository
 
 import com.flatcode.beautytouch.utils.DATA
@@ -12,26 +14,24 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthRepository @Inject constructor(
-    private val auth: FirebaseAuth,
-    private val database: FirebaseDatabase
+    private val auth: FirebaseAuth, private val database: FirebaseDatabase
 ) {
 
     fun login(email: String, password: String): Flow<Resource<Boolean>> = callbackFlow {
         trySend(Resource.Loading)
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnSuccessListener {
+        auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {
                 trySend(Resource.Success(true))
-            }
-            .addOnFailureListener {
+            }.addOnFailureListener {
                 trySend(Resource.Error(it.message ?: "Login Failed"))
             }
         awaitClose()
     }
 
-    fun register(name: String, email: String, password: String, number: String): Flow<Resource<Boolean>> = callbackFlow {
+    fun register(
+        name: String, email: String, password: String, number: String
+    ): Flow<Resource<Boolean>> = callbackFlow {
         trySend(Resource.Loading)
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnSuccessListener { result ->
+        auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener { result ->
                 val id = result.user?.uid
                 val hashMap = HashMap<String, Any?>()
                 hashMap[DATA.ID] = id
@@ -46,13 +46,11 @@ class AuthRepository @Inject constructor(
                     database.getReference(DATA.USERS).child(id).setValue(hashMap)
                         .addOnSuccessListener {
                             trySend(Resource.Success(true))
-                        }
-                        .addOnFailureListener {
+                        }.addOnFailureListener {
                             trySend(Resource.Error(it.message ?: "Failed to save user data"))
                         }
                 }
-            }
-            .addOnFailureListener {
+            }.addOnFailureListener {
                 trySend(Resource.Error(it.message ?: "Registration Failed"))
             }
         awaitClose()
@@ -60,8 +58,7 @@ class AuthRepository @Inject constructor(
 
     fun forgetPassword(email: String): Flow<Resource<String>> = callbackFlow {
         trySend(Resource.Loading)
-        auth.sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
+        auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     trySend(Resource.Success("Password reset has been sent to $email"))
                 } else {

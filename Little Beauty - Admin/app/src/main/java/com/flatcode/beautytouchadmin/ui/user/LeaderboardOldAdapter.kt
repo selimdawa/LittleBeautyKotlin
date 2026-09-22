@@ -22,8 +22,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import java.text.MessageFormat
-import java.util.Locale
 
 class LeaderboardOldAdapter(
     private val mContext: Context, 
@@ -52,14 +50,14 @@ class LeaderboardOldAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = list[position] ?: return
-        val id = DATA.EMPTY + item.id
-        val username = DATA.EMPTY + item.username
-        val image = DATA.EMPTY + item.imageurl
+        val id = item.id
+        val username = item.username ?: ""
+        val image = item.imageurl ?: ""
         val rankValue = list.size - position
 
-        holder.rank.text = MessageFormat.format("{0}", rankValue)
+        holder.rank.text = "$rankValue"
         holder.profileImage.loadImage(true, image)
-        if (username == DATA.EMPTY) {
+        if (username.isEmpty()) {
             holder.username.visibility = View.GONE
         } else {
             holder.username.visibility = View.VISIBLE
@@ -80,10 +78,10 @@ class LeaderboardOldAdapter(
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val results = FilterResults()
                 if (constraint != null && constraint.isNotEmpty()) {
-                    val constraintStr = constraint.toString().uppercase(Locale.getDefault())
+                    val constraintStr = constraint.toString().uppercase()
                     val filter = mutableListOf<User?>()
                     for (item in filterList) {
-                        if (item?.username?.uppercase(Locale.getDefault())?.contains(constraintStr) == true) {
+                        if (item?.username?.uppercase()?.contains(constraintStr) == true) {
                             filter.add(item)
                         }
                     }
@@ -115,9 +113,9 @@ class LeaderboardOldAdapter(
         val reference = FirebaseDatabase.getInstance().getReference(DATA.USERS).child(id)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val value = DATA.EMPTY + dataSnapshot.child(key).value
+                val value = dataSnapshot.child(key).value?.toString() ?: "0"
                 if (dataSnapshot.child(key).exists()) {
-                    points.text = MessageFormat.format("{0}", value)
+                    points.text = value
                 } else {
                     points.text = "0"
                 }

@@ -24,10 +24,6 @@ class LoadingDialog(private val context: Context) {
         dialog?.show()
     }
 
-    fun setMessage(message: String) {
-        binding?.messageTv?.text = message
-    }
-
     fun dismiss() {
         dialog?.dismiss()
     }

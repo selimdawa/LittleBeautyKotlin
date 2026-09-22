@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import com.flatcode.beautytouch.utils.openActivity
 import com.flatcode.beautytouch.databinding.ActivityAuthBinding
+import com.flatcode.beautytouch.utils.openActivity
 
 class AuthActivity : AppCompatActivity() {
 

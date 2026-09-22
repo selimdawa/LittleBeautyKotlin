@@ -1,9 +1,9 @@
 package com.flatcode.beautytouch.repository
 
-import com.flatcode.beautytouch.model.Post
-import com.flatcode.beautytouch.model.ShoppingCenter
 import com.flatcode.beautytouch.db.PostDao
 import com.flatcode.beautytouch.db.ShoppingCenterDao
+import com.flatcode.beautytouch.model.Post
+import com.flatcode.beautytouch.model.ShoppingCenter
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
 import com.google.firebase.auth.FirebaseAuth
@@ -31,7 +31,9 @@ class PostRepository @Inject constructor(
 
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
 
-    fun getCategoryCount(category: String, publisher: String, appName: String): Flow<Resource<Int>> = callbackFlow {
+    fun getCategoryCount(
+        category: String, publisher: String, appName: String
+    ): Flow<Resource<Int>> = callbackFlow {
         trySend(Resource.Loading)
         val reference = database.getReference(DATA.POSTS)
         val listener = object : ValueEventListener {
@@ -84,7 +86,7 @@ class PostRepository @Inject constructor(
                         list.add(post)
                     }
                 }
-                
+
                 // Fetch likes and saves to enrich the list
                 likesRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(likesSnapshot: DataSnapshot) {
@@ -94,121 +96,25 @@ class PostRepository @Inject constructor(
                                     val postLikes = likesSnapshot.child(post.postid)
                                     post.apply {
                                         nrLikes = postLikes.childrenCount.toInt()
-                                        isLiked = postLikes.child(auth.currentUser?.uid ?: "").exists()
+                                        isLiked =
+                                            postLikes.child(auth.currentUser?.uid ?: "").exists()
                                         isSaved = savesSnapshot.child(post.postid).exists()
                                     }
                                 }
-                                
+
                                 repositoryScope.launch {
                                     postDao.insertPosts(enrichedList)
                                 }
 
-                                val filteredList = enrichedList.filter { it.publisher == publisher && it.appName == appName }
+                                val filteredList =
+                                    enrichedList.filter { it.publisher == publisher && it.appName == appName }
                                 trySend(Resource.Success(filteredList))
                             }
-                            override fun onCancelled(error: DatabaseError) { trySend(Resource.Error(error.message)) }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                trySend(Resource.Error(error.message))
+                            }
                         })
-                    }
-                    override fun onCancelled(error: DatabaseError) { trySend(Resource.Error(error.message)) }
-                })
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                trySend(Resource.Error(error.message))
-            }
-        }
-        postsRef.addValueEventListener(listener)
-        awaitClose { postsRef.removeEventListener(listener) }
-    }
-
-    fun getHotProducts(publisher: String, appName: String): Flow<Resource<List<Post>>> = callbackFlow {
-        trySend(Resource.Loading)
-
-        repositoryScope.launch {
-            val localPosts = postDao.getPostsByPublisher(publisher, appName).first()
-            if (localPosts.isNotEmpty()) {
-                trySend(Resource.Success(localPosts))
-            }
-        }
-
-        val postsRef = database.getReference(DATA.POSTS)
-        val likesRef = database.getReference(DATA.LIKES)
-        val savesRef = database.getReference(DATA.SAVES).child(auth.currentUser?.uid ?: "")
-
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val list = mutableListOf<Post>()
-                for (child in snapshot.children) {
-                    val post = child.getValue(Post::class.java)
-                    if (post != null) {
-                        list.add(post)
-                    }
-                }
-                
-                likesRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(likesSnapshot: DataSnapshot) {
-                        savesRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(savesSnapshot: DataSnapshot) {
-                                val enrichedList = list.map { post ->
-                                    val postLikes = likesSnapshot.child(post.postid)
-                                    post.apply {
-                                        nrLikes = postLikes.childrenCount.toInt()
-                                        isLiked = postLikes.child(auth.currentUser?.uid ?: "").exists()
-                                        isSaved = savesSnapshot.child(post.postid).exists()
-                                    }
-                                }
-                                
-                                repositoryScope.launch {
-                                    postDao.insertPosts(enrichedList)
-                                }
-
-                                val filteredList = enrichedList.filter { it.publisher == publisher && it.appName == appName }
-                                trySend(Resource.Success(filteredList))
-                            }
-                            override fun onCancelled(error: DatabaseError) { trySend(Resource.Error(error.message)) }
-                        })
-                    }
-                    override fun onCancelled(error: DatabaseError) { trySend(Resource.Error(error.message)) }
-                })
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                trySend(Resource.Error(error.message))
-            }
-        }
-        postsRef.addValueEventListener(listener)
-        awaitClose { postsRef.removeEventListener(listener) }
-    }
-
-    fun getFavoritePosts(publisher: String, appName: String): Flow<Resource<List<Post>>> = callbackFlow {
-        trySend(Resource.Loading)
-        val uid = auth.currentUser?.uid
-        if (uid == null) {
-            trySend(Resource.Error("User not logged in"))
-            close()
-            return@callbackFlow
-        }
-        val savesRef = database.getReference(DATA.SAVES).child(uid)
-        val listener = object : ValueEventListener {
-            override fun onDataChange(savesSnapshot: DataSnapshot) {
-                val saveIds = savesSnapshot.children.mapNotNull { it.key }
-                val postsRef = database.getReference(DATA.POSTS)
-                postsRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(postsSnapshot: DataSnapshot) {
-                        val posts = mutableListOf<Post>()
-                        for (child in postsSnapshot.children) {
-                            child.getValue(Post::class.java)?.let { posts.add(it) }
-                        }
-                        
-                        enrichPosts(posts) { enrichedPosts ->
-                            repositoryScope.launch {
-                                postDao.insertPosts(enrichedPosts)
-                            }
-                            val filteredPosts = enrichedPosts.filter { 
-                                it.publisher == publisher && it.appName == appName && it.postid in saveIds 
-                            }
-                            trySend(Resource.Success(filteredPosts))
-                        }
                     }
 
                     override fun onCancelled(error: DatabaseError) {
@@ -221,38 +127,127 @@ class PostRepository @Inject constructor(
                 trySend(Resource.Error(error.message))
             }
         }
-        savesRef.addValueEventListener(listener)
-        awaitClose { savesRef.removeEventListener(listener) }
+        postsRef.addValueEventListener(listener)
+        awaitClose { postsRef.removeEventListener(listener) }
     }
 
-    fun getTopVotedPosts(publisher: String, appName: String): Flow<Resource<List<Post>>> = callbackFlow {
-        trySend(Resource.Loading)
-        val reference = database.getReference(DATA.POSTS).orderByChild(DATA.VIEWS_COUNT)
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val list = mutableListOf<Post>()
-                for (child in snapshot.children) {
-                    child.getValue(Post::class.java)?.let { list.add(it) }
+    fun getHotProducts(publisher: String, appName: String): Flow<Resource<List<Post>>> =
+        callbackFlow {
+            trySend(Resource.Loading)
+
+            repositoryScope.launch {
+                val localPosts = postDao.getPostsByPublisher(publisher, appName).first()
+                if (localPosts.isNotEmpty()) {
+                    trySend(Resource.Success(localPosts))
                 }
-                
-                enrichPosts(list) { enrichedList ->
-                    repositoryScope.launch {
-                        postDao.insertPosts(enrichedList)
+            }
+
+            val postsRef = database.getReference(DATA.POSTS)
+            val likesRef = database.getReference(DATA.LIKES)
+            val savesRef = database.getReference(DATA.SAVES).child(auth.currentUser?.uid ?: "")
+
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = mutableListOf<Post>()
+                    for (child in snapshot.children) {
+                        val post = child.getValue(Post::class.java)
+                        if (post != null) {
+                            list.add(post)
+                        }
                     }
-                    val filteredList = enrichedList.filter { it.publisher == publisher && it.appName == appName }
-                    trySend(Resource.Success(filteredList.reversed()))
+
+                    likesRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(likesSnapshot: DataSnapshot) {
+                            savesRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(savesSnapshot: DataSnapshot) {
+                                    val enrichedList = list.map { post ->
+                                        val postLikes = likesSnapshot.child(post.postid)
+                                        post.apply {
+                                            nrLikes = postLikes.childrenCount.toInt()
+                                            isLiked = postLikes.child(auth.currentUser?.uid ?: "")
+                                                .exists()
+                                            isSaved = savesSnapshot.child(post.postid).exists()
+                                        }
+                                    }
+
+                                    repositoryScope.launch {
+                                        postDao.insertPosts(enrichedList)
+                                    }
+
+                                    val filteredList =
+                                        enrichedList.filter { it.publisher == publisher && it.appName == appName }
+                                    trySend(Resource.Success(filteredList))
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    trySend(Resource.Error(error.message))
+                                }
+                            })
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            trySend(Resource.Error(error.message))
+                        }
+                    })
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(Resource.Error(error.message))
                 }
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                trySend(Resource.Error(error.message))
-            }
+            postsRef.addValueEventListener(listener)
+            awaitClose { postsRef.removeEventListener(listener) }
         }
-        reference.addValueEventListener(listener)
-        awaitClose { reference.removeEventListener(listener) }
-    }
 
-    fun getPostsByCategory(category: String, publisher: String, appName: String): Flow<Resource<List<Post>>> = callbackFlow {
+    fun getFavoritePosts(publisher: String, appName: String): Flow<Resource<List<Post>>> =
+        callbackFlow {
+            trySend(Resource.Loading)
+            val uid = auth.currentUser?.uid
+            if (uid == null) {
+                trySend(Resource.Error("User not logged in"))
+                close()
+                return@callbackFlow
+            }
+            val savesRef = database.getReference(DATA.SAVES).child(uid)
+            val listener = object : ValueEventListener {
+                override fun onDataChange(savesSnapshot: DataSnapshot) {
+                    val saveIds = savesSnapshot.children.mapNotNull { it.key }
+                    val postsRef = database.getReference(DATA.POSTS)
+                    postsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(postsSnapshot: DataSnapshot) {
+                            val posts = mutableListOf<Post>()
+                            for (child in postsSnapshot.children) {
+                                child.getValue(Post::class.java)?.let { posts.add(it) }
+                            }
+
+                            enrichPosts(posts) { enrichedPosts ->
+                                repositoryScope.launch {
+                                    postDao.insertPosts(enrichedPosts)
+                                }
+                                val filteredPosts = enrichedPosts.filter {
+                                    it.publisher == publisher && it.appName == appName && it.postid in saveIds
+                                }
+                                trySend(Resource.Success(filteredPosts))
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            trySend(Resource.Error(error.message))
+                        }
+                    })
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(Resource.Error(error.message))
+                }
+            }
+            savesRef.addValueEventListener(listener)
+            awaitClose { savesRef.removeEventListener(listener) }
+        }
+
+    fun getPostsByCategory(
+        category: String, publisher: String, appName: String
+    ): Flow<Resource<List<Post>>> = callbackFlow {
         trySend(Resource.Loading)
 
         repositoryScope.launch {
@@ -269,42 +264,13 @@ class PostRepository @Inject constructor(
                 for (child in snapshot.children) {
                     child.getValue(Post::class.java)?.let { list.add(it) }
                 }
-                
+
                 enrichPosts(list) { enrichedList ->
                     repositoryScope.launch {
                         postDao.insertPosts(enrichedList)
                     }
-                    val filteredList = enrichedList.filter { it.category == category && it.publisher == publisher && it.appName == appName }
-                    trySend(Resource.Success(filteredList))
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                trySend(Resource.Error(error.message))
-            }
-        }
-        reference.addValueEventListener(listener)
-        awaitClose { reference.removeEventListener(listener) }
-    }
-
-    fun getPostsBySearch(query: String, publisher: String, appName: String): Flow<Resource<List<Post>>> = callbackFlow {
-        trySend(Resource.Loading)
-        val reference = database.getReference(DATA.POSTS)
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val list = mutableListOf<Post>()
-                for (child in snapshot.children) {
-                    child.getValue(Post::class.java)?.let { list.add(it) }
-                }
-                
-                enrichPosts(list) { enrichedList ->
-                    repositoryScope.launch {
-                        postDao.insertPosts(enrichedList)
-                    }
-                    val filteredList = enrichedList.filter { 
-                        it.publisher == publisher && it.appName == appName &&
-                        (it.name?.contains(query, ignoreCase = true) == true)
-                    }
+                    val filteredList =
+                        enrichedList.filter { it.category == category && it.publisher == publisher && it.appName == appName }
                     trySend(Resource.Success(filteredList))
                 }
             }
@@ -329,7 +295,8 @@ class PostRepository @Inject constructor(
 
         val postRef = database.getReference(DATA.POSTS).child(postId)
         val likesRef = database.getReference(DATA.LIKES).child(postId)
-        val savesRef = database.getReference(DATA.SAVES).child(auth.currentUser?.uid ?: "").child(postId)
+        val savesRef =
+            database.getReference(DATA.SAVES).child(auth.currentUser?.uid ?: "").child(postId)
 
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -341,7 +308,8 @@ class PostRepository @Inject constructor(
                                 override fun onDataChange(savesSnapshot: DataSnapshot) {
                                     post.apply {
                                         nrLikes = likesSnapshot.childrenCount.toInt()
-                                        isLiked = likesSnapshot.child(auth.currentUser?.uid ?: "").exists()
+                                        isLiked = likesSnapshot.child(auth.currentUser?.uid ?: "")
+                                            .exists()
                                         isSaved = savesSnapshot.exists()
                                     }
                                     repositoryScope.launch {
@@ -349,10 +317,16 @@ class PostRepository @Inject constructor(
                                     }
                                     trySend(Resource.Success(post))
                                 }
-                                override fun onCancelled(error: DatabaseError) { trySend(Resource.Error(error.message)) }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    trySend(Resource.Error(error.message))
+                                }
                             })
                         }
-                        override fun onCancelled(error: DatabaseError) { trySend(Resource.Error(error.message)) }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            trySend(Resource.Error(error.message))
+                        }
                     })
                 }
             }
@@ -365,7 +339,9 @@ class PostRepository @Inject constructor(
         awaitClose { postRef.removeEventListener(listener) }
     }
 
-    fun getShoppingCenters(publisher: String, appName: String): Flow<Resource<List<ShoppingCenter>>> = callbackFlow {
+    fun getShoppingCenters(
+        publisher: String, appName: String
+    ): Flow<Resource<List<ShoppingCenter>>> = callbackFlow {
         trySend(Resource.Loading)
 
         repositoryScope.launch {
@@ -389,7 +365,8 @@ class PostRepository @Inject constructor(
                     shoppingCenterDao.insertShoppingCenters(list)
                 }
 
-                val filteredList = list.filter { it.publisher == publisher && it.appName == appName }
+                val filteredList =
+                    list.filter { it.publisher == publisher && it.appName == appName }
                 trySend(Resource.Success(filteredList))
             }
 
@@ -409,6 +386,7 @@ class PostRepository @Inject constructor(
                 val urls = snapshot.children.mapNotNull { it.value?.toString() }
                 trySend(Resource.Success(urls))
             }
+
             override fun onCancelled(error: DatabaseError) {
                 trySend(Resource.Error(error.message))
             }
@@ -421,11 +399,13 @@ class PostRepository @Inject constructor(
         val ref = database.getReference(DATA.POSTS).child(postId)
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val currentViews = snapshot.child(DATA.VIEWS_COUNT).value?.toString()?.toLong() ?: 0L
+                val currentViews =
+                    snapshot.child(DATA.VIEWS_COUNT).value?.toString()?.toLong() ?: 0L
                 val hashMap = HashMap<String, Any>()
                 hashMap[DATA.VIEWS_COUNT] = currentViews + 1
                 ref.updateChildren(hashMap)
             }
+
             override fun onCancelled(error: DatabaseError) {}
         })
     }
@@ -448,10 +428,16 @@ class PostRepository @Inject constructor(
                         }
                         onComplete(enrichedList)
                     }
-                    override fun onCancelled(error: DatabaseError) { onComplete(posts) }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        onComplete(posts)
+                    }
                 })
             }
-            override fun onCancelled(error: DatabaseError) { onComplete(posts) }
+
+            override fun onCancelled(error: DatabaseError) {
+                onComplete(posts)
+            }
         })
     }
 

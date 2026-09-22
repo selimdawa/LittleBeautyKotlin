@@ -14,7 +14,6 @@ import com.flatcode.beautytouchadmin.model.ShoppingCenter
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.databinding.ItemShoppingCenterBinding
-import java.text.MessageFormat
 
 class ShoppingCentersAdapter(
     private val mContext: Context, 
@@ -35,24 +34,21 @@ class ShoppingCentersAdapter(
 
         holder.image_product.loadImage(false, shoppingCenter.imageurl)
         holder.image_product2.loadImage(false, shoppingCenter.imageurl2)
-        if (shoppingCenter.name == DATA.EMPTY) {
+        if (shoppingCenter.name.isNullOrEmpty()) {
             holder.linearName.visibility = View.GONE
         } else {
             holder.linearName.visibility = View.VISIBLE
             holder.name.text = shoppingCenter.name
         }
-        if (shoppingCenter.location == DATA.EMPTY && shoppingCenter.location2 == DATA.EMPTY) {
+        if (shoppingCenter.location.isNullOrEmpty() && shoppingCenter.location2.isNullOrEmpty()) {
             holder.linearLocation.visibility = View.GONE
             holder.view.visibility = View.GONE
         } else {
             holder.linearLocation.visibility = View.VISIBLE
             holder.view.visibility = View.VISIBLE
-            holder.location.text = MessageFormat.format(
-                "{0} - {1} - {2}",
-                shoppingCenter.location, shoppingCenter.location2, shoppingCenter.location3
-            )
+            holder.location.text = "${shoppingCenter.location} - ${shoppingCenter.location2} - ${shoppingCenter.location3}"
         }
-        if (shoppingCenter.numberPhone == DATA.EMPTY) {
+        if (shoppingCenter.numberPhone.isNullOrEmpty()) {
             holder.linearNumberPhone.visibility = View.GONE
             holder.view2.visibility = View.GONE
         } else {

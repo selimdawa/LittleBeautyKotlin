@@ -14,13 +14,13 @@ class ShoppingCentersAdapter(
 ) : ListAdapter<ShoppingCenter, ShoppingCentersAdapter.ViewHolder>(ShoppingCenterDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemShoppingCentersBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            ItemShoppingCentersBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = getItem(position) ?: return
-        val context = holder.itemView.context
 
         with(holder.binding) {
             imageProduct.loadImage(false, item.imageurl)
@@ -28,17 +28,19 @@ class ShoppingCentersAdapter(
             name.text = item.name
             location.text = item.location
             numberPhone.text = item.numberPhone
-            
+
             root.setOnClickListener { onItemClick(item) }
         }
     }
 
-    class ViewHolder(val binding: ItemShoppingCentersBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ItemShoppingCentersBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     class ShoppingCenterDiffCallback : DiffUtil.ItemCallback<ShoppingCenter>() {
-        override fun areItemsTheSame(oldItem: ShoppingCenter, newItem: ShoppingCenter): Boolean = 
+        override fun areItemsTheSame(oldItem: ShoppingCenter, newItem: ShoppingCenter): Boolean =
             oldItem.id == newItem.id
-        override fun areContentsTheSame(oldItem: ShoppingCenter, newItem: ShoppingCenter): Boolean = 
+
+        override fun areContentsTheSame(oldItem: ShoppingCenter, newItem: ShoppingCenter): Boolean =
             oldItem == newItem
     }
 }

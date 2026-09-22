@@ -25,7 +25,6 @@ class PostLinearAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = getItem(position) ?: return
-        val context = holder.itemView.context
 
         with(holder.binding) {
             imageProduct.loadImage(false, post.postimage)

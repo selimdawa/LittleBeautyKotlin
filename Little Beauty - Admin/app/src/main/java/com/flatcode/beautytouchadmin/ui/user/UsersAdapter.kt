@@ -19,7 +19,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import java.text.MessageFormat
 
 class UsersAdapter(private val mContext: Context) :
     ListAdapter<User, UsersAdapter.ViewHolder>(DiffCallback) {
@@ -31,10 +30,10 @@ class UsersAdapter(private val mContext: Context) :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val user = getItem(position) ?: return
-        val id = DATA.EMPTY + user.id
+        val id = user.id
 
         holder.image.loadImage(true, user.imageurl)
-        if (user.username == DATA.EMPTY) {
+        if (user.username.isNullOrEmpty()) {
             holder.name.visibility = View.GONE
         } else {
             holder.name.visibility = View.VISIBLE
@@ -58,7 +57,7 @@ class UsersAdapter(private val mContext: Context) :
         val reference = FirebaseDatabase.getInstance().getReference(DATA.SAVES).child(userid)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                favorites.text = MessageFormat.format("{0}", dataSnapshot.childrenCount)
+                favorites.text = "${dataSnapshot.childrenCount}"
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
