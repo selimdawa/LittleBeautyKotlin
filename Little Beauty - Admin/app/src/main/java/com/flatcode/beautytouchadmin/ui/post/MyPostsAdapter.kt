@@ -6,24 +6,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.android.material.card.MaterialCardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.R
+import com.flatcode.beautytouchadmin.databinding.ItemMyPostBinding
+import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
-import com.flatcode.beautytouchadmin.databinding.ItemMyPostBinding
+import com.google.android.material.card.MaterialCardView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 class MyPostsAdapter(
-    private val mContext: Context, 
-    private val listener: OnItemClickListener
+    private val mContext: Context, private val listener: OnItemClickListener
 ) : ListAdapter<Post, MyPostsAdapter.ViewHolder>(DiffCallback) {
 
     interface OnItemClickListener {
@@ -39,7 +38,7 @@ class MyPostsAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = getItem(position) ?: return
 
-        holder.image_product.loadImage(false, post.postimage)
+        holder.imageProduct.loadImage(false, post.postimage)
         if (post.name == DATA.EMPTY) {
             holder.name.visibility = View.GONE
         } else {
@@ -50,12 +49,12 @@ class MyPostsAdapter(
             holder.price.visibility = View.GONE
         } else {
             holder.price.visibility = View.VISIBLE
-            holder.price.text = "${post.price} $"
+            holder.price.text = mContext.getString(R.string.price_format, post.price)
         }
 
         nrLikes(holder.likes, post.postid)
         isLiked(post.postid, holder.like)
-        
+
         holder.like.setOnClickListener {
             val isCurrentlyLiked = holder.like.tag == "liked"
             listener.onLikeClick(post, isCurrentlyLiked)
@@ -68,7 +67,7 @@ class MyPostsAdapter(
     }
 
     class ViewHolder(binding: ItemMyPostBinding) : RecyclerView.ViewHolder(binding.root) {
-        var image_product: ImageView = binding.imageProduct
+        var imageProduct: ImageView = binding.imageProduct
         var more: ImageView = binding.more
         var like: ImageView = binding.like
         var likes: TextView = binding.likes
@@ -77,19 +76,19 @@ class MyPostsAdapter(
         var card: MaterialCardView = binding.card
     }
 
-    private fun nrLikes(likes: TextView, postId: String?) {
-        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId!!)
+    private fun nrLikes(likes: TextView, postId: String) {
+        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                likes.text = "${dataSnapshot.childrenCount}"
+                likes.text = dataSnapshot.childrenCount.toString()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
         })
     }
 
-    private fun isLiked(postId: String?, imageView: ImageView) {
-        val reference = FirebaseDatabase.getInstance().getReference(DATA.LIKES).child(postId!!)
+    private fun isLiked(postId: String, imageView: ImageView) {
+        val reference = FirebaseDatabase.getInstance().getReference(DATA.LIKES).child(postId)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.child(DATA.FirebaseUserUid).exists()) {

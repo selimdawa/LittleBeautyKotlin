@@ -10,13 +10,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.flatcode.beautytouchadmin.model.ShoppingCenter
-import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.loadImage
+import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ItemShoppingCenterBinding
+import com.flatcode.beautytouchadmin.model.ShoppingCenter
+import com.flatcode.beautytouchadmin.utils.loadImage
 
 class ShoppingCentersAdapter(
-    private val mContext: Context, 
+    private val mContext: Context,
     private val listener: OnItemClickListener
 ) : ListAdapter<ShoppingCenter, ShoppingCentersAdapter.ViewHolder>(DiffCallback) {
 
@@ -25,15 +25,16 @@ class ShoppingCentersAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemShoppingCenterBinding.inflate(LayoutInflater.from(mContext), parent, false)
+        val binding =
+            ItemShoppingCenterBinding.inflate(LayoutInflater.from(mContext), parent, false)
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val shoppingCenter = getItem(position) ?: return
 
-        holder.image_product.loadImage(false, shoppingCenter.imageurl)
-        holder.image_product2.loadImage(false, shoppingCenter.imageurl2)
+        holder.imageProduct.loadImage(false, shoppingCenter.imageurl)
+        holder.imageProduct2.loadImage(false, shoppingCenter.imageurl2)
         if (shoppingCenter.name.isNullOrEmpty()) {
             holder.linearName.visibility = View.GONE
         } else {
@@ -46,7 +47,12 @@ class ShoppingCentersAdapter(
         } else {
             holder.linearLocation.visibility = View.VISIBLE
             holder.view.visibility = View.VISIBLE
-            holder.location.text = "${shoppingCenter.location} - ${shoppingCenter.location2} - ${shoppingCenter.location3}"
+            holder.location.text = mContext.getString(
+                R.string.location_format,
+                shoppingCenter.location,
+                shoppingCenter.location2,
+                shoppingCenter.location3
+            )
         }
         if (shoppingCenter.numberPhone.isNullOrEmpty()) {
             holder.linearNumberPhone.visibility = View.GONE
@@ -60,8 +66,8 @@ class ShoppingCentersAdapter(
     }
 
     class ViewHolder(binding: ItemShoppingCenterBinding) : RecyclerView.ViewHolder(binding.root) {
-        val image_product: ImageView = binding.imageProduct
-        val image_product2: ImageView = binding.imageProduct2
+        val imageProduct: ImageView = binding.imageProduct
+        val imageProduct2: ImageView = binding.imageProduct2
         val more: ImageView = binding.more
         val name: TextView = binding.name
         val location: TextView = binding.location

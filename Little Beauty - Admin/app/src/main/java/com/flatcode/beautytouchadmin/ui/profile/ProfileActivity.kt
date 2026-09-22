@@ -15,11 +15,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.canhub.cropper.CropImageContract
+import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityProfileBinding
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
 import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
-import com.flatcode.beautytouchadmin.utils.getFileExtension
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -135,13 +135,11 @@ class ProfileActivity : AppCompatActivity() {
     private fun validateData() {
         val username = binding!!.nameEdit.text.toString().trim()
         if (username.isEmpty()) {
-            Toast.makeText(context, "Please enter the name", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.enter_name, Toast.LENGTH_SHORT).show()
         } else {
-            dialog!!.setMessage("Modifications are loaded...")
+            dialog!!.setMessage(getString(R.string.loading))
             dialog!!.show()
-            viewModel.updateProfile(
-                DATA.FirebaseUserUid, username, imageUri, imageUri?.getFileExtension(context)
-            )
+            viewModel.updateProfile(DATA.FirebaseUserUid, username, imageUri)
         }
     }
 

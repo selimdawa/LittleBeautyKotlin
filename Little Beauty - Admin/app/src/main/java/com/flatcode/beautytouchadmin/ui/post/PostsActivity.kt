@@ -38,7 +38,7 @@ class PostsActivity : AppCompatActivity() {
         binding = ActivityPostsBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        binding!!.toolbar.nameSpace.text = "My Posts"
+        binding!!.toolbar.nameSpace.setText(R.string.my_posts)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         adapter = MyPostsAdapter(context, object : MyPostsAdapter.OnItemClickListener {
@@ -47,7 +47,7 @@ class PostsActivity : AppCompatActivity() {
             }
 
             override fun onLikeClick(post: Post, isLiked: Boolean) {
-                viewModel.toggleLike(post.postid!!, isLiked)
+                viewModel.toggleLike(post.postid, isLiked)
             }
         })
         binding!!.recyclerView.adapter = adapter
@@ -69,9 +69,9 @@ class PostsActivity : AppCompatActivity() {
     }
 
     private fun showMoreOptions(post: Post) {
-        val options = arrayOf("Edit", "Delete")
+        val options = arrayOf(getString(R.string.edit), getString(R.string.delete))
         AlertDialog.Builder(context)
-            .setTitle("Choose...")
+            .setTitle(R.string.choose)
             .setItems(options) { _: DialogInterface?, which: Int ->
                 if (which == 0) {
                     context.openActivity<PostEditActivity>(DATA.POST_ID to post.postid)
@@ -91,12 +91,12 @@ class PostsActivity : AppCompatActivity() {
         lp.copyFrom(dialog.window?.attributes)
         lp.width = WindowManager.LayoutParams.WRAP_CONTENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        
+
         val title = dialog.findViewById<TextView>(R.id.title)
         title.setText(R.string.do_you_want_to_delete_the_post)
-        
+
         dialog.findViewById<View>(R.id.yes).setOnClickListener {
-            viewModel.deletePost(post.postid!!)
+            viewModel.deletePost(post.postid)
             dialog.dismiss()
         }
         dialog.findViewById<View>(R.id.no).setOnClickListener { dialog.dismiss() }

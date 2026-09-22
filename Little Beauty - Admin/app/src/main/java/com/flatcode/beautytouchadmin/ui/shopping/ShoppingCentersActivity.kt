@@ -45,15 +45,15 @@ class ShoppingCentersActivity : AppCompatActivity() {
     }
 
     private fun showMoreOptions(item: ShoppingCenter) {
-        val options = arrayOf("Edit", "Delete")
+        val options = arrayOf(getString(R.string.edit), getString(R.string.delete))
         AlertDialog.Builder(context)
-            .setTitle("Choose...")
+            .setTitle(R.string.choose)
             .setItems(options) { _: DialogInterface?, which: Int ->
                 if (which == 0) {
                     context.openActivity<ShoppingCentresEditActivity>(DATA.SHOPPING_CENTER_ID to item.id)
                 } else if (which == 1) {
                     Dialog.showDeleteDialog(context, R.string.do_you_want_to_delete_the_pharmacy) {
-                        viewModel.deleteCenter(item.id!!)
+                        viewModel.deleteCenter(item.id)
                     }
                 }
             }.show()

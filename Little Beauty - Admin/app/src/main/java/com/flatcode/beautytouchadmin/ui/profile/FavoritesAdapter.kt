@@ -6,16 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.android.material.card.MaterialCardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.flatcode.beautytouchadmin.R
+import com.flatcode.beautytouchadmin.databinding.ItemProductLinearBinding
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.ui.post.PostDetailsActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
-import com.flatcode.beautytouchadmin.databinding.ItemProductLinearBinding
+import com.google.android.material.card.MaterialCardView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -41,9 +42,9 @@ class FavoritesAdapter(private val mContext: Context, initialList: MutableList<P
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = getItem(position) ?: return
-        val id = post.postid ?: ""
+        val id = post.postid
 
-        holder.image_product.loadImage(true, post.postimage)
+        holder.imageProduct.loadImage(true, post.postimage)
         if (post.name.isNullOrEmpty()) {
             holder.name.visibility = View.GONE
         } else {
@@ -54,7 +55,7 @@ class FavoritesAdapter(private val mContext: Context, initialList: MutableList<P
             holder.price.visibility = View.GONE
         } else {
             holder.price.visibility = View.VISIBLE
-            holder.price.text = "${post.price} $"
+            holder.price.text = mContext.getString(R.string.price_format, post.price)
         }
 
         nrLikes(holder.likes, post.postid)
@@ -65,19 +66,18 @@ class FavoritesAdapter(private val mContext: Context, initialList: MutableList<P
 
     class ViewHolder(binding: ItemProductLinearBinding) : RecyclerView.ViewHolder(binding.root) {
         val card: MaterialCardView = binding.card
-        val image_product: ImageView = binding.imageProduct
+        val imageProduct: ImageView = binding.imageProduct
         val like: ImageView = binding.like
         val likes: TextView = binding.likes
         val name: TextView = binding.name
         val price: TextView = binding.price
-        val save: ImageView = binding.save
     }
 
-    private fun nrLikes(likes: TextView, postId: String?) {
-        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId!!)
+    private fun nrLikes(likes: TextView, postId: String) {
+        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                likes.text = "${dataSnapshot.childrenCount}"
+                likes.text = dataSnapshot.childrenCount.toString()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}

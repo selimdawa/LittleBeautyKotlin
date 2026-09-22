@@ -18,7 +18,6 @@ import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
 import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
-import com.flatcode.beautytouchadmin.utils.getFileExtension
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -71,13 +70,13 @@ class PostAddActivity : AppCompatActivity() {
 
         binding!!.typeOne.setOnClickListener {
             typePost = "Skin Products"
-            binding!!.typeOne.text = "Skin Products ✓"
-            binding!!.typeTwo.text = "Hair Products"
+            binding!!.typeOne.setText(R.string.skin_products_selected)
+            binding!!.typeTwo.setText(R.string.hair_products)
         }
         binding!!.typeTwo.setOnClickListener {
             typePost = "Hair Products"
-            binding!!.typeOne.text = "Skin Products"
-            binding!!.typeTwo.text = "Hair Products ✓"
+            binding!!.typeOne.setText(R.string.skin_products)
+            binding!!.typeTwo.setText(R.string.hair_products_selected)
         }
         binding!!.go.setOnClickListener { validateData() }
         binding!!.layoutImageProfile.setOnClickListener {
@@ -110,19 +109,19 @@ class PostAddActivity : AppCompatActivity() {
         val price = binding!!.price.text.toString().trim()
 
         if (name.isEmpty()) {
-            Toast.makeText(context, "Enter a name", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.enter_name, Toast.LENGTH_SHORT).show()
         } else if (indications.isEmpty()) {
-            Toast.makeText(context, "Enter the indications", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.enter_indications, Toast.LENGTH_SHORT).show()
         } else if (howToUse.isEmpty()) {
-            Toast.makeText(context, "Enter how to use", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.enter_how_to_use, Toast.LENGTH_SHORT).show()
         } else if (price.isEmpty()) {
-            Toast.makeText(context, "Enter a price", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.enter_price, Toast.LENGTH_SHORT).show()
         } else if (typePost == DATA.EMPTY) {
-            Toast.makeText(context, "Enter a product category", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.enter_category, Toast.LENGTH_SHORT).show()
         } else if (imageUri == null) {
-            Toast.makeText(context, "There's no picture!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.no_picture, Toast.LENGTH_SHORT).show()
         } else {
-            dialog!!.setMessage("Post being created...")
+            dialog!!.setMessage(getString(R.string.post_created))
             dialog!!.show()
             viewModel.addPost(
                 name,
@@ -130,8 +129,7 @@ class PostAddActivity : AppCompatActivity() {
                 howToUse,
                 price,
                 typePost,
-                imageUri!!,
-                imageUri!!.getFileExtension(context)!!
+                imageUri!!
             )
         }
     }

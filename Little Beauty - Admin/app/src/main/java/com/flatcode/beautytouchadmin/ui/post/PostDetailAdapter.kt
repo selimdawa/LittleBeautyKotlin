@@ -56,97 +56,97 @@ class PostDetailAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = list[position] ?: return
 
-        holder.image_product.loadImage(false, post.postimage)
-        holder.image_product_1.loadImage(false, post.postimage)
-        holder.image_product_2.loadImage(false, post.postimage2)
-        holder.image_product_3.loadImage(false, post.postimage3)
-        holder.image_product_4.loadImage(false, post.postimage4)
-        holder.image_product_5.loadImage(false, post.postimage5)
-        holder.image_product_6.loadImage(false, post.postimage6)
-        holder.image_product_7.loadImage(false, post.postimage7)
-        holder.image_product_8.loadImage(false, post.postimage8)
-        holder.image_product_9.loadImage(false, post.postimage9)
-        holder.image_product_10.loadImage(false, post.postimage10)
+        holder.imageProduct.loadImage(false, post.postimage)
+        holder.imageProduct1.loadImage(false, post.postimage)
+        holder.imageProduct2.loadImage(false, post.postimage2)
+        holder.imageProduct3.loadImage(false, post.postimage3)
+        holder.imageProduct4.loadImage(false, post.postimage4)
+        holder.imageProduct5.loadImage(false, post.postimage5)
+        holder.imageProduct6.loadImage(false, post.postimage6)
+        holder.imageProduct7.loadImage(false, post.postimage7)
+        holder.imageProduct8.loadImage(false, post.postimage8)
+        holder.imageProduct9.loadImage(false, post.postimage9)
+        holder.imageProduct10.loadImage(false, post.postimage10)
 
         // Visibility logic
-        holder.image_product_2.visibility =
+        holder.imageProduct2.visibility =
             if (post.postimage2.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_3.visibility =
+        holder.imageProduct3.visibility =
             if (post.postimage3.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_4.visibility =
+        holder.imageProduct4.visibility =
             if (post.postimage4.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_5.visibility =
+        holder.imageProduct5.visibility =
             if (post.postimage5.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_6.visibility =
+        holder.imageProduct6.visibility =
             if (post.postimage6.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_7.visibility =
+        holder.imageProduct7.visibility =
             if (post.postimage7.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_8.visibility =
+        holder.imageProduct8.visibility =
             if (post.postimage8.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_9.visibility =
+        holder.imageProduct9.visibility =
             if (post.postimage9.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_10.visibility =
+        holder.imageProduct10.visibility =
             if (post.postimage10.isNullOrEmpty()) View.GONE else View.VISIBLE
 
         if (post.postimage2.isNullOrEmpty() && post.postimage3.isNullOrEmpty() && post.postimage4.isNullOrEmpty() && post.postimage5.isNullOrEmpty() && post.postimage6.isNullOrEmpty() && post.postimage7.isNullOrEmpty() && post.postimage8.isNullOrEmpty() && post.postimage9.isNullOrEmpty() && post.postimage10.isNullOrEmpty()) {
-            holder.scroll_image.visibility = View.GONE
+            holder.scrollImage.visibility = View.GONE
         } else {
-            holder.scroll_image.visibility = View.VISIBLE
+            holder.scrollImage.visibility = View.VISIBLE
         }
 
         if (post.name.isNullOrEmpty()) {
-            holder.product_name.visibility = View.GONE
+            holder.productName.visibility = View.GONE
         } else {
-            holder.product_name.visibility = View.VISIBLE
-            holder.product_name.text = post.name
+            holder.productName.visibility = View.VISIBLE
+            holder.productName.text = post.name
         }
         if (post.price.isNullOrEmpty()) {
-            holder.price_product.visibility = View.GONE
+            holder.priceProduct.visibility = View.GONE
         } else {
-            holder.price_product.visibility = View.VISIBLE
-            holder.price_product.text = "${post.price} $"
+            holder.priceProduct.visibility = View.VISIBLE
+            holder.priceProduct.text = mContext.getString(R.string.price_format, post.price)
         }
         if (post.indications.isNullOrEmpty()) {
-            holder.linear_indications.visibility = View.GONE
-            holder.linear_indications2.visibility = View.GONE
+            holder.linearIndications.visibility = View.GONE
+            holder.linearIndications2.visibility = View.GONE
         } else {
-            holder.linear_indications.visibility = View.VISIBLE
-            holder.text_indications.visibility = View.VISIBLE
-            holder.linear_indications2.visibility = View.VISIBLE
+            holder.linearIndications.visibility = View.VISIBLE
+            holder.textIndications.visibility = View.VISIBLE
+            holder.linearIndications2.visibility = View.VISIBLE
             holder.indications.visibility = View.VISIBLE
             holder.indications.text = post.indications
         }
         if (post.use.isNullOrEmpty()) {
-            holder.linear_how_to_use.visibility = View.GONE
-            holder.linear_how_to_use2.visibility = View.GONE
+            holder.linearHowToUse.visibility = View.GONE
+            holder.linearHowToUse2.visibility = View.GONE
         } else {
-            holder.linear_how_to_use.visibility = View.VISIBLE
-            holder.text_how_to_use.visibility = View.VISIBLE
-            holder.linear_how_to_use2.visibility = View.VISIBLE
-            holder.how_to_use.visibility = View.VISIBLE
-            holder.how_to_use.text = post.use
+            holder.linearHowToUse.visibility = View.VISIBLE
+            holder.textHowToUse.visibility = View.VISIBLE
+            holder.linearHowToUse2.visibility = View.VISIBLE
+            holder.howToUse.visibility = View.VISIBLE
+            holder.howToUse.text = post.use
         }
 
         // Like/Save States
         holder.like.setImageResource(if (isLiked) R.drawable.ic_heart_selected else R.drawable.ic_heart_unselected)
         holder.save.setImageResource(if (isSaved) R.drawable.ic_favorites_selected else R.drawable.ic_favorites_unselected)
-        holder.like_number.text = "$likesCount"
+        holder.likeNumber.text = likesCount.toString()
 
         holder.like.setOnClickListener { listener.onLikeClick(post) }
         holder.save.setOnClickListener { listener.onSaveClick(post) }
 
         // Image selection
         val imageViews = listOf(
-            holder.image_product_1,
-            holder.image_product_2,
-            holder.image_product_3,
-            holder.image_product_4,
-            holder.image_product_5,
-            holder.image_product_6,
-            holder.image_product_7,
-            holder.image_product_8,
-            holder.image_product_9,
-            holder.image_product_10
+            holder.imageProduct1,
+            holder.imageProduct2,
+            holder.imageProduct3,
+            holder.imageProduct4,
+            holder.imageProduct5,
+            holder.imageProduct6,
+            holder.imageProduct7,
+            holder.imageProduct8,
+            holder.imageProduct9,
+            holder.imageProduct10
         )
         val imageUrls = listOf(
             post.postimage,
@@ -162,7 +162,7 @@ class PostDetailAdapter(
         )
 
         imageViews.forEachIndexed { index, imageView ->
-            buttonClick(imageView, imageUrls[index], holder.image_product)
+            buttonClick(imageView, imageUrls[index], holder.imageProduct)
         }
     }
 
@@ -173,31 +173,31 @@ class PostDetailAdapter(
     }
 
     class ViewHolder(binding: ItemPostDetailBinding) : RecyclerView.ViewHolder(binding.root) {
-        val image_product: ImageView = binding.imageProduct
+        val imageProduct: ImageView = binding.imageProduct
         val save: ImageView = binding.save
         val like: ImageView = binding.like
-        val image_product_1: ImageView = binding.imageProduct1
-        val image_product_2: ImageView = binding.imageProduct2
-        val image_product_3: ImageView = binding.imageProduct3
-        val image_product_4: ImageView = binding.imageProduct4
-        val image_product_5: ImageView = binding.imageProduct5
-        val image_product_6: ImageView = binding.imageProduct6
-        val image_product_7: ImageView = binding.imageProduct7
-        val image_product_8: ImageView = binding.imageProduct8
-        val image_product_9: ImageView = binding.imageProduct9
-        val image_product_10: ImageView = binding.imageProduct10
-        val product_name: TextView = binding.productName
-        val price_product: TextView = binding.priceProduct
-        val like_number: TextView = binding.likeNumber
-        val text_indications: TextView = binding.textIndications
+        val imageProduct1: ImageView = binding.imageProduct1
+        val imageProduct2: ImageView = binding.imageProduct2
+        val imageProduct3: ImageView = binding.imageProduct3
+        val imageProduct4: ImageView = binding.imageProduct4
+        val imageProduct5: ImageView = binding.imageProduct5
+        val imageProduct6: ImageView = binding.imageProduct6
+        val imageProduct7: ImageView = binding.imageProduct7
+        val imageProduct8: ImageView = binding.imageProduct8
+        val imageProduct9: ImageView = binding.imageProduct9
+        val imageProduct10: ImageView = binding.imageProduct10
+        val productName: TextView = binding.productName
+        val priceProduct: TextView = binding.priceProduct
+        val likeNumber: TextView = binding.likeNumber
+        val textIndications: TextView = binding.textIndications
         val indications: TextView = binding.indications
-        val text_how_to_use: TextView = binding.textHowToUse
-        val how_to_use: TextView = binding.howToUse
-        val linear_indications: LinearLayout = binding.linearIndications
-        val linear_indications2: LinearLayout = binding.linearIndications2
-        val linear_how_to_use: LinearLayout = binding.linearHowToUse
-        val linear_how_to_use2: LinearLayout = binding.linearHowToUse2
-        val scroll_image: HorizontalScrollView = binding.scrollImage
+        val textHowToUse: TextView = binding.textHowToUse
+        val howToUse: TextView = binding.howToUse
+        val linearIndications: LinearLayout = binding.linearIndications
+        val linearIndications2: LinearLayout = binding.linearIndications2
+        val linearHowToUse: LinearLayout = binding.linearHowToUse
+        val linearHowToUse2: LinearLayout = binding.linearHowToUse2
+        val scrollImage: HorizontalScrollView = binding.scrollImage
     }
 
     companion object DiffCallback : DiffUtil.ItemCallback<Post>() {

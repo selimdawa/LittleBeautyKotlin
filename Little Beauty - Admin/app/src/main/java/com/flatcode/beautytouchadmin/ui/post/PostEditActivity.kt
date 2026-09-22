@@ -3,7 +3,6 @@ package com.flatcode.beautytouchadmin.ui.post
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -13,13 +12,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.*
-import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
-import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
 import com.canhub.cropper.CropImageContract
+import com.flatcode.beautytouchadmin.R
+import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
+import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.checkStoragePermission
+import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
+import com.flatcode.beautytouchadmin.utils.loadImage
+import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 
 @AndroidEntryPoint
 class PostEditActivity : AppCompatActivity() {
@@ -66,21 +69,21 @@ class PostEditActivity : AppCompatActivity() {
 
         dialog = MyDialog.loadingDialog(context)
 
-        binding!!.toolbar.nameSpace.setText(R.string.add_post)
+        binding!!.toolbar.nameSpace.setText(R.string.edit_post)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         binding!!.typeOne.setOnClickListener {
             typePost = "Skin Products"
-            binding!!.typeOne.text = "Skin Products ✓"
-            binding!!.typeTwo.text = "Hair Products"
+            binding!!.typeOne.setText(R.string.skin_products_selected)
+            binding!!.typeTwo.setText(R.string.hair_products)
         }
         binding!!.typeTwo.setOnClickListener {
             typePost = "Hair Products"
-            binding!!.typeOne.text = "Skin Products"
-            binding!!.typeTwo.text = "Hair Products ✓"
+            binding!!.typeOne.setText(R.string.skin_products)
+            binding!!.typeTwo.setText(R.string.hair_products_selected)
         }
 
-        binding!!.toolbar.nameSpace.text = "Edit post"
+        binding!!.toolbar.nameSpace.setText(R.string.edit_post)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
         binding!!.layoutImageProfile.setOnClickListener {
@@ -103,11 +106,11 @@ class PostEditActivity : AppCompatActivity() {
                         binding!!.indications.setText(it.indications)
                         binding!!.howToUse.setText(it.use)
                         if (it.category == "Skin Products") {
-                            binding!!.typeOne.text = "Skin Products ✓"
-                            binding!!.typeTwo.text = "Hair Products"
+                            binding!!.typeOne.setText(R.string.skin_products_selected)
+                            binding!!.typeTwo.setText(R.string.hair_products)
                         } else if (it.category == "Hair Products") {
-                            binding!!.typeOne.text = "Skin Products"
-                            binding!!.typeTwo.text = "Hair Products ✓"
+                            binding!!.typeOne.setText(R.string.skin_products)
+                            binding!!.typeTwo.setText(R.string.hair_products_selected)
                         }
                     }
                 }
@@ -136,19 +139,18 @@ class PostEditActivity : AppCompatActivity() {
         val price = binding!!.price.text.toString().trim()
 
         if (name.isEmpty()) {
-            Toast.makeText(context, "Enter a name", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.enter_name, Toast.LENGTH_SHORT).show()
         } else if (indications.isEmpty()) {
-            Toast.makeText(context, "Enter the indications", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.enter_indications, Toast.LENGTH_SHORT).show()
         } else if (howToUse.isEmpty()) {
-            Toast.makeText(context, "Enter how to use", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.enter_how_to_use, Toast.LENGTH_SHORT).show()
         } else if (price.isEmpty()) {
-            Toast.makeText(context, "Enter a price", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.enter_price, Toast.LENGTH_SHORT).show()
         } else {
-            dialog!!.setMessage("Post is updating")
+            dialog!!.setMessage(getString(R.string.post_updating))
             dialog!!.show()
             viewModel.updatePost(
-                id!!, name, indications, howToUse, price, typePost ?: "",
-                imageUri, imageUri?.getFileExtension(context)
+                id!!, name, indications, howToUse, price, typePost ?: "", imageUri
             )
         }
     }

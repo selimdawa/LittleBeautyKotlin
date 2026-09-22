@@ -24,7 +24,6 @@ import com.flatcode.beautytouchadmin.databinding.ActivityAboutMeBinding
 import com.flatcode.beautytouchadmin.ui.other.ToolsViewModel
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
 import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
-import com.flatcode.beautytouchadmin.utils.getFileExtension
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,7 +71,7 @@ class AboutMeActivity : AppCompatActivity() {
 
         dialog = MyDialog.loadingDialog(context)
 
-        binding!!.toolbar.nameSpace.text = "About Me"
+        binding!!.toolbar.nameSpace.setText(R.string.about_me)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
         binding!!.show.setOnClickListener { showDialogAboutMy() }
@@ -113,11 +112,11 @@ class AboutMeActivity : AppCompatActivity() {
         val name = binding!!.name.text.toString().trim()
 
         if (name.isEmpty()) {
-            Toast.makeText(context, "Enter a name", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.enter_name, Toast.LENGTH_SHORT).show()
         } else {
-            dialog!!.setMessage("Image is being updated...")
+            dialog!!.setMessage(getString(R.string.loading))
             dialog!!.show()
-            viewModel.updateAboutMe(name, imageUri, imageUri?.getFileExtension(context))
+            viewModel.updateAboutMe(name, imageUri)
         }
     }
 

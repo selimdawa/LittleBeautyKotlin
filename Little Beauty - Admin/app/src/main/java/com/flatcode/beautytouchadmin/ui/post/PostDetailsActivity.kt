@@ -22,7 +22,6 @@ class PostDetailsActivity : AppCompatActivity() {
     private val context: Context = this@PostDetailsActivity
     private var binding: ActivityPostDetailsBinding? = null
     private var adapter: PostDetailAdapter? = null
-    private val list = mutableListOf<Post?>()
     private var postId: String? = null
     private val viewModel: PostDetailsViewModel by viewModels()
 
@@ -36,13 +35,13 @@ class PostDetailsActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.setText(R.string.post_detail)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        adapter = PostDetailAdapter(context, list, object : PostDetailAdapter.OnItemClickListener {
+        adapter = PostDetailAdapter(context, mutableListOf(), object : PostDetailAdapter.OnItemClickListener {
             override fun onLikeClick(post: Post) {
-                viewModel.toggleLike(post.postid!!)
+                viewModel.toggleLike(post.postid)
             }
 
             override fun onSaveClick(post: Post) {
-                viewModel.toggleSave(post.postid!!)
+                viewModel.toggleSave(post.postid)
             }
         })
         binding!!.recyclerView.adapter = adapter
@@ -56,10 +55,7 @@ class PostDetailsActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.post.collect { post ->
                     post?.let {
-                        list.clear()
-                        list.add(it)
-                        adapter?.list = list
-                        adapter?.notifyDataSetChanged()
+                        adapter?.list = mutableListOf(it)
                     }
                 }
             }
