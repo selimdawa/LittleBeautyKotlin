@@ -9,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityHotProductBinding
+import com.flatcode.beautytouchadmin.model.Post
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -20,8 +20,8 @@ class HotProductActivity : AppCompatActivity() {
 
     private var binding: ActivityHotProductBinding? = null
     private val context: Context = this@HotProductActivity
-    private var hotpostAdapter: HotProductRemoveAdapter? = null
-    private var allpostAdapter: HotProductAddAdapter? = null
+    private var hotPostAdapter: HotProductRemoveAdapter? = null
+    private var allPostAdapter: HotProductAddAdapter? = null
     private val viewModel: HotProductViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,19 +32,21 @@ class HotProductActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.setText(R.string.hot_product)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        hotpostAdapter = HotProductRemoveAdapter(context, object : HotProductRemoveAdapter.OnItemClickListener {
-            override fun onRemoveClick(post: Post) {
-                viewModel.removeHotProduct(post.postid!!)
-            }
-        })
-        binding!!.recyclerView.adapter = hotpostAdapter
+        hotPostAdapter =
+            HotProductRemoveAdapter(context, object : HotProductRemoveAdapter.OnItemClickListener {
+                override fun onRemoveClick(post: Post) {
+                    viewModel.removeHotProduct(post.postid)
+                }
+            })
+        binding!!.recyclerView.adapter = hotPostAdapter
 
-        allpostAdapter = HotProductAddAdapter(context, object : HotProductAddAdapter.OnItemClickListener {
-            override fun onAddClick(post: Post) {
-                viewModel.addHotProduct(post.postid!!)
-            }
-        })
-        binding!!.recyclerView2.adapter = allpostAdapter
+        allPostAdapter =
+            HotProductAddAdapter(context, object : HotProductAddAdapter.OnItemClickListener {
+                override fun onAddClick(post: Post) {
+                    viewModel.addHotProduct(post.postid)
+                }
+            })
+        binding!!.recyclerView2.adapter = allPostAdapter
 
         observeViewModel()
     }
@@ -53,7 +55,7 @@ class HotProductActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.hotPosts.collect { posts ->
-                    hotpostAdapter?.submitList(posts)
+                    hotPostAdapter?.submitList(posts)
                     binding!!.progressBar.visibility = View.GONE
                     binding!!.recyclerView.visibility = View.VISIBLE
                 }
@@ -63,7 +65,7 @@ class HotProductActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.otherPosts.collect { posts ->
-                    allpostAdapter?.submitList(posts)
+                    allPostAdapter?.submitList(posts)
                     binding!!.progressBar2.visibility = View.GONE
                     binding!!.recyclerView2.visibility = View.VISIBLE
                 }

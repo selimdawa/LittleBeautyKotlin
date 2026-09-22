@@ -17,7 +17,6 @@ import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityToolsBinding
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
 import com.flatcode.beautytouchadmin.utils.cropImageSessionOptions
-import com.flatcode.beautytouchadmin.utils.getFileExtension
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,12 +34,15 @@ class ToolsActivity : AppCompatActivity() {
     private var imageUri3: Uri? = null
     private var imageUri4: Uri? = null
     private var dialog: Dialog? = null
-    private val IMAGE_NOW = 1
-    private val IMAGE_OLD = 2
-    private val LOGO_NOW = 3
-    private val LOGO_OLD = 4
-    private var IMAGE_NUMBER = 0
+    private var imageNumber = 0
     private val viewModel: ToolsViewModel by viewModels()
+
+    companion object {
+        private const val IMAGE_NOW = 1
+        private const val IMAGE_OLD = 2
+        private const val LOGO_NOW = 3
+        private const val LOGO_OLD = 4
+    }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -59,7 +61,7 @@ class ToolsActivity : AppCompatActivity() {
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
             val uri = result.uriContent
-            when (IMAGE_NUMBER) {
+            when (imageNumber) {
                 IMAGE_NOW -> {
                     imageUri = uri
                     binding!!.imageSessionNow.setImageURI(imageUri)
@@ -94,19 +96,19 @@ class ToolsActivity : AppCompatActivity() {
         dialog = MyDialog.loadingDialog(context)
 
         binding!!.editImageSessionNow.setOnClickListener {
-            IMAGE_NUMBER = IMAGE_NOW
+            imageNumber = IMAGE_NOW
             checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
         binding!!.editImageSessionOld.setOnClickListener {
-            IMAGE_NUMBER = IMAGE_OLD
+            imageNumber = IMAGE_OLD
             checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
         binding!!.editLogoSessionNow.setOnClickListener {
-            IMAGE_NUMBER = LOGO_NOW
+            imageNumber = LOGO_NOW
             checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
         binding!!.editLogoSessionOld.setOnClickListener {
-            IMAGE_NUMBER = LOGO_OLD
+            imageNumber = LOGO_OLD
             checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
         binding!!.toolbar.nameSpace.setText(R.string.tools)
@@ -177,11 +179,7 @@ class ToolsActivity : AppCompatActivity() {
                 imageUri,
                 imageUri2,
                 imageUri3,
-                imageUri4,
-                imageUri?.getFileExtension(context),
-                imageUri2?.getFileExtension(context),
-                imageUri3?.getFileExtension(context),
-                imageUri4?.getFileExtension(context)
+                imageUri4
             )
         }
     }

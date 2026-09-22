@@ -8,10 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.databinding.ActivityAdsMeterBinding
+import com.flatcode.beautytouchadmin.utils.DATA
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -20,7 +19,6 @@ class ADsMeterActivity : AppCompatActivity() {
 
     private var binding: ActivityAdsMeterBinding? = null
     private val context: Context = this@ADsMeterActivity
-    private val list = mutableListOf<User?>()
     private var adapter: ADsUserAdapter? = null
     private var type: String = DATA.AD_LOAD
     private val viewModel: ADsViewModel by viewModels()
@@ -33,7 +31,7 @@ class ADsMeterActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.setText(R.string.users_ads)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        adapter = ADsUserAdapter(context, list)
+        adapter = ADsUserAdapter(context)
         binding!!.recyclerView.adapter = adapter
 
         binding!!.adLoad.setOnClickListener {
@@ -56,13 +54,10 @@ class ADsMeterActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.users.collect { users ->
-                    list.clear()
-                    list.addAll(users)
-                    adapter?.list = list
-                    adapter?.notifyDataSetChanged()
+                    adapter?.submitList(users)
 
                     binding!!.progress.visibility = View.GONE
-                    if (list.isNotEmpty()) {
+                    if (users.isNotEmpty()) {
                         binding!!.recyclerView.visibility = View.VISIBLE
                         binding!!.emptyText.visibility = View.GONE
                     } else {

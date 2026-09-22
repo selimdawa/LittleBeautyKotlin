@@ -13,28 +13,17 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.Application
+import com.flatcode.beautytouchadmin.databinding.ItemAdsUserBinding
 import com.flatcode.beautytouchadmin.model.User
-import com.flatcode.beautytouchadmin.ui.ads.ADsInfoActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
-import com.flatcode.beautytouchadmin.databinding.ItemAdsUserBinding
 
 class ADsUserAdapter(
-    private val context: Context, initialList: MutableList<User?>
+    private val context: Context
 ) : ListAdapter<User, ADsUserAdapter.ViewHolder>(DiffCallback), Filterable {
 
-    var list: MutableList<User?> = initialList
-        set(value) {
-            field = value
-            submitList(value.filterNotNull())
-        }
-
-    var filterList: MutableList<User?> = initialList
-
-    init {
-        submitList(initialList.filterNotNull())
-    }
+    private var originalList: List<User> = currentList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemAdsUserBinding.inflate(LayoutInflater.from(context), parent, false)
@@ -42,7 +31,7 @@ class ADsUserAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = list[position] ?: return
+        val item = getItem(position) ?: return
         val userId = item.id
         val username = item.username ?: ""
         val profileImage = item.imageurl ?: ""
@@ -52,14 +41,14 @@ class ADsUserAdapter(
         val formattedDate: String = Application.formatTimestamp(timestamp)
 
         holder.profileImage.loadImage(true, profileImage)
-        if (username.isNullOrEmpty()) {
+        if (username.isEmpty()) {
             holder.username.visibility = View.GONE
         } else {
             holder.username.visibility = View.VISIBLE
             holder.username.text = username
         }
 
-        val rankValue = list.size - position
+        val rankValue = itemCount - position
         holder.time.text = formattedDate
         holder.rank.text = "$rankValue"
         holder.numberADsLoad.text = "$adLoaded"
@@ -74,19 +63,23 @@ class ADsUserAdapter(
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val results = FilterResults()
+                if (originalList.isEmpty() && currentList.isNotEmpty()) {
+                    originalList = ArrayList(currentList)
+                }
+
                 if (!constraint.isNullOrEmpty()) {
                     val constraintStr = constraint.toString().uppercase()
-                    val filter = mutableListOf<User?>()
-                    for (item in filterList) {
-                        if (item?.username?.uppercase()?.contains(constraintStr) == true) {
+                    val filter = mutableListOf<User>()
+                    for (item in originalList) {
+                        if (item.username?.uppercase()?.contains(constraintStr) == true) {
                             filter.add(item)
                         }
                     }
                     results.count = filter.size
                     results.values = filter
                 } else {
-                    results.count = filterList.size
-                    results.values = filterList
+                    results.count = originalList.size
+                    results.values = originalList
                 }
                 return results
             }

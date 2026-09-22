@@ -12,36 +12,22 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.flatcode.beautytouchadmin.databinding.ItemLeaderboradBinding
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.ui.ads.ADsInfoActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
-import com.flatcode.beautytouchadmin.databinding.ItemLeaderboradBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 class LeaderboardOldAdapter(
-    private val mContext: Context, 
-    initialList: MutableList<User?>, 
-    var isUser: Boolean,
-    private val pointsKey: String? = null
+    private val mContext: Context, private val pointsKey: String? = null
 ) : ListAdapter<User, LeaderboardOldAdapter.ViewHolder>(DiffCallback), Filterable {
 
-    var list: MutableList<User?> = initialList
-        set(value) {
-            field = value
-            submitList(value.filterNotNull())
-        }
-
-    var filterList: MutableList<User?> = initialList
-    private var filter: LeaderboardOldFilter? = null
-
-    init {
-        submitList(initialList.filterNotNull())
-    }
+    private var originalList: List<User> = currentList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemLeaderboradBinding.inflate(LayoutInflater.from(mContext), parent, false)
@@ -49,19 +35,19 @@ class LeaderboardOldAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = list[position] ?: return
+        val item = getItem(position) ?: return
         val id = item.id
         val username = item.username ?: ""
         val image = item.imageurl ?: ""
-        val rankValue = list.size - position
+        val rankValue = itemCount - position
 
         holder.rank.text = "$rankValue"
         holder.profileImage.loadImage(true, image)
-        if (username.isEmpty()) {
-            holder.username.visibility = View.GONE
-        } else {
+        if (username.isNotEmpty()) {
             holder.username.visibility = View.VISIBLE
             holder.username.text = username
+        } else {
+            holder.username.visibility = View.GONE
         }
 
         if (pointsKey != null) {
@@ -77,26 +63,29 @@ class LeaderboardOldAdapter(
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
                 val results = FilterResults()
-                if (constraint != null && constraint.isNotEmpty()) {
+                if (originalList.isEmpty() && currentList.isNotEmpty()) {
+                    originalList = ArrayList(currentList)
+                }
+
+                if (!constraint.isNullOrEmpty()) {
                     val constraintStr = constraint.toString().uppercase()
-                    val filter = mutableListOf<User?>()
-                    for (item in filterList) {
-                        if (item?.username?.uppercase()?.contains(constraintStr) == true) {
+                    val filter = mutableListOf<User>()
+                    for (item in originalList) {
+                        if (item.username?.uppercase()?.contains(constraintStr) == true) {
                             filter.add(item)
                         }
                     }
                     results.count = filter.size
                     results.values = filter
                 } else {
-                    results.count = filterList.size
-                    results.values = filterList
+                    results.count = originalList.size
+                    results.values = originalList
                 }
                 return results
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
-                @Suppress("UNCHECKED_CAST")
-                submitList(results.values as MutableList<User>)
+                @Suppress("UNCHECKED_CAST") submitList(results.values as MutableList<User>)
             }
         }
     }

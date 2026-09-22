@@ -18,7 +18,6 @@ import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivitySliderShowBinding
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
 import com.flatcode.beautytouchadmin.utils.cropImageSliderOptions
-import com.flatcode.beautytouchadmin.utils.getFileExtension
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +32,7 @@ class SliderShowActivity : AppCompatActivity() {
     private val context: Context = also { activity = it }
     private var imageUri: Uri? = null
     private var dialog: Dialog? = null
-    private var IMAGE_NUMBER = 0
+    private var imageNumber = 0
     private val viewModel: SliderViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -55,9 +54,7 @@ class SliderShowActivity : AppCompatActivity() {
             imageUri = result.uriContent
             dialog!!.setMessage("Posting photo...")
             dialog!!.show()
-            viewModel.uploadSlider(
-                IMAGE_NUMBER.toString(), imageUri!!, imageUri!!.getFileExtension(context)!!
-            )
+            viewModel.uploadSlider(imageNumber.toString(), imageUri!!)
         } else {
             val error = result.error
             Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
@@ -103,7 +100,7 @@ class SliderShowActivity : AppCompatActivity() {
         )
         buttons.forEachIndexed { index, button ->
             button.setOnClickListener {
-                IMAGE_NUMBER = index + 1
+                imageNumber = index + 1
                 checkStoragePermission(requestPermissionLauncher) { pickImage() }
             }
         }
@@ -134,7 +131,7 @@ class SliderShowActivity : AppCompatActivity() {
 
     private fun updateUI(sliders: Map<String, String>) {
         val count = sliders.size
-        binding!!.toolbar.nameSpace.text = "Slider Show ( $count )"
+        binding!!.toolbar.nameSpace.text = getString(R.string.slider_show_format, count)
 
         val images = listOf(
             binding!!.imageOne,

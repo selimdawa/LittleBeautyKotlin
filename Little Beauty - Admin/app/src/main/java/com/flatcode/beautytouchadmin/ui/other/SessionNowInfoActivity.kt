@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivitySessionNowInfoBinding
 import com.flatcode.beautytouchadmin.ui.user.LeaderboardAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,7 +27,7 @@ class SessionNowInfoActivity : AppCompatActivity() {
         binding = ActivitySessionNowInfoBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        binding!!.toolbar.nameSpace.text = "Session Now"
+        binding!!.toolbar.nameSpace.setText(R.string.session_now)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         observeViewModel()

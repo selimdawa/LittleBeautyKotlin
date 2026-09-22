@@ -8,9 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.ui.user.LeaderboardOldAdapter
-import com.flatcode.beautytouchadmin.model.User
+import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivitySessionOldInfoBinding
+import com.flatcode.beautytouchadmin.ui.user.LeaderboardOldAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -19,7 +19,6 @@ class SessionOldInfoActivity : AppCompatActivity() {
 
     private var binding: ActivitySessionOldInfoBinding? = null
     private val context: Context = this@SessionOldInfoActivity
-    private val list = mutableListOf<User?>()
     private var adapter: LeaderboardOldAdapter? = null
     private val viewModel: SessionViewModel by viewModels()
 
@@ -28,7 +27,7 @@ class SessionOldInfoActivity : AppCompatActivity() {
         binding = ActivitySessionOldInfoBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        binding!!.toolbar.nameSpace.text = "Session Old"
+        binding!!.toolbar.nameSpace.setText(R.string.session_old)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         observeViewModel()
@@ -40,7 +39,7 @@ class SessionOldInfoActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.pointsKey.collect { key ->
                     if (key != null) {
-                        adapter = LeaderboardOldAdapter(context, list, true, key)
+                        adapter = LeaderboardOldAdapter(context, key)
                         binding!!.recyclerView.adapter = adapter
                     }
                 }
@@ -50,13 +49,10 @@ class SessionOldInfoActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.users.collect { users ->
-                    list.clear()
-                    list.addAll(users)
-                    adapter?.list = list
-                    adapter?.notifyDataSetChanged()
+                    adapter?.submitList(users)
 
                     binding!!.bar.visibility = View.GONE
-                    if (list.isNotEmpty()) {
+                    if (users.isNotEmpty()) {
                         binding!!.recyclerView.visibility = View.VISIBLE
                         binding!!.emptyText.visibility = View.GONE
                     } else {

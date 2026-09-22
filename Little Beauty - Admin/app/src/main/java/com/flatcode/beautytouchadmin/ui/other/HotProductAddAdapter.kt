@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ItemProductAddBinding
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.ui.post.PostDetailsActivity
@@ -39,7 +40,7 @@ class HotProductAddAdapter(
         val post = getItem(position) ?: return
         val id = post.postid
 
-        holder.image_product.loadImage(false, post.postimage)
+        holder.imageProduct.loadImage(false, post.postimage)
         if (post.name == DATA.EMPTY) {
             holder.name.visibility = View.GONE
         } else {
@@ -50,7 +51,7 @@ class HotProductAddAdapter(
             holder.price.visibility = View.GONE
         } else {
             holder.price.visibility = View.VISIBLE
-            holder.price.text = "${post.price} $"
+            holder.price.text = mContext.getString(R.string.price_format, post.price)
         }
 
         nrLikes(holder.likes, id)
@@ -62,18 +63,18 @@ class HotProductAddAdapter(
 
     class ViewHolder(binding: ItemProductAddBinding) : RecyclerView.ViewHolder(binding.root) {
         val card: MaterialCardView = binding.card
-        val image_product: ImageView = binding.imageProduct
+        val imageProduct: ImageView = binding.imageProduct
         val likes: TextView = binding.likes
         val name: TextView = binding.name
         val price: TextView = binding.price
         val add: ImageButton = binding.add
     }
 
-    private fun nrLikes(likes: TextView, postId: String?) {
-        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId!!)
+    private fun nrLikes(likes: TextView, postId: String) {
+        val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId)
         reference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                likes.text = "${dataSnapshot.childrenCount}"
+                likes.text = dataSnapshot.childrenCount.toString()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}

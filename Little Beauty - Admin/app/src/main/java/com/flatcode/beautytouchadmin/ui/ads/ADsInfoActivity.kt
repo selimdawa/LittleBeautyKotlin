@@ -8,11 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.model.ADs
 import com.flatcode.beautytouchadmin.R
+import com.flatcode.beautytouchadmin.databinding.ActivityAdsInfoBinding
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.loadImage
-import com.flatcode.beautytouchadmin.databinding.ActivityAdsInfoBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -21,7 +20,6 @@ class ADsInfoActivity : AppCompatActivity() {
 
     private var binding: ActivityAdsInfoBinding? = null
     private val context: Context = this@ADsInfoActivity
-    private val list = mutableListOf<ADs?>()
     private var adapter: ADsInfoAdapter? = null
     private var profileId: String? = null
     private val viewModel: ADsViewModel by viewModels()
@@ -36,7 +34,7 @@ class ADsInfoActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.setText(R.string.info_ads)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        adapter = ADsInfoAdapter(context, list)
+        adapter = ADsInfoAdapter(context)
         binding!!.recyclerView.adapter = adapter
 
         profileId?.let {
@@ -62,13 +60,10 @@ class ADsInfoActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.ads.collect { ads ->
-                    list.clear()
-                    list.addAll(ads)
-                    adapter?.list = list
-                    adapter?.notifyDataSetChanged()
+                    adapter?.submitList(ads)
 
                     binding!!.progress.visibility = View.GONE
-                    if (list.isNotEmpty()) {
+                    if (ads.isNotEmpty()) {
                         binding!!.recyclerView.visibility = View.VISIBLE
                         binding!!.emptyText.visibility = View.GONE
                     } else {
