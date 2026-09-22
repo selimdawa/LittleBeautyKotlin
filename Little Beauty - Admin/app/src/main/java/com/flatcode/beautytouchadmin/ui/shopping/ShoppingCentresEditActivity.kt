@@ -3,7 +3,6 @@ package com.flatcode.beautytouchadmin.ui.shopping
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -13,13 +12,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.model.ShoppingCenter
-import com.flatcode.beautytouchadmin.utils.*
-import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
-import com.flatcode.beautytouchadmin.databinding.ActivityShoppingCentersAddBinding
 import com.canhub.cropper.CropImageContract
+import com.flatcode.beautytouchadmin.R
+import com.flatcode.beautytouchadmin.databinding.ActivityShoppingCentersAddBinding
+import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.checkStoragePermission
+import com.flatcode.beautytouchadmin.utils.cropImageShoppingCenterOptions
+import com.flatcode.beautytouchadmin.utils.loadImage
+import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 
 @AndroidEntryPoint
 class ShoppingCentresEditActivity : AppCompatActivity() {
@@ -31,9 +34,9 @@ class ShoppingCentresEditActivity : AppCompatActivity() {
     private var imageUri: Uri? = null
     private var imageUri2: Uri? = null
     private var dialog: Dialog? = null
-    private val IMAGE_PIC = 1
-    private val IMAGE_MAP = 2
-    private var IMAGE_NUMBER = 0
+    private val imagePic = 1
+    private val imageMap = 2
+    private var imageNumber = 0
     private val viewModel: ShoppingActionViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -53,10 +56,10 @@ class ShoppingCentresEditActivity : AppCompatActivity() {
     private val cropImage = registerForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
             val uri = result.uriContent
-            if (IMAGE_NUMBER == IMAGE_PIC) {
+            if (imageNumber == imagePic) {
                 imageUri = uri
                 binding!!.imageOne.setImageURI(imageUri)
-            } else if (IMAGE_NUMBER == IMAGE_MAP) {
+            } else if (imageNumber == imageMap) {
                 imageUri2 = uri
                 binding!!.imageTwo.setImageURI(imageUri2)
             }
@@ -76,15 +79,15 @@ class ShoppingCentresEditActivity : AppCompatActivity() {
         dialog = MyDialog.loadingDialog(context)
 
         binding!!.addImage.setOnClickListener {
-            IMAGE_NUMBER = IMAGE_PIC
+            imageNumber = imagePic
             checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
         binding!!.addImageTwo.setOnClickListener {
-            IMAGE_NUMBER = IMAGE_MAP
+            imageNumber = imageMap
             checkStoragePermission(requestPermissionLauncher) { pickImage() }
         }
 
-        binding!!.toolbar.nameSpace.text = "Edit the shopping center"
+        binding!!.toolbar.nameSpace.setText(R.string.edit_shopping_center)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
 
@@ -142,13 +145,17 @@ class ShoppingCentresEditActivity : AppCompatActivity() {
         } else if (numberPhone.isEmpty()) {
             Toast.makeText(context, "Enter a phone number", Toast.LENGTH_SHORT).show()
         } else {
-            dialog!!.setMessage("Editing....")
+            dialog!!.setMessage(getString(R.string.loading))
             dialog!!.show()
             viewModel.updateShoppingCenter(
-                id!!, name, locationOne, locationTwo, locationThree, numberPhone,
-                imageUri, imageUri2,
-                imageUri?.getFileExtension(context),
-                imageUri2?.getFileExtension(context)
+                id!!,
+                name,
+                locationOne,
+                locationTwo,
+                locationThree,
+                numberPhone,
+                imageUri,
+                imageUri2
             )
         }
     }

@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityUsersBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,8 +55,7 @@ class UsersActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.usersCount.collect { count ->
-                    val usersText = getString(R.string.users)
-                    binding!!.toolbar.nameSpace.text = "$usersText ( $count )"
+        binding!!.toolbar.nameSpace.text = getString(R.string.users_count_format, getString(R.string.users), count)
                 }
             }
         }

@@ -57,7 +57,6 @@ class UserDetailActivity : AppCompatActivity() {
                     list.clear()
                     list.addAll(posts)
                     adapter?.list = list
-                    adapter?.notifyDataSetChanged()
                     binding!!.recyclerView.visibility = View.VISIBLE
                 }
             }

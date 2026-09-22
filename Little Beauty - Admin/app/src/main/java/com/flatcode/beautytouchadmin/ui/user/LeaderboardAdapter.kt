@@ -12,20 +12,19 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.flatcode.beautytouchadmin.databinding.ItemLeaderboradBinding
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.ui.ads.ADsInfoActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
-import com.flatcode.beautytouchadmin.databinding.ItemLeaderboradBinding
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 class LeaderboardAdapter(
-    private val mContext: Context, 
-    var isUser: Boolean,
+    private val mContext: Context,
     private val pointsKey: String? = null
 ) : ListAdapter<User, LeaderboardAdapter.ViewHolder>(DiffCallback), Filterable {
 
@@ -68,8 +67,8 @@ class LeaderboardAdapter(
                 if (originalList.isEmpty() && currentList.isNotEmpty()) {
                     originalList = ArrayList(currentList)
                 }
-                
-                if (constraint != null && constraint.isNotEmpty()) {
+
+                if (!constraint.isNullOrEmpty()) {
                     val constraintStr = constraint.toString().uppercase()
                     val filter = mutableListOf<User>()
                     for (item in originalList) {
