@@ -10,7 +10,7 @@ import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.databinding.ItemPostDetailBinding
 import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Glide
+import com.flatcode.beautytouch.utils.loadImage
 import java.text.MessageFormat
 
 class PostDetailAdapter(
@@ -37,13 +37,13 @@ class PostDetailAdapter(
                 post.postimage6, post.postimage7, post.postimage8, post.postimage9, post.postimage10
             )
 
-            imageProduct.Glide(false, context, post.postimage)
+            imageProduct.loadImage(false, post.postimage)
             
             imageViews.forEachIndexed { index, imageView ->
                 val imageUrl = images[index]
-                imageView.Glide(false, context, imageUrl)
+                imageView.loadImage(false, imageUrl)
                 imageView.visibility = if (imageUrl == DATA.EMPTY && index > 0) View.GONE else View.VISIBLE
-                imageView.setOnClickListener { imageProduct.Glide(false, context, imageUrl) }
+                imageView.setOnClickListener { imageProduct.loadImage(false, imageUrl) }
             }
 
             val hasMoreImages = images.drop(1).any { it != DATA.EMPTY }

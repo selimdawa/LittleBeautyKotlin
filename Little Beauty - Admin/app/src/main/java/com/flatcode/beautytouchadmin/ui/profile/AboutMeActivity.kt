@@ -88,7 +88,7 @@ class AboutMeActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.tools.collect { tools ->
                     tools?.let {
-                        binding!!.image.glide(true, it.imageMe)
+                        binding!!.image.loadImage(true, it.imageMe)
                         binding!!.name.setText(it.aboutMe)
                     }
                 }
@@ -135,7 +135,7 @@ class AboutMeActivity : AppCompatActivity() {
         val text = dialog.findViewById<TextView>(R.id.text)
         
         viewModel.tools.value?.let {
-            image.glide(true, it.imageMe)
+            image.loadImage(true, it.imageMe)
             text.text = it.aboutMe
         }
         

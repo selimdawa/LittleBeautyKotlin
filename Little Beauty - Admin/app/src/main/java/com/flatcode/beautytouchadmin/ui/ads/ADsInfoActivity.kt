@@ -11,7 +11,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.model.ADs
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.databinding.ActivityAdsInfoBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -53,7 +53,7 @@ class ADsInfoActivity : AppCompatActivity() {
                 viewModel.user.collect { user ->
                     user?.let {
                         binding!!.username.text = it.username
-                        binding!!.profileImage.glide(true, it.imageurl)
+                        binding!!.profileImage.loadImage(true, it.imageurl)
                     }
                 }
             }

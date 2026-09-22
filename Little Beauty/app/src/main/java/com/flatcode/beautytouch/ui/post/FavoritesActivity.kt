@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.databinding.ActivityFavoritesBinding
 import com.flatcode.beautytouch.ui.adapter.ProductsStaggeredAdapter
-import com.flatcode.beautytouch.utils.BannerAd
+import com.flatcode.beautytouch.utils.bannerAd
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.openActivity
@@ -46,7 +46,7 @@ class FavoritesActivity : AppCompatActivity() {
         }
 
         binding!!.toolbar.nameSpace.setText(R.string.favorites)
-        binding!!.adView.BannerAd(applicationContext, DATA.BANNER_FAVORITES)
+        binding!!.adView.bannerAd(applicationContext, DATA.BANNER_FAVORITES)
 
         adapter = ProductsStaggeredAdapter(
             onItemClick = { post -> context.openActivity<PostDetailsActivity>(DATA.POST_ID to post.postid) },

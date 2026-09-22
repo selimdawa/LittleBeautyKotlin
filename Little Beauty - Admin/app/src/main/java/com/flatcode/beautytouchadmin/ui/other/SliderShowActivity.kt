@@ -139,7 +139,7 @@ class SliderShowActivity : AppCompatActivity() {
         for (i in 0 until 20) {
             val key = (i + 1).toString()
             val url = sliders[key] ?: ""
-            images[i].glide(false, url)
+            images[i].loadImage(false, url)
             linears[i].visibility = if (count >= i) View.VISIBLE else View.GONE
         }
         binding!!.bar.visibility = View.GONE

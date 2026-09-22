@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.databinding.ItemPostDetailBinding
 import java.text.MessageFormat
 
@@ -58,17 +58,17 @@ class PostDetailAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = list[position] ?: return
 
-        holder.image_product.glide(false, post.postimage)
-        holder.image_product_1.glide(false, post.postimage)
-        holder.image_product_2.glide(false, post.postimage2)
-        holder.image_product_3.glide(false, post.postimage3)
-        holder.image_product_4.glide(false, post.postimage4)
-        holder.image_product_5.glide(false, post.postimage5)
-        holder.image_product_6.glide(false, post.postimage6)
-        holder.image_product_7.glide(false, post.postimage7)
-        holder.image_product_8.glide(false, post.postimage8)
-        holder.image_product_9.glide(false, post.postimage9)
-        holder.image_product_10.glide(false, post.postimage10)
+        holder.image_product.loadImage(false, post.postimage)
+        holder.image_product_1.loadImage(false, post.postimage)
+        holder.image_product_2.loadImage(false, post.postimage2)
+        holder.image_product_3.loadImage(false, post.postimage3)
+        holder.image_product_4.loadImage(false, post.postimage4)
+        holder.image_product_5.loadImage(false, post.postimage5)
+        holder.image_product_6.loadImage(false, post.postimage6)
+        holder.image_product_7.loadImage(false, post.postimage7)
+        holder.image_product_8.loadImage(false, post.postimage8)
+        holder.image_product_9.loadImage(false, post.postimage9)
+        holder.image_product_10.loadImage(false, post.postimage10)
 
         // Visibility logic
         holder.image_product_2.visibility = if (post.postimage2 == DATA.EMPTY) View.GONE else View.VISIBLE
@@ -147,7 +147,7 @@ class PostDetailAdapter(
 
     private fun buttonClick(view: View, url: String?, mainImage: ImageView) {
         view.setOnClickListener {
-            mainImage.glide(false, url)
+            mainImage.loadImage(false, url)
         }
     }
 

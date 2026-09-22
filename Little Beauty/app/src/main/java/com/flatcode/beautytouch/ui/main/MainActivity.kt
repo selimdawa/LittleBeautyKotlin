@@ -36,10 +36,10 @@ import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.openActivity
-import com.flatcode.beautytouch.utils.InterstitialAd
-import com.flatcode.beautytouch.utils.InterstitialShow
-import com.flatcode.beautytouch.utils.Glide
-import com.flatcode.beautytouch.utils.RateUs
+import com.flatcode.beautytouch.utils.interstitialAd
+import com.flatcode.beautytouch.utils.interstitialShow
+import com.flatcode.beautytouch.utils.loadImage
+import com.flatcode.beautytouch.utils.rateUs
 import com.flatcode.beautytouch.databinding.ActivityMainBinding
 import com.flatcode.beautytouch.databinding.DialogAboutBinding
 import com.flatcode.beautytouch.databinding.DialogAppBinding
@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
 
         MobileAds.initialize(this) { }
-        activity!!.InterstitialAd()
+        activity!!.interstitialAd()
 
         binding.myProfile.setOnClickListener {
             context.openActivity<ProfileActivity>()
@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 4 -> {
                     Toast.makeText(applicationContext, shopping_center, Toast.LENGTH_SHORT)
                         .show()
-                    activity!!.InterstitialShow(DATA.INTERSTITIAL_HOME)
+                    activity!!.interstitialShow(DATA.INTERSTITIAL_HOME)
                 }
             }
         }
@@ -276,7 +276,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             userViewModel.appTools.collect { resource ->
                 if (resource is Resource.Success) {
                     val tools = resource.data
-                    dialogBinding.image.Glide(true, context, tools.imageMe)
+                    dialogBinding.image.loadImage(true, tools.imageMe)
                     dialogBinding.text.text = tools.aboutMe
                 }
             }
@@ -298,7 +298,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         lp.copyFrom(dialog.window!!.attributes)
         lp.width = WindowManager.LayoutParams.WRAP_CONTENT
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialogBinding.linearRate.setOnClickListener { activity!!.RateUs() }
+        dialogBinding.linearRate.setOnClickListener { activity!!.rateUs() }
         dialogBinding.facebookDesign.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View) {
                 startActivity(openFacebookIntent)

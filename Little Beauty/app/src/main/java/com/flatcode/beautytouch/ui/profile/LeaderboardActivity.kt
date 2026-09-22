@@ -15,7 +15,7 @@ import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.model.User
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.Glide
+import com.flatcode.beautytouch.utils.loadImage
 import com.flatcode.beautytouch.utils.openActivity
 import com.flatcode.beautytouch.ui.post.PostDetailsActivity
 import com.flatcode.beautytouch.databinding.ActivityLeaderboardBinding
@@ -65,8 +65,8 @@ class LeaderboardActivity : AppCompatActivity() {
                 Timber.d("App tools collected: $resource")
                 if (resource is Resource.Success) {
                     val tools = resource.data
-                    binding!!.imageSession.Glide(false, context, tools.imageSession)
-                    binding!!.imageLogo.Glide(false, context, tools.imageLogo)
+                    binding!!.imageSession.loadImage(false, tools.imageSession)
+                    binding!!.imageLogo.loadImage(false, tools.imageLogo)
                     binding!!.sessionNumber.text = tools.session
                     val key = tools.year + "_" + tools.sessionNumber
                     viewModel.loadLeaderboard(key)
@@ -106,7 +106,7 @@ class LeaderboardActivity : AppCompatActivity() {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val post = dataSnapshot.getValue(Post::class.java)
                     if (post?.postid == R) {
-                        Reward.Glide(false, context, post.postimage)
+                        Reward.loadImage(false, post.postimage)
                         Reward.setOnClickListener {
                             context.openActivity<PostDetailsActivity>(DATA.POST_ID to R)
                         }

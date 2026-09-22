@@ -117,10 +117,10 @@ class ToolsActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.tools.collect { tools ->
                     tools?.let {
-                        binding!!.imageSessionNow.glide(false, it.imageSession)
-                        binding!!.imageSessionOld.glide(false, it.oldImageSession)
-                        binding!!.logoSessionNow.glide(false, it.imageLogo)
-                        binding!!.logoSessionOld.glide(false, it.oldImageLogo)
+                        binding!!.imageSessionNow.loadImage(false, it.imageSession)
+                        binding!!.imageSessionOld.loadImage(false, it.oldImageSession)
+                        binding!!.logoSessionNow.loadImage(false, it.imageLogo)
+                        binding!!.logoSessionOld.loadImage(false, it.oldImageLogo)
                         binding!!.sessionNow.setText(it.session)
                         binding!!.sessionOld.setText(it.oldSession)
                         binding!!.sessionNumberNow.setText(it.sessionNumber)

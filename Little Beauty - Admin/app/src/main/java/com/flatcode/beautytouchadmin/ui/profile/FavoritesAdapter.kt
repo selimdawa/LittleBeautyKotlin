@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.ui.post.PostDetailsActivity
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemProductLinearBinding
 import com.google.firebase.database.DataSnapshot
@@ -44,7 +44,7 @@ class FavoritesAdapter(private val mContext: Context, initialList: MutableList<P
         val post = getItem(position) ?: return
         val id = DATA.EMPTY + post.postid
 
-        holder.image_product.glide(true, post.postimage)
+        holder.image_product.loadImage(true, post.postimage)
         if (post.name == DATA.EMPTY) {
             holder.name.visibility = View.GONE
         } else {

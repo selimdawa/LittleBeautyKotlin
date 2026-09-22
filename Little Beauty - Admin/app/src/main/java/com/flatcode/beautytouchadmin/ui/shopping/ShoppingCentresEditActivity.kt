@@ -104,8 +104,8 @@ class ShoppingCentresEditActivity : AppCompatActivity() {
                         binding!!.location2.setText(it.location2)
                         binding!!.location3.setText(it.location3)
                         binding!!.numberPhone.setText(it.numberPhone)
-                        binding!!.imageOne.glide(false, it.imageurl)
-                        binding!!.imageTwo.glide(false, it.imageurl2)
+                        binding!!.imageOne.loadImage(false, it.imageurl)
+                        binding!!.imageTwo.loadImage(false, it.imageurl2)
                     }
                 }
             }

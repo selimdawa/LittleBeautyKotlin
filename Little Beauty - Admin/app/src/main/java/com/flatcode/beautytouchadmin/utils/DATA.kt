@@ -24,8 +24,8 @@ object DATA {
     const val BANNER_FAVORITES = "BannerFavorites"
     const val BANNER_SHOPPING_CENTRES = "BannerShoppingCenters"
     const val INTERSTITIAL_HOME = "InterstitialHome"
-    var MIX_SLIDER_X = 680
-    var MIX_SLIDER_Y = 360
+    var MIN_SLIDER_X = 680
+    var MIN_SLIDER_Y = 360
     const val EMPTY = ""
     const val SPACE = " "
     const val VIEWS = "views"
@@ -34,7 +34,7 @@ object DATA {
     const val HOT_PRODUCT = "HotProduct"
     const val M_TOOLS = "Mtools"
     const val BEAUTY_TOUCH = "Little Beauty"
-    const val PUBLICHER = "KTWe3PaSUSbv3xulRKSwUgConC92"
+    const val PUBLISHER = "KTWe3PaSUSbv3xulRKSwUgConC92"
     const val APP_NAME = "Little Beauty"
     const val ALL = "All"
     const val SKIN = "Skin"

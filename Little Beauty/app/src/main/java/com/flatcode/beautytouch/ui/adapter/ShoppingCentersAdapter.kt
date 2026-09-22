@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouch.databinding.ItemShoppingCentersBinding
 import com.flatcode.beautytouch.model.ShoppingCenter
-import com.flatcode.beautytouch.utils.Glide
+import com.flatcode.beautytouch.utils.loadImage
 
 class ShoppingCentersAdapter(
     private val onItemClick: (ShoppingCenter) -> Unit
@@ -23,8 +23,8 @@ class ShoppingCentersAdapter(
         val context = holder.itemView.context
 
         with(holder.binding) {
-            imageProduct.Glide(false, context, item.imageurl)
-            imageProduct2.Glide(false, context, item.imageurl2)
+            imageProduct.loadImage(false, item.imageurl)
+            imageProduct2.loadImage(false, item.imageurl2)
             name.text = item.name
             location.text = item.location
             numberPhone.text = item.numberPhone

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.ui.post.PostDetailsActivity
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemProductRemoveBinding
 import com.google.firebase.database.DataSnapshot
@@ -41,7 +41,7 @@ class HotProductRemoveAdapter(
         val post = getItem(position) ?: return
         val id = post.postid
 
-        holder.image_product.glide(false, post.postimage)
+        holder.image_product.loadImage(false, post.postimage)
         if (post.name == DATA.EMPTY) {
             holder.name.visibility = View.GONE
         } else {

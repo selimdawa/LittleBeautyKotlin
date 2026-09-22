@@ -10,7 +10,7 @@ import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.databinding.ItemProductLinearBinding
 import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Glide
+import com.flatcode.beautytouch.utils.loadImage
 import java.text.MessageFormat
 
 class PostHotAdapter(
@@ -29,7 +29,7 @@ class PostHotAdapter(
         val context = holder.itemView.context
 
         with(holder.binding) {
-            imageProduct.Glide(false, context, post.postimage)
+            imageProduct.loadImage(false, post.postimage)
 
             name.apply {
                 visibility = if (post.name == DATA.EMPTY) View.GONE else View.VISIBLE

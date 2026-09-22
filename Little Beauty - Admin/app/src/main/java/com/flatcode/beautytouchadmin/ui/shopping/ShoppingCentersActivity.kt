@@ -1,15 +1,9 @@
 package com.flatcode.beautytouchadmin.ui.shopping
 
-import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
-import android.view.Window
-import android.view.WindowManager
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -58,32 +52,11 @@ class ShoppingCentersActivity : AppCompatActivity() {
                 if (which == 0) {
                     context.openActivity<ShoppingCentresEditActivity>(DATA.SHOPPING_CENTER_ID to item.id)
                 } else if (which == 1) {
-                    showDeleteDialog(item)
+                    Dialog.showDeleteDialog(context, R.string.do_you_want_to_delete_the_pharmacy) {
+                        viewModel.deleteCenter(item.id!!)
+                    }
                 }
             }.show()
-    }
-
-    private fun showDeleteDialog(item: ShoppingCenter) {
-        val dialog = Dialog(context)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_logout)
-        dialog.setCancelable(true)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        val title = dialog.findViewById<TextView>(R.id.title)
-        title.setText(R.string.do_you_want_to_delete_the_pharmacy)
-
-        dialog.findViewById<View>(R.id.yes).setOnClickListener {
-            viewModel.deleteCenter(item.id!!)
-            dialog.dismiss()
-        }
-        dialog.findViewById<View>(R.id.no).setOnClickListener { dialog.dismiss() }
-        dialog.show()
-        dialog.window?.attributes = lp
     }
 
     private fun observeViewModel() {

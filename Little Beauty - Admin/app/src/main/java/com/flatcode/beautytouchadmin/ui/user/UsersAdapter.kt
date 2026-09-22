@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemUserBinding
 import com.google.firebase.database.DataSnapshot
@@ -33,7 +33,7 @@ class UsersAdapter(private val mContext: Context) :
         val user = getItem(position) ?: return
         val id = DATA.EMPTY + user.id
 
-        holder.image.glide(true, user.imageurl)
+        holder.image.loadImage(true, user.imageurl)
         if (user.username == DATA.EMPTY) {
             holder.name.visibility = View.GONE
         } else {

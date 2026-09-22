@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.flatcode.beautytouchadmin.model.ShoppingCenter
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.databinding.ItemShoppingCenterBinding
 import java.text.MessageFormat
 
@@ -33,8 +33,8 @@ class ShoppingCentersAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val shoppingCenter = getItem(position) ?: return
 
-        holder.image_product.glide(false, shoppingCenter.imageurl)
-        holder.image_product2.glide(false, shoppingCenter.imageurl2)
+        holder.image_product.loadImage(false, shoppingCenter.imageurl)
+        holder.image_product2.loadImage(false, shoppingCenter.imageurl2)
         if (shoppingCenter.name == DATA.EMPTY) {
             holder.linearName.visibility = View.GONE
         } else {

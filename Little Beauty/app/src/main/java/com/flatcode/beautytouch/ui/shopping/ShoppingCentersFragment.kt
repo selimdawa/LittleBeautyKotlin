@@ -11,7 +11,7 @@ import com.flatcode.beautytouch.ui.post.PostViewModel
 import com.flatcode.beautytouch.ui.adapter.ShoppingCentersAdapter
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
-import com.flatcode.beautytouch.utils.BannerAd
+import com.flatcode.beautytouch.utils.bannerAd
 import com.flatcode.beautytouch.databinding.FragmentShoppingCentersBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -31,7 +31,7 @@ class ShoppingCentersFragment : Fragment() {
     ): View? {
         binding = FragmentShoppingCentersBinding.inflate(inflater, container, false)
 
-        binding!!.adView.BannerAd(context, DATA.BANNER_SHOPPING_CENTRES)
+        binding!!.adView.bannerAd(context, DATA.BANNER_SHOPPING_CENTRES)
 
         adapter = ShoppingCentersAdapter(
             onItemClick = { center ->

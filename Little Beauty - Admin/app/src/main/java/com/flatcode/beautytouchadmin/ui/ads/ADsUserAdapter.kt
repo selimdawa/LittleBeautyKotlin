@@ -17,7 +17,7 @@ import com.flatcode.beautytouchadmin.filter.ADsUserFilter
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.ui.ads.ADsInfoActivity
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemAdsUserBinding
 import java.text.MessageFormat
@@ -53,7 +53,7 @@ class ADsUserAdapter(private val context: Context, initialList: MutableList<User
         val adClicked = DATA.EMPTY + item.adClick
         val formattedDate: String = Application.formatTimestamp(timestamp.toLong())
 
-        holder.profileImage.glide(true, profileImage)
+        holder.profileImage.loadImage(true, profileImage)
         if (username == DATA.EMPTY) {
             holder.username.visibility = View.GONE
         } else {

@@ -1,30 +1,19 @@
 package com.flatcode.beautytouchadmin.utils
 
-import android.app.Activity
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
-import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.scale
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.navigation.NavController
 import coil3.load
 import coil3.request.crossfade
 import coil3.request.placeholder
-import coil3.request.transformations
-import coil3.size.Size
-import coil3.transform.Transformation
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView
@@ -32,8 +21,7 @@ import com.flatcode.beautytouchadmin.R
 import java.io.Serializable
 
 inline fun <reified T : Activity> Context.openActivity(
-    vararg extras: Pair<String, Any?>,
-    clear: Boolean = false
+    vararg extras: Pair<String, Any?>, clear: Boolean = false
 ) {
     val intent = Intent(this, T::class.java).apply {
         if (clear) addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -49,15 +37,7 @@ inline fun <reified T : Activity> Context.openActivity(
     startActivity(intent)
 }
 
-fun NavController.navigateAction(actionId: Int) {
-    this.navigate(actionId)
-}
-
-fun NavController.navigateWithBundle(actionId: Int, bundle: Bundle) {
-    this.navigate(actionId, bundle)
-}
-
-fun ImageView.glide(isUser: Boolean, url: String?) {
+fun ImageView.loadImage(isUser: Boolean, url: String?) {
     try {
         if (url == DATA.BASIC) {
             if (isUser) {
@@ -71,33 +51,13 @@ fun ImageView.glide(isUser: Boolean, url: String?) {
                 crossfade(true)
             }
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         this.setImageResource(R.drawable.icon)
     }
 }
 
-fun ImageView.glideBlur(isUser: Boolean, url: String?, level: Int) {
-    try {
-        if (url == DATA.BASIC) {
-            if (isUser) {
-                this.setImageResource(R.drawable.basic_user)
-            } else {
-                this.setImageResource(R.drawable.icon)
-            }
-        } else {
-            this.load(url) {
-                placeholder(R.color.image_profile)
-                transformations(SimpleBlurTransformation(level.toFloat()))
-            }
-        }
-    } catch (e: Exception) {
-        this.setImageResource(R.drawable.icon)
-    }
-}
-
-fun Activity.cropImageSquareOptions(): CropImageContractOptions = CropImageContractOptions(
-    uri = null,
-    cropImageOptions = CropImageOptions(
+fun cropImageSquareOptions(): CropImageContractOptions = CropImageContractOptions(
+    uri = null, cropImageOptions = CropImageOptions(
         guidelines = CropImageView.Guidelines.ON,
         multiTouchEnabled = true,
         minCropResultWidth = DATA.MIN_SQUARE,
@@ -109,13 +69,12 @@ fun Activity.cropImageSquareOptions(): CropImageContractOptions = CropImageContr
     )
 )
 
-fun Activity.cropImageSliderOptions(): CropImageContractOptions = CropImageContractOptions(
-    uri = null,
-    cropImageOptions = CropImageOptions(
+fun cropImageSliderOptions(): CropImageContractOptions = CropImageContractOptions(
+    uri = null, cropImageOptions = CropImageOptions(
         guidelines = CropImageView.Guidelines.ON,
         multiTouchEnabled = true,
-        minCropResultWidth = DATA.MIX_SLIDER_X,
-        minCropResultHeight = DATA.MIX_SLIDER_Y,
+        minCropResultWidth = DATA.MIN_SLIDER_X,
+        minCropResultHeight = DATA.MIN_SLIDER_Y,
         aspectRatioX = 16,
         aspectRatioY = 9,
         fixAspectRatio = true,
@@ -123,13 +82,12 @@ fun Activity.cropImageSliderOptions(): CropImageContractOptions = CropImageContr
     )
 )
 
-fun Activity.cropImageShoppingCenterOptions(): CropImageContractOptions = CropImageContractOptions(
-    uri = null,
-    cropImageOptions = CropImageOptions(
+fun cropImageShoppingCenterOptions(): CropImageContractOptions = CropImageContractOptions(
+    uri = null, cropImageOptions = CropImageOptions(
         guidelines = CropImageView.Guidelines.ON,
         multiTouchEnabled = true,
-        minCropResultWidth = DATA.MIX_SLIDER_X,
-        minCropResultHeight = DATA.MIX_SLIDER_Y,
+        minCropResultWidth = DATA.MIN_SLIDER_X,
+        minCropResultHeight = DATA.MIN_SLIDER_Y,
         aspectRatioX = 2,
         aspectRatioY = 1,
         fixAspectRatio = true,
@@ -137,9 +95,8 @@ fun Activity.cropImageShoppingCenterOptions(): CropImageContractOptions = CropIm
     )
 )
 
-fun Activity.cropImageSessionOptions(): CropImageContractOptions = CropImageContractOptions(
-    uri = null,
-    cropImageOptions = CropImageOptions(
+fun cropImageSessionOptions(): CropImageContractOptions = CropImageContractOptions(
+    uri = null, cropImageOptions = CropImageOptions(
         guidelines = CropImageView.Guidelines.ON,
         multiTouchEnabled = true,
         minCropResultWidth = DATA.MIN_SQUARE,
@@ -151,14 +108,19 @@ fun Activity.cropImageSessionOptions(): CropImageContractOptions = CropImageCont
     )
 )
 
-fun Activity.checkStoragePermission(launcher: ActivityResultLauncher<String>, onGranted: () -> Unit) {
+fun Activity.checkStoragePermission(
+    launcher: ActivityResultLauncher<String>, onGranted: () -> Unit
+) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         // On Android 13+ (API 33+) and Android 14+ (API 34+), storage permissions are not required
         // to pick images using the system Photo Picker / standard GET_CONTENT intent.
         onGranted()
     } else {
         val permission = Manifest.permission.READ_EXTERNAL_STORAGE
-        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this, permission
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             onGranted()
         } else {
             launcher.launch(permission)
@@ -167,85 +129,7 @@ fun Activity.checkStoragePermission(launcher: ActivityResultLauncher<String>, on
 }
 
 fun Uri.getFileExtension(context: Context): String? {
-    val cR = context.contentResolver
+    val contentResolver = context.contentResolver
     val mime = MimeTypeMap.getSingleton()
-    return mime.getExtensionFromMimeType(cR.getType(this))
-}
-
-fun View.applySystemBarsPadding() {
-    ViewCompat.setOnApplyWindowInsetsListener(this) { v, windowInsets ->
-        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-        v.setPadding(v.paddingLeft, insets.top, v.paddingRight, insets.bottom)
-        windowInsets
-    }
-}
-
-fun View.applyStatusBarPadding() {
-    ViewCompat.setOnApplyWindowInsetsListener(this) { v, windowInsets ->
-        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-        v.setPadding(v.paddingLeft, insets.top, v.paddingRight, v.paddingBottom)
-        windowInsets
-    }
-}
-
-fun View.applyNavigationBarPadding() {
-    ViewCompat.setOnApplyWindowInsetsListener(this) { v, windowInsets ->
-        val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-        v.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, insets.bottom)
-        windowInsets
-    }
-}
-
-class SimpleBlurTransformation(private val radius: Float) : Transformation() {
-    override val cacheKey: String = "${SimpleBlurTransformation::class.java.name}-$radius"
-
-    override suspend fun transform(input: Bitmap, size: Size): Bitmap {
-        if (input.isRecycled) return input
-        val scaleFactor = 6
-        val w = (input.width / scaleFactor).coerceAtLeast(1)
-        val h = (input.height / scaleFactor).coerceAtLeast(1)
-        val small = input.scale(w, h, true)
-        val r = (radius / scaleFactor).toInt().coerceAtLeast(1)
-        val pix = IntArray(w * h)
-        small.getPixels(pix, 0, w, 0, 0, w, h)
-        val blurred = IntArray(w * h)
-        for (y in 0 until h) for (x in 0 until w) {
-            var rs = 0L
-            var gs = 0L
-            var bs = 0L
-            var c = 0
-            for (i in -r..r) {
-                val xi = (x + i).coerceIn(0, w - 1)
-                val p = pix[y * w + xi]
-                rs += (p shr 16) and 0xff
-                gs += (p shr 8) and 0xff
-                bs += p and 0xff
-                c++
-            }
-            blurred[y * w + x] =
-                (0xff shl 24) or ((rs / c).toInt() shl 16) or ((gs / c).toInt() shl 8) or (bs / c).toInt()
-        }
-        for (x in 0 until w) for (y in 0 until h) {
-            var rs = 0L
-            var gs = 0L
-            var bs = 0L
-            var c = 0
-            for (i in -r..r) {
-                val yi = (y + i).coerceIn(0, h - 1)
-                val p = blurred[yi * w + x]
-                rs += (p shr 16) and 0xff
-                gs += (p shr 8) and 0xff
-                bs += p and 0xff
-                c++
-            }
-            pix[y * w + x] =
-                (0xff shl 24) or ((rs / c).toInt() shl 16) or ((gs / c).toInt() shl 8) or (bs / c).toInt()
-        }
-        val output = createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        output.setPixels(pix, 0, w, 0, 0, w, h)
-        val finalOutput = output.scale(input.width, input.height, true)
-        if (output != finalOutput) output.recycle()
-        if (small != input) small.recycle()
-        return finalOutput
-    }
+    return mime.getExtensionFromMimeType(contentResolver.getType(this))
 }

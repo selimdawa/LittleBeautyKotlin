@@ -16,7 +16,7 @@ import com.flatcode.beautytouchadmin.filter.LeaderboardOldFilter
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.ui.ads.ADsInfoActivity
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ItemLeaderboradBinding
 import com.google.firebase.database.DataSnapshot
@@ -58,7 +58,7 @@ class LeaderboardOldAdapter(
         val rankValue = list.size - position
 
         holder.rank.text = MessageFormat.format("{0}", rankValue)
-        holder.profileImage.glide(true, image)
+        holder.profileImage.loadImage(true, image)
         if (username == DATA.EMPTY) {
             holder.username.visibility = View.GONE
         } else {

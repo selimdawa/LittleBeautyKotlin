@@ -12,7 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.model.Main
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.glide
+import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.viewBinding
 import com.flatcode.beautytouchadmin.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,7 +53,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private fun updateUI(state: MainState) {
         state.user?.let { user ->
-            binding.toolbar.image.glide(true, user.imageurl)
+            binding.toolbar.image.loadImage(true, user.imageurl)
         }
 
         list.clear()

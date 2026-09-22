@@ -106,7 +106,7 @@ class ProfileActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.user.collect { user ->
                     user?.let {
-                        binding!!.image.glide(true, it.imageurl)
+                        binding!!.image.loadImage(true, it.imageurl)
                         binding!!.name.text = it.username
                         binding!!.nameEdit.setText(it.username)
                     }

@@ -37,7 +37,7 @@ class HotProductRepository @Inject constructor(private val database: FirebaseDat
                 val list = mutableListOf<Post>()
                 for (data in snapshot.children) {
                     val post = data.getValue(Post::class.java)
-                    if (post?.publisher == DATA.PUBLICHER && post.aname == DATA.APP_NAME) {
+                    if (post?.publisher == DATA.PUBLISHER && post.aname == DATA.APP_NAME) {
                         list.add(post)
                     }
                 }

@@ -99,7 +99,7 @@ class PostEditActivity : AppCompatActivity() {
                 viewModel.post.collect { item ->
                     item?.let {
                         typePost = it.category
-                        binding!!.image.glide(true, it.postimage)
+                        binding!!.image.loadImage(true, it.postimage)
                         binding!!.name.setText(it.name)
                         binding!!.price.setText(it.price)
                         binding!!.indications.setText(it.indications)

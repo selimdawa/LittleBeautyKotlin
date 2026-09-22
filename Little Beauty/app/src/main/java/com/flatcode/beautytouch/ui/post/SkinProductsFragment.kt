@@ -9,7 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.databinding.FragmentSkinProductsBinding
 import com.flatcode.beautytouch.ui.adapter.ProductsStaggeredAdapter
-import com.flatcode.beautytouch.utils.BannerAd
+import com.flatcode.beautytouch.utils.bannerAd
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.openActivity
@@ -31,7 +31,7 @@ class SkinProductsFragment : Fragment() {
     ): View? {
         binding = FragmentSkinProductsBinding.inflate(inflater, container, false)
 
-        binding!!.adView.BannerAd(context, DATA.BANNER_SKIN)
+        binding!!.adView.bannerAd(context, DATA.BANNER_SKIN)
 
         adapter = ProductsStaggeredAdapter(
             onItemClick = { post -> context?.openActivity<PostDetailsActivity>(DATA.POST_ID to post.postid) },

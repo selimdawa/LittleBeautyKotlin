@@ -12,7 +12,7 @@ import com.flatcode.beautytouch.databinding.ItemLeaderboardBinding
 import com.flatcode.beautytouch.filter.LeaderboardFilter
 import com.flatcode.beautytouch.model.User
 import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Glide
+import com.flatcode.beautytouch.utils.loadImage
 import java.text.MessageFormat
 
 class LeaderboardAdapter(
@@ -34,7 +34,7 @@ class LeaderboardAdapter(
 
         with(holder.binding) {
             range.text = MessageFormat.format("{0}", rank)
-            imageProfile.Glide(true, context, user.imageurl)
+            imageProfile.loadImage(true, user.imageurl)
 
             username.apply {
                 visibility = if (user.username == DATA.EMPTY) View.GONE else View.VISIBLE

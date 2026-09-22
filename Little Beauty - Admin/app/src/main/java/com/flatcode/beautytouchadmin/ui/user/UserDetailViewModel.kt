@@ -38,7 +38,7 @@ class UserDetailViewModel @Inject constructor(
                 postRepository.getSavedPostIds(userId),
                 postRepository.getAllPosts()
             ) { ids, posts ->
-                posts.filter { it.postid in ids && it.publisher == DATA.PUBLICHER && it.aname == DATA.APP_NAME }.reversed()
+                posts.filter { it.postid in ids && it.publisher == DATA.PUBLISHER && it.aname == DATA.APP_NAME }.reversed()
             }.collect {
                 _savedPosts.value = it
             }
