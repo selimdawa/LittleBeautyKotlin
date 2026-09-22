@@ -41,8 +41,7 @@ class ToolsViewModel @Inject constructor(private val repository: ToolsRepository
     fun updateTools(
         sessionNow: String, sessionOld: String, sessionNumberNow: String, sessionNumberOld: String,
         yearNow: String, yearOld: String,
-        imageUri1: Uri?, imageUri2: Uri?, imageUri3: Uri?, imageUri4: Uri?,
-        ext1: String?, ext2: String?, ext3: String?, ext4: String?
+        imageUri1: Uri?, imageUri2: Uri?, imageUri3: Uri?, imageUri4: Uri?
     ) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -56,10 +55,10 @@ class ToolsViewModel @Inject constructor(private val repository: ToolsRepository
                     "oldYear" to yearOld
                 )
 
-                imageUri1?.let { hashMap["imageSession"] = repository.uploadImage("Images/Session/sessionNow", it, ext1!!) }
-                imageUri2?.let { hashMap["oldImageSession"] = repository.uploadImage("Images/Session/sessionOld", it, ext2!!) }
-                imageUri3?.let { hashMap["imageLogo"] = repository.uploadImage("Images/Logo/logoNow", it, ext3!!) }
-                imageUri4?.let { hashMap["oldImageLogo"] = repository.uploadImage("Images/Logo/logoOld", it, ext4!!) }
+                imageUri1?.let { hashMap["imageSession"] = repository.uploadImage("Images/Session/sessionNow", it) }
+                imageUri2?.let { hashMap["oldImageSession"] = repository.uploadImage("Images/Session/sessionOld", it) }
+                imageUri3?.let { hashMap["imageLogo"] = repository.uploadImage("Images/Logo/logoNow", it) }
+                imageUri4?.let { hashMap["oldImageLogo"] = repository.uploadImage("Images/Logo/logoOld", it) }
 
                 repository.updateTools(hashMap)
                 _actionStatus.emit(Result.success("Tools updated successfully"))
@@ -71,7 +70,7 @@ class ToolsViewModel @Inject constructor(private val repository: ToolsRepository
         }
     }
 
-    fun updateAboutMe(name: String, imageUri: Uri?, extension: String?) {
+    fun updateAboutMe(name: String, imageUri: Uri?) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
@@ -80,7 +79,7 @@ class ToolsViewModel @Inject constructor(private val repository: ToolsRepository
                 )
 
                 imageUri?.let {
-                    hashMap["imageMe"] = repository.uploadImage("Images/AboutMe/" + DATA.FirebaseUserUid, it, extension!!)
+                    hashMap["imageMe"] = repository.uploadImage("Images/AboutMe/" + DATA.FirebaseUserUid, it)
                 }
 
                 repository.updateTools(hashMap)

@@ -7,25 +7,23 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.android.material.card.MaterialCardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.flatcode.beautytouchadmin.databinding.ItemProductAddBinding
 import com.flatcode.beautytouchadmin.model.Post
-import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.ui.post.PostDetailsActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.openActivity
-import com.flatcode.beautytouchadmin.databinding.ItemProductAddBinding
+import com.google.android.material.card.MaterialCardView
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 class HotProductAddAdapter(
-    private val mContext: Context, 
-    private val listener: OnItemClickListener
+    private val mContext: Context, private val listener: OnItemClickListener
 ) : ListAdapter<Post, HotProductAddAdapter.ViewHolder>(DiffCallback) {
 
     interface OnItemClickListener {

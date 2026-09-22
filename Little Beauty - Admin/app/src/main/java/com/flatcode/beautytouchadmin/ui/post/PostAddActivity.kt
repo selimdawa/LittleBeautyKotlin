@@ -3,7 +3,6 @@ package com.flatcode.beautytouchadmin.ui.post
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -13,13 +12,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.*
-import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
-import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
 import com.canhub.cropper.CropImageContract
+import com.flatcode.beautytouchadmin.R
+import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
+import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.checkStoragePermission
+import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
+import com.flatcode.beautytouchadmin.utils.getFileExtension
+import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 
 @AndroidEntryPoint
 class PostAddActivity : AppCompatActivity() {
@@ -122,7 +125,12 @@ class PostAddActivity : AppCompatActivity() {
             dialog!!.setMessage("Post being created...")
             dialog!!.show()
             viewModel.addPost(
-                name, indications, howToUse, price, typePost, imageUri!!,
+                name,
+                indications,
+                howToUse,
+                price,
+                typePost,
+                imageUri!!,
                 imageUri!!.getFileExtension(context)!!
             )
         }

@@ -36,11 +36,11 @@ class SliderViewModel @Inject constructor(private val repository: SliderReposito
         }
     }
 
-    fun uploadSlider(name: String, imageUri: Uri, extension: String) {
+    fun uploadSlider(name: String, imageUri: Uri) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val imageUrl = repository.uploadSliderImage(name, imageUri, extension)
+                val imageUrl = repository.uploadSliderImage(name, imageUri)
                 repository.updateSlider(mapOf(name to imageUrl))
                 _actionStatus.emit(Result.success("Published..."))
             } catch (e: Exception) {

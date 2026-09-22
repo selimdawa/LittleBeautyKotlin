@@ -1,3 +1,5 @@
+@file:Suppress("SpellCheckingInspection")
+
 package com.flatcode.beautytouchadmin.ui.post
 
 import android.net.Uri
@@ -16,7 +18,8 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class PostActionViewModel @Inject constructor(private val repository: PostRepository) : ViewModel() {
+class PostActionViewModel @Inject constructor(private val repository: PostRepository) :
+    ViewModel() {
 
     private val _post = MutableStateFlow<Post?>(null)
     val post: StateFlow<Post?> = _post
@@ -36,14 +39,18 @@ class PostActionViewModel @Inject constructor(private val repository: PostReposi
     }
 
     fun addPost(
-        name: String, indications: String, howToUse: String, price: String,
-        category: String, imageUri: Uri, extension: String
+        name: String,
+        indications: String,
+        howToUse: String,
+        price: String,
+        category: String,
+        imageUri: Uri
     ) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
                 val id = repository.generatePostId() ?: throw Exception("Failed to generate ID")
-                val imageUrl = repository.uploadImage(id, imageUri, extension)
+                val imageUrl = repository.uploadImage(id, imageUri)
 
                 val hashMap = hashMapOf<String, Any?>(
                     "aname" to DATA.APP_NAME,
@@ -79,8 +86,13 @@ class PostActionViewModel @Inject constructor(private val repository: PostReposi
     }
 
     fun updatePost(
-        postId: String, name: String, indications: String, howToUse: String,
-        price: String, category: String, imageUri: Uri?, extension: String?
+        postId: String,
+        name: String,
+        indications: String,
+        howToUse: String,
+        price: String,
+        category: String,
+        imageUri: Uri?
     ) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -93,8 +105,8 @@ class PostActionViewModel @Inject constructor(private val repository: PostReposi
                     "category" to category
                 )
 
-                if (imageUri != null && extension != null) {
-                    val imageUrl = repository.uploadImage(postId, imageUri, extension)
+                if (imageUri != null) {
+                    val imageUrl = repository.uploadImage(postId, imageUri)
                     hashMap["postimage"] = imageUrl
                 }
 

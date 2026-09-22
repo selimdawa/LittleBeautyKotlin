@@ -11,14 +11,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.databinding.ItemPostDetailBinding
+import com.flatcode.beautytouchadmin.model.Post
+import com.flatcode.beautytouchadmin.utils.loadImage
 
 class PostDetailAdapter(
-    private val mContext: Context, 
+    private val mContext: Context,
     initialList: MutableList<Post?>,
     private val listener: OnItemClickListener
 ) : ListAdapter<Post, PostDetailAdapter.ViewHolder>(DiffCallback) {
@@ -70,20 +69,26 @@ class PostDetailAdapter(
         holder.image_product_10.loadImage(false, post.postimage10)
 
         // Visibility logic
-        holder.image_product_2.visibility = if (post.postimage2.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_3.visibility = if (post.postimage3.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_4.visibility = if (post.postimage4.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_5.visibility = if (post.postimage5.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_6.visibility = if (post.postimage6.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_7.visibility = if (post.postimage7.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_8.visibility = if (post.postimage8.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_9.visibility = if (post.postimage9.isNullOrEmpty()) View.GONE else View.VISIBLE
-        holder.image_product_10.visibility = if (post.postimage10.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_2.visibility =
+            if (post.postimage2.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_3.visibility =
+            if (post.postimage3.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_4.visibility =
+            if (post.postimage4.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_5.visibility =
+            if (post.postimage5.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_6.visibility =
+            if (post.postimage6.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_7.visibility =
+            if (post.postimage7.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_8.visibility =
+            if (post.postimage8.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_9.visibility =
+            if (post.postimage9.isNullOrEmpty()) View.GONE else View.VISIBLE
+        holder.image_product_10.visibility =
+            if (post.postimage10.isNullOrEmpty()) View.GONE else View.VISIBLE
 
-        if (post.postimage2.isNullOrEmpty() && post.postimage3.isNullOrEmpty() && post.postimage4.isNullOrEmpty()
-            && post.postimage5.isNullOrEmpty() && post.postimage6.isNullOrEmpty() && post.postimage7.isNullOrEmpty()
-            && post.postimage8.isNullOrEmpty() && post.postimage9.isNullOrEmpty() && post.postimage10.isNullOrEmpty()
-        ) {
+        if (post.postimage2.isNullOrEmpty() && post.postimage3.isNullOrEmpty() && post.postimage4.isNullOrEmpty() && post.postimage5.isNullOrEmpty() && post.postimage6.isNullOrEmpty() && post.postimage7.isNullOrEmpty() && post.postimage8.isNullOrEmpty() && post.postimage9.isNullOrEmpty() && post.postimage10.isNullOrEmpty()) {
             holder.scroll_image.visibility = View.GONE
         } else {
             holder.scroll_image.visibility = View.VISIBLE
@@ -132,12 +137,28 @@ class PostDetailAdapter(
 
         // Image selection
         val imageViews = listOf(
-            holder.image_product_1, holder.image_product_2, holder.image_product_3, holder.image_product_4, holder.image_product_5,
-            holder.image_product_6, holder.image_product_7, holder.image_product_8, holder.image_product_9, holder.image_product_10
+            holder.image_product_1,
+            holder.image_product_2,
+            holder.image_product_3,
+            holder.image_product_4,
+            holder.image_product_5,
+            holder.image_product_6,
+            holder.image_product_7,
+            holder.image_product_8,
+            holder.image_product_9,
+            holder.image_product_10
         )
         val imageUrls = listOf(
-            post.postimage, post.postimage2, post.postimage3, post.postimage4, post.postimage5,
-            post.postimage6, post.postimage7, post.postimage8, post.postimage9, post.postimage10
+            post.postimage,
+            post.postimage2,
+            post.postimage3,
+            post.postimage4,
+            post.postimage5,
+            post.postimage6,
+            post.postimage7,
+            post.postimage8,
+            post.postimage9,
+            post.postimage10
         )
 
         imageViews.forEachIndexed { index, imageView ->

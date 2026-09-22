@@ -1,3 +1,5 @@
+@file:Suppress("SpellCheckingInspection")
+
 package com.flatcode.beautytouchadmin.ui.shopping
 
 import android.net.Uri
@@ -36,15 +38,14 @@ class ShoppingActionViewModel @Inject constructor(private val repository: Shoppi
 
     fun addShoppingCenter(
         name: String, location: String, location2: String, location3: String,
-        numberPhone: String, imageUri: Uri, imageUri2: Uri,
-        extension1: String, extension2: String
+        numberPhone: String, imageUri: Uri, imageUri2: Uri
     ) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
                 val id = repository.generateId() ?: throw Exception("Failed to generate ID")
-                val image1 = repository.uploadImage(id, imageUri, extension1)
-                val image2 = repository.uploadImage(id, imageUri2, extension2, "2")
+                val image1 = repository.uploadImage(id, imageUri)
+                val image2 = repository.uploadImage(id, imageUri2, "2")
 
                 val hashMap = hashMapOf<String, Any?>(
                     "aname" to DATA.APP_NAME,
@@ -71,8 +72,7 @@ class ShoppingActionViewModel @Inject constructor(private val repository: Shoppi
 
     fun updateShoppingCenter(
         id: String, name: String, location: String, location2: String, location3: String,
-        numberPhone: String, imageUri: Uri?, imageUri2: Uri?,
-        extension1: String?, extension2: String?
+        numberPhone: String, imageUri: Uri?, imageUri2: Uri?
     ) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -85,11 +85,11 @@ class ShoppingActionViewModel @Inject constructor(private val repository: Shoppi
                     "numberPhone" to numberPhone
                 )
 
-                if (imageUri != null && extension1 != null) {
-                    hashMap["imageurl"] = repository.uploadImage(id, imageUri, extension1)
+                if (imageUri != null) {
+                    hashMap["imageurl"] = repository.uploadImage(id, imageUri)
                 }
-                if (imageUri2 != null && extension2 != null) {
-                    hashMap["imageurl2"] = repository.uploadImage(id, imageUri2, extension2, "2")
+                if (imageUri2 != null) {
+                    hashMap["imageurl2"] = repository.uploadImage(id, imageUri2, "2")
                 }
 
                 repository.updateShoppingCenter(id, hashMap)

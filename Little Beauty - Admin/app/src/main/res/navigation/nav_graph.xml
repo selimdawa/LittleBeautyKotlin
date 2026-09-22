@@ -3,41 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/splashFragment">
-
-    <fragment
-        android:id="@+id/splashFragment"
-        android:name="com.flatcode.beautytouchadmin.ui.main.SplashFragment"
-        android:label="@string/label_splash"
-        tools:layout="@layout/activity_splash">
-        <action
-            android:id="@+id/action_splashFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-        <action
-            android:id="@+id/action_splashFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.flatcode.beautytouchadmin.ui.auth.LoginFragment"
-        android:label="@string/label_login"
-        tools:layout="@layout/activity_login">
-        <action
-            android:id="@+id/action_loginFragment_to_homeFragment"
-            app:destination="@id/homeFragment"
-            app:popUpTo="@id/nav_graph"
-            app:popUpToInclusive="true" />
-    </fragment>
+    app:startDestination="@id/homeFragment">
 
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.flatcode.beautytouchadmin.ui.main.HomeFragment"
         android:label="@string/label_home"
-        tools:layout="@layout/activity_main" />
+        tools:layout="@layout/fragment_home" />
 
 </navigation>

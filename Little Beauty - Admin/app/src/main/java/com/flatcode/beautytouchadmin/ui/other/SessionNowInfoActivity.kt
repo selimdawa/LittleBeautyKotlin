@@ -8,9 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.ui.user.LeaderboardAdapter
-import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.databinding.ActivitySessionNowInfoBinding
+import com.flatcode.beautytouchadmin.ui.user.LeaderboardAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

@@ -58,7 +58,7 @@ class UserRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    suspend fun uploadProfileImage(userId: String, imageUri: Uri, extension: String): String =
+    suspend fun uploadProfileImage(userId: String, imageUri: Uri): String =
         withContext(Dispatchers.IO) {
             try {
                 val options = mapOf(

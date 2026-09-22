@@ -1,6 +1,5 @@
 package com.flatcode.beautytouchadmin.ui.main
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -12,6 +11,7 @@ import com.flatcode.beautytouchadmin.databinding.ActivitySplashBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
@@ -27,7 +27,7 @@ class SplashActivity : AppCompatActivity() {
         setContentView(binding!!.root)
 
         lifecycleScope.launch {
-            delay(timeFinal)
+            delay(timeFinal.milliseconds)
             checkUser()
         }
     }

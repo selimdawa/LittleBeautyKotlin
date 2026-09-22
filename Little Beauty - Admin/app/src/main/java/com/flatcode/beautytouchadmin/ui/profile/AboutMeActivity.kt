@@ -3,7 +3,6 @@ package com.flatcode.beautytouchadmin.ui.profile
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -19,14 +18,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.*
-import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
-import com.flatcode.beautytouchadmin.ui.other.ToolsViewModel
-import com.flatcode.beautytouchadmin.databinding.ActivityAboutMeBinding
 import com.canhub.cropper.CropImageContract
+import com.flatcode.beautytouchadmin.R
+import com.flatcode.beautytouchadmin.databinding.ActivityAboutMeBinding
+import com.flatcode.beautytouchadmin.ui.other.ToolsViewModel
+import com.flatcode.beautytouchadmin.utils.checkStoragePermission
+import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
+import com.flatcode.beautytouchadmin.utils.getFileExtension
+import com.flatcode.beautytouchadmin.utils.loadImage
+import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 
 @AndroidEntryPoint
 class AboutMeActivity : AppCompatActivity() {
@@ -130,12 +133,12 @@ class AboutMeActivity : AppCompatActivity() {
         lp.height = WindowManager.LayoutParams.WRAP_CONTENT
         val image = dialog.findViewById<ImageView>(R.id.image)
         val text = dialog.findViewById<TextView>(R.id.text)
-        
+
         viewModel.tools.value?.let {
             image.loadImage(true, it.imageMe)
             text.text = it.aboutMe
         }
-        
+
         dialog.show()
         dialog.window!!.attributes = lp
     }

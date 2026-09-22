@@ -3,7 +3,6 @@ package com.flatcode.beautytouchadmin.ui.other
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -14,13 +13,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.*
-import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
-import com.flatcode.beautytouchadmin.databinding.ActivitySliderShowBinding
 import com.canhub.cropper.CropImageContract
+import com.flatcode.beautytouchadmin.R
+import com.flatcode.beautytouchadmin.databinding.ActivitySliderShowBinding
+import com.flatcode.beautytouchadmin.utils.checkStoragePermission
+import com.flatcode.beautytouchadmin.utils.cropImageSliderOptions
+import com.flatcode.beautytouchadmin.utils.getFileExtension
+import com.flatcode.beautytouchadmin.utils.loadImage
+import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 
 @AndroidEntryPoint
 class SliderShowActivity : AppCompatActivity() {
@@ -53,8 +56,7 @@ class SliderShowActivity : AppCompatActivity() {
             dialog!!.setMessage("Posting photo...")
             dialog!!.show()
             viewModel.uploadSlider(
-                IMAGE_NUMBER.toString(), imageUri!!,
-                imageUri!!.getFileExtension(context)!!
+                IMAGE_NUMBER.toString(), imageUri!!, imageUri!!.getFileExtension(context)!!
             )
         } else {
             val error = result.error
@@ -78,11 +80,26 @@ class SliderShowActivity : AppCompatActivity() {
 
     private fun setupClickListeners() {
         val buttons = listOf(
-            binding!!.addOne, binding!!.addTwo, binding!!.addThree, binding!!.addFour, binding!!.addFive,
-            binding!!.addSix, binding!!.addSeven, binding!!.addEight, binding!!.addNine, binding!!.addTeen,
-            binding!!.addEleven, binding!!.addTwelfth, binding!!.addThirteen, binding!!.addFourteenth,
-            binding!!.addFifteenth, binding!!.addSixteen, binding!!.addSeventeen, binding!!.addEighteen,
-            binding!!.addNineteen, binding!!.addTwenty
+            binding!!.addOne,
+            binding!!.addTwo,
+            binding!!.addThree,
+            binding!!.addFour,
+            binding!!.addFive,
+            binding!!.addSix,
+            binding!!.addSeven,
+            binding!!.addEight,
+            binding!!.addNine,
+            binding!!.addTeen,
+            binding!!.addEleven,
+            binding!!.addTwelfth,
+            binding!!.addThirteen,
+            binding!!.addFourteenth,
+            binding!!.addFifteenth,
+            binding!!.addSixteen,
+            binding!!.addSeventeen,
+            binding!!.addEighteen,
+            binding!!.addNineteen,
+            binding!!.addTwenty
         )
         buttons.forEachIndexed { index, button ->
             button.setOnClickListener {
@@ -118,20 +135,50 @@ class SliderShowActivity : AppCompatActivity() {
     private fun updateUI(sliders: Map<String, String>) {
         val count = sliders.size
         binding!!.toolbar.nameSpace.text = "Slider Show ( $count )"
-        
+
         val images = listOf(
-            binding!!.imageOne, binding!!.imageTwo, binding!!.imageThree, binding!!.imageFour, binding!!.imageFive,
-            binding!!.imageSix, binding!!.imageSeven, binding!!.imageEight, binding!!.imageNine, binding!!.imageTeen,
-            binding!!.imageEleven, binding!!.imageTwelfth, binding!!.imageThirteen, binding!!.imageFourteenth,
-            binding!!.imageFifteenth, binding!!.imageSixteen, binding!!.imageSeventeen, binding!!.imageEighteen,
-            binding!!.imageNineteen, binding!!.imageTwenty
+            binding!!.imageOne,
+            binding!!.imageTwo,
+            binding!!.imageThree,
+            binding!!.imageFour,
+            binding!!.imageFive,
+            binding!!.imageSix,
+            binding!!.imageSeven,
+            binding!!.imageEight,
+            binding!!.imageNine,
+            binding!!.imageTeen,
+            binding!!.imageEleven,
+            binding!!.imageTwelfth,
+            binding!!.imageThirteen,
+            binding!!.imageFourteenth,
+            binding!!.imageFifteenth,
+            binding!!.imageSixteen,
+            binding!!.imageSeventeen,
+            binding!!.imageEighteen,
+            binding!!.imageNineteen,
+            binding!!.imageTwenty
         )
         val linears = listOf(
-            binding!!.linearOne, binding!!.linearTwo, binding!!.linearThree, binding!!.linearFour, binding!!.linearFive,
-            binding!!.linearSix, binding!!.linearSeven, binding!!.linearEight, binding!!.linearNine, binding!!.linearTeen,
-            binding!!.linearEleven, binding!!.linearTwelfth, binding!!.linearThirteen, binding!!.linearFourteenth,
-            binding!!.linearFifteenth, binding!!.linearSixteen, binding!!.linearSeventeen, binding!!.linearEighteen,
-            binding!!.linearNineteen, binding!!.linearTwenty
+            binding!!.linearOne,
+            binding!!.linearTwo,
+            binding!!.linearThree,
+            binding!!.linearFour,
+            binding!!.linearFive,
+            binding!!.linearSix,
+            binding!!.linearSeven,
+            binding!!.linearEight,
+            binding!!.linearNine,
+            binding!!.linearTeen,
+            binding!!.linearEleven,
+            binding!!.linearTwelfth,
+            binding!!.linearThirteen,
+            binding!!.linearFourteenth,
+            binding!!.linearFifteenth,
+            binding!!.linearSixteen,
+            binding!!.linearSeventeen,
+            binding!!.linearEighteen,
+            binding!!.linearNineteen,
+            binding!!.linearTwenty
         )
 
         for (i in 0 until 20) {

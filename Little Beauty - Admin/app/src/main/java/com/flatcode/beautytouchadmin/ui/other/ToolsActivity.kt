@@ -3,7 +3,6 @@ package com.flatcode.beautytouchadmin.ui.other
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
@@ -13,13 +12,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.*
-import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
-import com.flatcode.beautytouchadmin.databinding.ActivityToolsBinding
 import com.canhub.cropper.CropImageContract
+import com.flatcode.beautytouchadmin.R
+import com.flatcode.beautytouchadmin.databinding.ActivityToolsBinding
+import com.flatcode.beautytouchadmin.utils.checkStoragePermission
+import com.flatcode.beautytouchadmin.utils.cropImageSessionOptions
+import com.flatcode.beautytouchadmin.utils.getFileExtension
+import com.flatcode.beautytouchadmin.utils.loadImage
+import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 
 @AndroidEntryPoint
 class ToolsActivity : AppCompatActivity() {
@@ -61,14 +64,17 @@ class ToolsActivity : AppCompatActivity() {
                     imageUri = uri
                     binding!!.imageSessionNow.setImageURI(imageUri)
                 }
+
                 IMAGE_OLD -> {
                     imageUri2 = uri
                     binding!!.imageSessionOld.setImageURI(imageUri2)
                 }
+
                 LOGO_NOW -> {
                     imageUri3 = uri
                     binding!!.logoSessionNow.setImageURI(imageUri3)
                 }
+
                 LOGO_OLD -> {
                     imageUri4 = uri
                     binding!!.logoSessionOld.setImageURI(imageUri4)
@@ -162,8 +168,16 @@ class ToolsActivity : AppCompatActivity() {
             dialog!!.setMessage("Editing....")
             dialog!!.show()
             viewModel.updateTools(
-                sessionNow, sessionOld, sessionNumberNow, sessionNumberOld, yearNow, yearOld,
-                imageUri, imageUri2, imageUri3, imageUri4,
+                sessionNow,
+                sessionOld,
+                sessionNumberNow,
+                sessionNumberOld,
+                yearNow,
+                yearOld,
+                imageUri,
+                imageUri2,
+                imageUri3,
+                imageUri4,
                 imageUri?.getFileExtension(context),
                 imageUri2?.getFileExtension(context),
                 imageUri3?.getFileExtension(context),

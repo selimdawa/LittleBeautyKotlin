@@ -34,7 +34,7 @@ class ProfileViewModel @Inject constructor(private val repository: UserRepositor
         }
     }
 
-    fun updateProfile(userId: String, username: String, imageUri: Uri?, extension: String?) {
+    fun updateProfile(userId: String, username: String, imageUri: Uri?) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
@@ -42,8 +42,8 @@ class ProfileViewModel @Inject constructor(private val repository: UserRepositor
                     DATA.USER_NAME to username
                 )
 
-                if (imageUri != null && extension != null) {
-                    val imageUrl = repository.uploadProfileImage(userId, imageUri, extension)
+                if (imageUri != null) {
+                    val imageUrl = repository.uploadProfileImage(userId, imageUri)
                     hashMap[DATA.IMAGE_URL] = imageUrl
                 }
 

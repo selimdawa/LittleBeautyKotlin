@@ -36,7 +36,7 @@ class SliderRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    suspend fun uploadSliderImage(name: String, imageUri: Uri, extension: String): String =
+    suspend fun uploadSliderImage(name: String, imageUri: Uri): String =
         withContext(Dispatchers.IO) {
             try {
                 val options = mapOf(
@@ -45,7 +45,7 @@ class SliderRepository @Inject constructor(
                 )
                 val result = cloudinary.uploader().upload(imageUri.toString(), options)
                 result["secure_url"] as String
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 ""
             }
         }

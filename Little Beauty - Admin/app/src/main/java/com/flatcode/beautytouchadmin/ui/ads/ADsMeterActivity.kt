@@ -33,7 +33,7 @@ class ADsMeterActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.setText(R.string.users_ads)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        adapter = ADsUserAdapter(context, list, true)
+        adapter = ADsUserAdapter(context, list)
         binding!!.recyclerView.adapter = adapter
 
         binding!!.adLoad.setOnClickListener {

@@ -36,7 +36,7 @@ class ADsInfoActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.setText(R.string.info_ads)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        adapter = ADsInfoAdapter(context, list, true)
+        adapter = ADsInfoAdapter(context, list)
         binding!!.recyclerView.adapter = adapter
 
         profileId?.let {

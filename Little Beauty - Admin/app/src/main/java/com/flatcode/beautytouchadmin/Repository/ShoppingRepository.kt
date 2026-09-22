@@ -59,7 +59,7 @@ class ShoppingRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    suspend fun uploadImage(id: String, imageUri: Uri, extension: String, index: String = ""): String =
+    suspend fun uploadImage(id: String, imageUri: Uri, index: String = ""): String =
         withContext(Dispatchers.IO) {
             try {
                 val publicId = if (index.isEmpty()) id else "${id}_$index"
@@ -69,7 +69,7 @@ class ShoppingRepository @Inject constructor(
                 )
                 val result = cloudinary.uploader().upload(imageUri.toString(), options)
                 result["secure_url"] as String
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 ""
             }
         }

@@ -3,7 +3,6 @@ package com.flatcode.beautytouchadmin.ui.profile
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -15,12 +14,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.utils.*
-import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
-import com.flatcode.beautytouchadmin.databinding.ActivityProfileBinding
 import com.canhub.cropper.CropImageContract
+import com.flatcode.beautytouchadmin.databinding.ActivityProfileBinding
+import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.checkStoragePermission
+import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
+import com.flatcode.beautytouchadmin.utils.getFileExtension
+import com.flatcode.beautytouchadmin.utils.loadImage
+import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
 
 @AndroidEntryPoint
 class ProfileActivity : AppCompatActivity() {
@@ -119,7 +123,9 @@ class ProfileActivity : AppCompatActivity() {
                     result.onSuccess {
                         Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                     }.onFailure {
-                        Toast.makeText(context, "Something went wrong! " + it.message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context, "Something went wrong! " + it.message, Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
@@ -134,8 +140,7 @@ class ProfileActivity : AppCompatActivity() {
             dialog!!.setMessage("Modifications are loaded...")
             dialog!!.show()
             viewModel.updateProfile(
-                DATA.FirebaseUserUid, username, imageUri,
-                imageUri?.getFileExtension(context)
+                DATA.FirebaseUserUid, username, imageUri, imageUri?.getFileExtension(context)
             )
         }
     }
