@@ -28,7 +28,7 @@
         android:layout_gravity="center"
         android:fontFamily="@font/bad_script"
         android:text="@string/app_name"
-        android:textColor="?mc_tick"
+        android:textColor="?mc_track"
         android:textSize="21sp"
         android:textStyle="bold" />
 
@@ -39,6 +39,6 @@
         android:layout_gravity="start"
         android:contentDescription="@string/open_menu"
         android:src="@drawable/ic_drawer"
-        app:tint="?mc_tick" />
+        app:tint="?mc_track" />
 
 </com.google.android.material.appbar.MaterialToolbar>
