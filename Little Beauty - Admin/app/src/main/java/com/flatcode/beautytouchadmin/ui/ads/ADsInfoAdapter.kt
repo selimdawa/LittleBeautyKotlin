@@ -60,8 +60,7 @@ class ADsInfoAdapter(private val context: Context) :
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
-                @Suppress("UNCHECKED_CAST")
-                submitList(results.values as MutableList<ADs>)
+                submitList((results.values as? List<*>)?.filterIsInstance<ADs>())
             }
         }
     }

@@ -4,18 +4,18 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivitySessionNowInfoBinding
 import com.flatcode.beautytouchadmin.ui.user.LeaderboardAdapter
+import com.flatcode.beautytouchadmin.utils.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class SessionNowInfoActivity : AppCompatActivity() {
+class SessionNowInfoActivity : BaseActivity() {
 
     private var binding: ActivitySessionNowInfoBinding? = null
     private val context: Context = this@SessionNowInfoActivity
@@ -39,7 +39,7 @@ class SessionNowInfoActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.pointsKey.collect { key ->
                     if (key != null) {
-                        adapter = LeaderboardAdapter(context, true, key)
+                        adapter = LeaderboardAdapter(context, key)
                         binding!!.recyclerView.adapter = adapter
                     }
                 }

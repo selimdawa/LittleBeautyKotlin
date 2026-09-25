@@ -4,12 +4,12 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.databinding.ActivityLeaderboardBinding
 import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.ui.adapter.LeaderboardOldAdapter
 import com.flatcode.beautytouch.ui.post.PostDetailsActivity
+import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.loadImage
@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
-class LeaderboardOldActivity : AppCompatActivity() {
+class LeaderboardOldActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLeaderboardBinding
     private val context: Context = this

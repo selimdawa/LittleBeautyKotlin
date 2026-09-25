@@ -9,7 +9,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import com.flatcode.beautytouchadmin.utils.BaseActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -22,10 +22,10 @@ import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
+import com.flatcode.beautytouchadmin.utils.loadingDialog
 
 @AndroidEntryPoint
-class SliderShowActivity : AppCompatActivity() {
+class SliderShowActivity : BaseActivity() {
 
     private var binding: ActivitySliderShowBinding? = null
     private var activity: Activity? = null
@@ -69,7 +69,7 @@ class SliderShowActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.setText(R.string.slider_show)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        dialog = MyDialog.loadingDialog(context)
+        dialog = loadingDialog(context)
 
         setupClickListeners()
         observeViewModel()

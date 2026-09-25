@@ -24,8 +24,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
 class LeaderboardAdapter(
-    private val mContext: Context,
-    private val pointsKey: String? = null
+    private val mContext: Context, private val pointsKey: String? = null
 ) : ListAdapter<User, LeaderboardAdapter.ViewHolder>(DiffCallback), Filterable {
 
     private var originalList: List<User> = currentList
@@ -86,8 +85,7 @@ class LeaderboardAdapter(
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
-                @Suppress("UNCHECKED_CAST")
-                submitList(results.values as MutableList<User>)
+                submitList((results.values as? List<*>)?.filterIsInstance<User>())
             }
         }
     }

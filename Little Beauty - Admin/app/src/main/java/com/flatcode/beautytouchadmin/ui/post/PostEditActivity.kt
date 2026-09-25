@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import com.flatcode.beautytouchadmin.utils.BaseActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -22,10 +22,10 @@ import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
+import com.flatcode.beautytouchadmin.utils.loadingDialog
 
 @AndroidEntryPoint
-class PostEditActivity : AppCompatActivity() {
+class PostEditActivity : BaseActivity() {
 
     private var binding: ActivityPostAddBinding? = null
     private var activity: Activity? = null
@@ -67,7 +67,7 @@ class PostEditActivity : AppCompatActivity() {
 
         id = intent.getStringExtra(DATA.POST_ID)
 
-        dialog = MyDialog.loadingDialog(context)
+        dialog = loadingDialog(context)
 
         binding!!.toolbar.nameSpace.setText(R.string.edit_post)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }

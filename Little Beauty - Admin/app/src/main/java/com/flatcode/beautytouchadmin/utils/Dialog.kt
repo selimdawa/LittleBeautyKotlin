@@ -1,49 +1,50 @@
 package com.flatcode.beautytouchadmin.utils
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
+import androidx.core.graphics.drawable.toDrawable
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.view.Window
-import android.view.WindowManager
 import android.widget.TextView
 import com.flatcode.beautytouchadmin.R
+import com.flatcode.beautytouchadmin.databinding.DialogLoadingBinding
+import com.flatcode.beautytouchadmin.databinding.DialogLogoutBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-object Dialog {
-    fun showDeleteDialog(context: Context, titleResId: Int, onYesClick: () -> Unit) {
-        Dialog(context).apply {
-            requestWindowFeature(Window.FEATURE_NO_TITLE)
-            setContentView(R.layout.dialog_logout)
-            setCancelable(true)
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+fun Activity.showDeleteDialog(titleResId: Int, onYesClick: () -> Unit) {
+    if (isFinishing || isDestroyed) return
 
-            val lp = WindowManager.LayoutParams().apply {
-                copyFrom(window?.attributes)
-                width = WindowManager.LayoutParams.WRAP_CONTENT
-                height = WindowManager.LayoutParams.WRAP_CONTENT
-            }
+    val dialogBinding = DialogLogoutBinding.inflate(layoutInflater)
+    val alertDialog = MaterialAlertDialogBuilder(this).setView(dialogBinding.root).create()
 
-            findViewById<TextView>(R.id.title).setText(titleResId)
+    alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-            findViewById<TextView>(R.id.yes).setOnClickListener {
-                onYesClick()
-                dismiss()
-            }
-            findViewById<TextView>(R.id.no).setOnClickListener {
-                dismiss()
-            }
-            show()
-            window?.attributes = lp
-        }
+    dialogBinding.title.setText(titleResId)
+
+    dialogBinding.yes.setOnClickListener {
+        onYesClick()
+        alertDialog.dismiss()
+    }
+    dialogBinding.no.setOnClickListener {
+        alertDialog.dismiss()
     }
 
-    fun loadingDialog(context: Context): Dialog {
-        return Dialog(context).apply {
-            requestWindowFeature(Window.FEATURE_NO_TITLE)
-            setContentView(R.layout.dialog_loading)
-            setCancelable(false)
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
+    alertDialog.show()
+
+    val widthPx = (300 * resources.displayMetrics.density).toInt()
+    alertDialog.window?.setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT)
+}
+
+fun loadingDialog(context: Context): Dialog {
+    val binding = DialogLoadingBinding.inflate(LayoutInflater.from(context))
+    return Dialog(context).apply {
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        setContentView(binding.root)
+        setCancelable(false)
+        window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
     }
 }
 

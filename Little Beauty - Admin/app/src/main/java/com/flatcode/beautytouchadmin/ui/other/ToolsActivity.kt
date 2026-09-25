@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import com.flatcode.beautytouchadmin.utils.BaseActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,10 +21,10 @@ import com.flatcode.beautytouchadmin.utils.loadImage
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import com.flatcode.beautytouchadmin.utils.Dialog as MyDialog
+import com.flatcode.beautytouchadmin.utils.loadingDialog
 
 @AndroidEntryPoint
-class ToolsActivity : AppCompatActivity() {
+class ToolsActivity : BaseActivity() {
 
     private var binding: ActivityToolsBinding? = null
     private var activity: Activity? = null
@@ -93,7 +93,7 @@ class ToolsActivity : AppCompatActivity() {
         binding = ActivityToolsBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        dialog = MyDialog.loadingDialog(context)
+        dialog = loadingDialog(context)
 
         binding!!.editImageSessionNow.setOnClickListener {
             imageNumber = IMAGE_NOW

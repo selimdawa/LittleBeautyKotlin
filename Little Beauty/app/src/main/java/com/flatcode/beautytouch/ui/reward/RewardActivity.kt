@@ -4,18 +4,14 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.databinding.ActivityRewardBinding
 import com.flatcode.beautytouch.ui.profile.LeaderboardActivity
 import com.flatcode.beautytouch.ui.profile.LeaderboardOldActivity
 import com.flatcode.beautytouch.ui.profile.UserViewModel
+import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.LoadingDialog
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.openActivity
@@ -24,14 +20,13 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class RewardActivity : AppCompatActivity() {
+class RewardActivity : BaseActivity() {
 
     private val context: Context = this
     private lateinit var binding: ActivityRewardBinding
@@ -44,16 +39,9 @@ class RewardActivity : AppCompatActivity() {
     private var currentSession = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityRewardBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updatePadding(top = systemBars.top, bottom = systemBars.bottom)
-            insets
-        }
 
         binding.toolbar.nameSpace.setText(R.string.earn_points)
         binding.leaderboardCard.setOnClickListener {
@@ -82,8 +70,8 @@ class RewardActivity : AppCompatActivity() {
                     } else {
                         binding.leaderboardCardOld.visibility = View.GONE
                     }
-                    binding.sessionInfo.text = "$currentYear | $currentSession"
-                    binding.sessionInfoOld.text = "$oldYear | $oldSession"
+                    binding.sessionInfo.text = getString(R.string.session_format, currentYear, currentSession)
+                    binding.sessionInfoOld.text = getString(R.string.session_format, oldYear, oldSession)
                     viewModel.loadPoints(currentYear, currentSession)
                     binding.rewardCard.setOnClickListener {
                         loadAndShowRewardedAd()
@@ -99,7 +87,7 @@ class RewardActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.points.collect { resource ->
                 if (resource is Resource.Success) {
-                    binding.myPoints.text = "My Points : ${resource.data}"
+                    binding.myPoints.text = getString(R.string.my_points_format, resource.data)
                 }
             }
         }

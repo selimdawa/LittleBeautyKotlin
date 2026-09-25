@@ -7,19 +7,21 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.model.ShoppingCenter
 import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.*
 import com.flatcode.beautytouchadmin.databinding.ActivityShoppingCentersBinding
+import com.flatcode.beautytouchadmin.model.ShoppingCenter
+import com.flatcode.beautytouchadmin.utils.BaseActivity
+import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.openActivity
+import com.flatcode.beautytouchadmin.utils.showDeleteDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ShoppingCentersActivity : AppCompatActivity() {
+class ShoppingCentersActivity : BaseActivity() {
 
     private var binding: ActivityShoppingCentersBinding? = null
     private val context: Context = this@ShoppingCentersActivity
@@ -34,11 +36,12 @@ class ShoppingCentersActivity : AppCompatActivity() {
         binding!!.toolbar.nameSpace.setText(R.string.shopping_centers)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        adapter = ShoppingCentersAdapter(context, object : ShoppingCentersAdapter.OnItemClickListener {
-            override fun onMoreClick(item: ShoppingCenter) {
-                showMoreOptions(item)
-            }
-        })
+        adapter =
+            ShoppingCentersAdapter(context, object : ShoppingCentersAdapter.OnItemClickListener {
+                override fun onMoreClick(item: ShoppingCenter) {
+                    showMoreOptions(item)
+                }
+            })
         binding!!.recyclerView.adapter = adapter
 
         observeViewModel()
@@ -46,13 +49,12 @@ class ShoppingCentersActivity : AppCompatActivity() {
 
     private fun showMoreOptions(item: ShoppingCenter) {
         val options = arrayOf(getString(R.string.edit), getString(R.string.delete))
-        AlertDialog.Builder(context)
-            .setTitle(R.string.choose)
+        AlertDialog.Builder(context).setTitle(R.string.choose)
             .setItems(options) { _: DialogInterface?, which: Int ->
                 if (which == 0) {
                     context.openActivity<ShoppingCentresEditActivity>(DATA.SHOPPING_CENTER_ID to item.id)
                 } else if (which == 1) {
-                    Dialog.showDeleteDialog(context, R.string.do_you_want_to_delete_the_pharmacy) {
+                    showDeleteDialog(R.string.do_you_want_to_delete_the_pharmacy) {
                         viewModel.deleteCenter(item.id)
                     }
                 }

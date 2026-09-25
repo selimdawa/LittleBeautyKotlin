@@ -1,27 +1,17 @@
 package com.flatcode.beautytouch.ui.main
 
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.Window
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -29,23 +19,22 @@ import coil3.load
 import com.flatcode.beautytouch.BuildConfig
 import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.databinding.ActivityMainBinding
-import com.flatcode.beautytouch.databinding.DialogAboutBinding
-import com.flatcode.beautytouch.databinding.DialogAppBinding
-import com.flatcode.beautytouch.databinding.DialogCloseappBinding
-import com.flatcode.beautytouch.databinding.DialogLogoutBinding
 import com.flatcode.beautytouch.ui.auth.LoginActivity
 import com.flatcode.beautytouch.ui.post.FavoritesActivity
 import com.flatcode.beautytouch.ui.post.PostViewModel
 import com.flatcode.beautytouch.ui.profile.ProfileActivity
 import com.flatcode.beautytouch.ui.profile.UserViewModel
 import com.flatcode.beautytouch.ui.reward.RewardActivity
+import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.interstitialAd
 import com.flatcode.beautytouch.utils.interstitialShow
-import com.flatcode.beautytouch.utils.loadImage
 import com.flatcode.beautytouch.utils.openActivity
-import com.flatcode.beautytouch.utils.rateUs
+import com.flatcode.beautytouch.utils.showCloseAppDialog
+import com.flatcode.beautytouch.utils.showDialogAboutApp
+import com.flatcode.beautytouch.utils.showDialogAboutMy
+import com.flatcode.beautytouch.utils.showDialogLogout
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.material.navigation.NavigationView
@@ -56,7 +45,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
@@ -74,17 +63,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val postViewModel: PostViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            binding.toolbar.root.updatePadding(top = systemBars.top)
-            binding.bottomNavigation.updatePadding(bottom = systemBars.bottom)
-            insets
-        }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -115,14 +97,49 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.favorites.setOnClickListener { context.openActivity<FavoritesActivity>() }
         binding.messenger.setOnClickListener {
             val i = Intent(Intent.ACTION_VIEW)
-            i.data = Uri.parse("https://wa.me/message/E2YOU4NVTIEAD1")
+            i.data = "https://wa.me/message/E2YOU4NVTIEAD1".toUri()
             startActivity(i)
         }
         binding.reward.setOnClickListener { context.openActivity<RewardActivity>() }
-        binding.aboutApp.setOnClickListener { showDialogAboutApp() }
+        binding.aboutApp.setOnClickListener {
+            showDialogAboutApp(
+                onDesignClick = {
+                    startActivity(
+                        getOpenFacebookIntent(
+                            DATA.FB_DESIGNER,
+                            DATA.FB_DESIGNER_2
+                        )
+                    )
+                },
+                onProgrammerClick = {
+                    startActivity(
+                        getOpenFacebookIntent(
+                            DATA.FB_PROGRAMMER,
+                            DATA.FB_PROGRAMMER_2
+                        )
+                    )
+                }
+            )
+        }
         binding.shareApp.setOnClickListener { shareApp() }
-        binding.aboutMy.setOnClickListener { showDialogAboutMy() }
-        binding.logout.setOnClickListener { showDialogLogout() }
+        binding.aboutMy.setOnClickListener {
+            lifecycleScope.launch {
+                userViewModel.appTools.collect { resource ->
+                    if (resource is Resource.Success) {
+                        val tools = resource.data
+                        showDialogAboutMy(tools.imageMe, tools.aboutMe)
+                    }
+                }
+            }
+            userViewModel.loadAppTools()
+        }
+        binding.logout.setOnClickListener {
+            showDialogLogout {
+                userViewModel.logout()
+                context.openActivity<LoginActivity>(clear = true)
+                finish()
+            }
+        }
 
         val bottomNavigation = binding.bottomNavigation
         this.bottomNavigation = bottomNavigation
@@ -230,22 +247,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private fun showCloseAppDialog() {
-        val dialogBinding = DialogCloseappBinding.inflate(layoutInflater)
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(dialogBinding.root)
-        dialog.setCancelable(true)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialogBinding.yes.setOnClickListener { finish() }
-        dialogBinding.no.setOnClickListener { dialog.cancel() }
-        dialog.show()
-        dialog.window?.attributes = lp
-    }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         binding.drawerLayout.closeDrawer(GravityCompat.START)
@@ -263,55 +264,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         startActivity(Intent.createChooser(shareIntent, "Choose how to share"))
     }
 
-    private fun showDialogAboutMy() {
-        val dialogBinding = DialogAboutBinding.inflate(layoutInflater)
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(dialogBinding.root)
-        dialog.setCancelable(true)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-
-        lifecycleScope.launch {
-            userViewModel.appTools.collect { resource ->
-                if (resource is Resource.Success) {
-                    val tools = resource.data
-                    dialogBinding.image.loadImage(true, tools.imageMe)
-                    dialogBinding.text.text = tools.aboutMe
-                }
-            }
-        }
-        userViewModel.loadAppTools()
-
-        dialog.show()
-        dialog.window?.attributes = lp
-    }
-
-    private fun showDialogAboutApp() {
-        val dialogBinding = DialogAppBinding.inflate(layoutInflater)
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(dialogBinding.root)
-        dialog.setCancelable(true)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialogBinding.linearRate.setOnClickListener { rateUs() }
-        dialogBinding.facebookDesign.setOnClickListener {
-            startActivity(getOpenFacebookIntent(DATA.FB_DESIGNER, DATA.FB_DESIGNER_2))
-        }
-        dialogBinding.facebookProgrammer.setOnClickListener {
-            startActivity(getOpenFacebookIntent(DATA.FB_PROGRAMMER, DATA.FB_PROGRAMMER_2))
-        }
-        dialog.show()
-        dialog.window?.attributes = lp
-    }
-
     private fun getOpenFacebookIntent(url: String, fallbackUrl: String): Intent {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -321,31 +273,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             } else {
                 packageManager.getPackageInfo("com.facebook.katana", 0)
             }
-            Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            Intent(Intent.ACTION_VIEW, url.toUri())
         } catch (_: Exception) {
-            Intent(Intent.ACTION_VIEW, Uri.parse(fallbackUrl))
+            Intent(Intent.ACTION_VIEW, fallbackUrl.toUri())
         }
-    }
-
-    private fun showDialogLogout() {
-        val dialogBinding = DialogLogoutBinding.inflate(layoutInflater)
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(dialogBinding.root)
-        dialog.setCancelable(true)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window?.attributes)
-        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialogBinding.yes.setOnClickListener {
-            userViewModel.logout()
-            context.openActivity<LoginActivity>(clear = true)
-            finish()
-        }
-        dialogBinding.no.setOnClickListener { dialog.cancel() }
-        dialog.show()
-        dialog.window?.attributes = lp
     }
 
     companion object {

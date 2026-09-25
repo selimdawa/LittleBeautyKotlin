@@ -1,12 +1,14 @@
 package com.flatcode.beautytouch.utils
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Parcelable
 import android.widget.ImageView
+import androidx.core.net.toUri
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
 import coil3.load
@@ -78,6 +80,21 @@ fun Context.startCropActivity(
     }
 }
 
+fun Activity.rateUs() {
+    val uri = ("market://details?id=" + this.packageName).toUri()
+    val goToMarket = Intent(Intent.ACTION_VIEW, uri)
+    try {
+        this.startActivity(goToMarket)
+    } catch (_: ActivityNotFoundException) {
+        this.startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                ("http://play.google.com/store/apps/details?id=" + this.packageName).toUri()
+            )
+        )
+    }
+}
+
 fun AdView.bannerAd(context: Context?, bannerName: String?) {
     if (context != null) MobileAds.initialize(context) { }
 
@@ -127,12 +144,16 @@ fun Activity.interstitialShow(interstitialName: String?) {
 
             override fun onAdImpression() {
                 FirebaseAuth.getInstance().currentUser?.uid.adUserCount(DATA.AD_LOAD, 1)
-                FirebaseAuth.getInstance().currentUser?.uid.adCount(interstitialName, DATA.ADS_LOADED_COUNT)
+                FirebaseAuth.getInstance().currentUser?.uid.adCount(
+                    interstitialName, DATA.ADS_LOADED_COUNT
+                )
             }
 
             override fun onAdClicked() {
                 FirebaseAuth.getInstance().currentUser?.uid.adUserCount(DATA.AD_CLICK, 1)
-                FirebaseAuth.getInstance().currentUser?.uid.adCount(interstitialName, DATA.ADS_CLICKED_COUNT)
+                FirebaseAuth.getInstance().currentUser?.uid.adCount(
+                    interstitialName, DATA.ADS_CLICKED_COUNT
+                )
             }
         }
         ad.show(this)

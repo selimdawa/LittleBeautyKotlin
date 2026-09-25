@@ -85,7 +85,7 @@ class ADsUserAdapter(
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults) {
-                @Suppress("UNCHECKED_CAST") submitList(results.values as MutableList<User>)
+                submitList((results.values as? List<*>)?.filterIsInstance<User>())
             }
         }
     }
