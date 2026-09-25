@@ -33,14 +33,14 @@ class LeaderboardAdapter(
             position + 1 // Displaying actual rank instead of reverse position which was confusing
 
         with(holder.binding) {
-            range.text = "$rank"
+            range.text = rank.toString()
             imageProfile.loadImage(true, user.imageurl)
 
             username.apply {
                 visibility = if (user.username == DATA.EMPTY) View.GONE else View.VISIBLE
                 text = user.username
             }
-            points.text = "${user.points}"
+            points.text = user.points.toString()
 
             root.setOnClickListener { onItemClick(user) }
         }

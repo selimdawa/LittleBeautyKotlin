@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
-import com.flatcode.beautytouchadmin.utils.BaseActivity
 import androidx.core.content.IntentCompat
 import com.canhub.cropper.CropImageOptions
 import com.canhub.cropper.CropImageView

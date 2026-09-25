@@ -155,7 +155,7 @@ class SliderShowActivity : BaseActivity() {
             binding!!.imageNineteen,
             binding!!.imageTwenty
         )
-        val linears = listOf(
+        val linearLayouts = listOf(
             binding!!.linearOne,
             binding!!.linearTwo,
             binding!!.linearThree,
@@ -182,7 +182,7 @@ class SliderShowActivity : BaseActivity() {
             val key = (i + 1).toString()
             val url = sliders[key] ?: ""
             images[i].loadImage(false, url)
-            linears[i].visibility = if (count >= i) View.VISIBLE else View.GONE
+            linearLayouts[i].visibility = if (count >= i) View.VISIBLE else View.GONE
         }
         binding!!.bar.visibility = View.GONE
     }

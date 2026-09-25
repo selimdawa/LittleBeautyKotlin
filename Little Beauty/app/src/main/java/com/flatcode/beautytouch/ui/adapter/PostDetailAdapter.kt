@@ -70,7 +70,7 @@ class PostDetailAdapter(
             }
             priceProduct.apply {
                 visibility = if (post.price == DATA.EMPTY) View.GONE else View.VISIBLE
-                text = "${post.price} SYP"
+                text = context.getString(R.string.price_syp_format, post.price)
             }
 
             linearIndications.visibility =
@@ -99,7 +99,7 @@ class PostDetailAdapter(
             save.setImageResource(if (post.isSaved) R.drawable.ic_favorites_selected else R.drawable.ic_favorites_unselected)
             save.tag = if (post.isSaved) "saved" else "save"
 
-            likeNumber.text = "${post.nrLikes}"
+            likeNumber.text = post.nrLikes.toString()
 
             like.setOnClickListener { onLikeClick(post) }
             save.setOnClickListener { onSaveClick(post) }

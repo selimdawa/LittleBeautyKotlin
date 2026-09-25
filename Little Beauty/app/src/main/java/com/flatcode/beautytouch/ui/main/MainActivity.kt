@@ -211,7 +211,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             postViewModel.skinCount.collect { resource ->
                 Timber.d("Skin count collected: $resource")
                 if (resource is Resource.Success) {
-                    binding.numberProductSkin.text = "${resource.data}"
+                    binding.numberProductSkin.text = resource.data.toString()
                     bottomNavigation?.setCount(1, resource.data.toString())
                 }
             }
@@ -220,7 +220,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             postViewModel.hairCount.collect { resource ->
                 Timber.d("Hair count collected: $resource")
                 if (resource is Resource.Success) {
-                    binding.numberProductHair.text = "${resource.data}"
+                    binding.numberProductHair.text = resource.data.toString()
                     bottomNavigation?.setCount(3, resource.data.toString())
                 }
             }
@@ -229,7 +229,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             postViewModel.shoppingCount.collect { resource ->
                 Timber.d("Shopping count collected: $resource")
                 if (resource is Resource.Success) {
-                    binding.numberShoppingCenters.text = "${resource.data}"
+                    binding.numberShoppingCenters.text = resource.data.toString()
                     bottomNavigation?.setCount(4, resource.data.toString())
                 }
             }
