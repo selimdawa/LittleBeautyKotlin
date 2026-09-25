@@ -1,14 +1,11 @@
 package com.flatcode.beautytouchadmin.model
 
 import android.os.Parcelable
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-@Entity(tableName = "tools")
 data class Tools(
-    @PrimaryKey var session: String = "",
+    var session: String = "",
     var imageLogo: String? = null,
     var oldImageLogo: String? = null,
     var imageSession: String? = null,

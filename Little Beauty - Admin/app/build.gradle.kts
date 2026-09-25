@@ -64,9 +64,6 @@ dependencies {
     //Navigation
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.ui)
-    //Room
-    implementation(libs.androidx.room.runtime)
-    ksp(libs.androidx.room.compiler)
     //Firebase
     implementation(platform(libs.firebase.bom)) //Firebase BOM
     implementation(libs.firebase.auth)
@@ -76,8 +73,4 @@ dependencies {
     //Other
     implementation(libs.material.ripple)                //Ripple Effect
     implementation(libs.timber)
-}
-
-ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
 }

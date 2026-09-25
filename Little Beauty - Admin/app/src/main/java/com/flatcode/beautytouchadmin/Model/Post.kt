@@ -3,14 +3,11 @@
 package com.flatcode.beautytouchadmin.model
 
 import android.os.Parcelable
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-@Entity(tableName = "posts")
 data class Post(
-    @PrimaryKey var postid: String = "",
+    var postid: String = "",
     var category: String? = null,
     var name: String? = null,
     var postimage: String? = null,
