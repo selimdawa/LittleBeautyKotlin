@@ -18,6 +18,7 @@ import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
 import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
+import com.flatcode.beautytouchadmin.utils.isNetworkAvailable
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -120,6 +121,8 @@ class PostAddActivity : BaseActivity() {
             Toast.makeText(context, R.string.enter_category, Toast.LENGTH_SHORT).show()
         } else if (imageUri == null) {
             Toast.makeText(context, R.string.no_picture, Toast.LENGTH_SHORT).show()
+        } else if (!isNetworkAvailable()) {
+            Toast.makeText(context, getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show()
         } else {
             dialog!!.setMessage(getString(R.string.post_created))
             dialog!!.show()

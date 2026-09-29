@@ -17,6 +17,7 @@ import com.flatcode.beautytouch.databinding.ActivityProfileBinding
 import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.LoadingDialog
 import com.flatcode.beautytouch.utils.Resource
+import com.flatcode.beautytouch.utils.isNetworkAvailable
 import com.flatcode.beautytouch.utils.startCropActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -190,6 +191,8 @@ class ProfileActivity : BaseActivity() {
         val username = binding.nameEdit.text.toString().trim()
         if (username.isEmpty()) {
             Toast.makeText(this, "Please enter the name", Toast.LENGTH_SHORT).show()
+        } else if (!isNetworkAvailable()) {
+            Toast.makeText(this, getString(com.flatcode.beautytouch.R.string.no_internet_connection), Toast.LENGTH_SHORT).show()
         } else {
             val uri = imageUri
             if (uri == null) {
