@@ -1,11 +1,16 @@
 package com.flatcode.beautytouch.db
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.flatcode.beautytouch.model.Post
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostDao {
+
     @Query("SELECT * FROM posts")
     fun getAllPosts(): Flow<List<Post>>
 

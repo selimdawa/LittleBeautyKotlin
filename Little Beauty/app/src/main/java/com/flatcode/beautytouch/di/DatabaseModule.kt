@@ -2,7 +2,17 @@ package com.flatcode.beautytouch.di
 
 import android.content.Context
 import androidx.room.Room
-import com.flatcode.beautytouch.db.*
+import com.flatcode.beautytouch.db.ADsDao
+import com.flatcode.beautytouch.db.AppDatabase
+import com.flatcode.beautytouch.db.FavoriteDao
+import com.flatcode.beautytouch.db.InterestedDao
+import com.flatcode.beautytouch.db.PointsDao
+import com.flatcode.beautytouch.db.PostDao
+import com.flatcode.beautytouch.db.RewardDao
+import com.flatcode.beautytouch.db.ShoppingCenterDao
+import com.flatcode.beautytouch.db.SliderDao
+import com.flatcode.beautytouch.db.ToolsDao
+import com.flatcode.beautytouch.db.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,7 +31,7 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "beauty_touch_db"
-        ).build()
+        ).fallbackToDestructiveMigration(true).build()
     }
 
     @Provides
@@ -41,4 +51,16 @@ object DatabaseModule {
 
     @Provides
     fun provideRewardDao(database: AppDatabase): RewardDao = database.rewardDao()
+
+    @Provides
+    fun providePointsDao(database: AppDatabase): PointsDao = database.pointsDao()
+
+    @Provides
+    fun provideFavoriteDao(database: AppDatabase): FavoriteDao = database.favoriteDao()
+
+    @Provides
+    fun provideInterestedDao(database: AppDatabase): InterestedDao = database.interestedDao()
+
+    @Provides
+    fun provideSliderDao(database: AppDatabase): SliderDao = database.sliderDao()
 }
