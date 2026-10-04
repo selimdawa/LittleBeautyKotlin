@@ -8,7 +8,6 @@ import com.flatcode.beautytouch.databinding.ActivityPostDetailBinding
 import com.flatcode.beautytouch.ui.adapter.PostDetailAdapter
 import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -39,13 +38,9 @@ class PostDetailsActivity : BaseActivity() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.postDetails.collect { resource ->
-                when (resource) {
-                    is Resource.Success -> {
-                        adapter?.submitList(listOf(resource.data))
-                    }
-
-                    else -> {}
+            viewModel.postDetails.collect { post ->
+                post?.let {
+                    adapter?.submitList(listOf(it))
                 }
             }
         }

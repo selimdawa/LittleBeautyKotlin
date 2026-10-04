@@ -11,7 +11,6 @@ import com.flatcode.beautytouch.databinding.FragmentShoppingCentersBinding
 import com.flatcode.beautytouch.ui.adapter.ShoppingCentersAdapter
 import com.flatcode.beautytouch.ui.post.PostViewModel
 import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.bannerAd
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -46,33 +45,17 @@ class ShoppingCentersFragment : Fragment() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.shoppingCenters.collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        binding.bar.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.GONE
-                        binding.emptyText.visibility = View.GONE
-                    }
-
-                    is Resource.Success -> {
-                        val items = resource.data.reversed()
-                        binding.bar.visibility = View.GONE
-                        if (items.isNotEmpty()) {
-                            binding.recyclerView.visibility = View.VISIBLE
-                            binding.emptyText.visibility = View.GONE
-                        } else {
-                            binding.recyclerView.visibility = View.GONE
-                            binding.emptyText.visibility = View.VISIBLE
-                        }
-                        adapter?.submitList(items)
-                    }
-
-                    is Resource.Error -> {
-                        binding.bar.visibility = View.GONE
-                    }
-
-                    else -> {}
+            viewModel.shoppingCenters.collect { list ->
+                val items = list.reversed()
+                binding.bar.visibility = View.GONE
+                if (items.isNotEmpty()) {
+                    binding.recyclerView.visibility = View.VISIBLE
+                    binding.emptyText.visibility = View.GONE
+                } else {
+                    binding.recyclerView.visibility = View.GONE
+                    binding.emptyText.visibility = View.VISIBLE
                 }
+                adapter?.submitList(items)
             }
         }
     }

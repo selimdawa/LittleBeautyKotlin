@@ -51,7 +51,7 @@
                 android:layout_height="150sp"
                 android:layout_centerHorizontal="true"
                 android:importantForAccessibility="no"
-                android:src="@drawable/icon" />
+                android:src="@drawable/logo" />
 
             <TextView
                 android:layout_width="match_parent"

@@ -10,7 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.databinding.FragmentSkinProductsBinding
 import com.flatcode.beautytouch.ui.adapter.ProductsStaggeredAdapter
 import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.bannerAd
 import com.flatcode.beautytouch.utils.openActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,33 +45,17 @@ class SkinProductsFragment : Fragment() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.postsByCategory.collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        binding.bar.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.GONE
-                        binding.emptyText.visibility = View.GONE
-                    }
-
-                    is Resource.Success -> {
-                        val posts = resource.data.reversed()
-                        binding.bar.visibility = View.GONE
-                        if (posts.isNotEmpty()) {
-                            binding.recyclerView.visibility = View.VISIBLE
-                            binding.emptyText.visibility = View.GONE
-                        } else {
-                            binding.recyclerView.visibility = View.GONE
-                            binding.emptyText.visibility = View.VISIBLE
-                        }
-                        adapter?.submitList(posts)
-                    }
-
-                    is Resource.Error -> {
-                        binding.bar.visibility = View.GONE
-                    }
-
-                    else -> {}
+            viewModel.postsByCategory.collect { list ->
+                val posts = list.reversed()
+                binding.bar.visibility = View.GONE
+                if (posts.isNotEmpty()) {
+                    binding.recyclerView.visibility = View.VISIBLE
+                    binding.emptyText.visibility = View.GONE
+                } else {
+                    binding.recyclerView.visibility = View.GONE
+                    binding.emptyText.visibility = View.VISIBLE
                 }
+                adapter?.submitList(posts)
             }
         }
     }

@@ -11,7 +11,6 @@ import com.flatcode.beautytouch.ui.adapter.LeaderboardAdapter
 import com.flatcode.beautytouch.ui.post.PostDetailsActivity
 import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.loadImage
 import com.flatcode.beautytouch.utils.openActivity
 import com.google.firebase.database.DataSnapshot
@@ -20,7 +19,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class LeaderboardActivity : BaseActivity() {
@@ -38,7 +36,7 @@ class LeaderboardActivity : BaseActivity() {
 
         adapter = LeaderboardAdapter(
             onItemClick = { _ ->
-                // Handle item click if needed, e.g., open user profile
+                // Handle item click if needed
             })
         binding.recyclerView.adapter = adapter
 
@@ -47,39 +45,32 @@ class LeaderboardActivity : BaseActivity() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.appTools.collect { resource ->
-                Timber.d("App tools collected: $resource")
-                if (resource is Resource.Success) {
-                    val tools = resource.data
-                    binding.imageSession.loadImage(false, tools.imageSession)
-                    binding.imageLogo.loadImage(false, tools.imageLogo)
-                    binding.sessionNumber.text = tools.session
-                    val key = "${tools.year}_${tools.sessionNumber}"
+            viewModel.appTools.collect { tools ->
+                tools?.let {
+                    binding.imageSession.loadImage(false, it.imageSession)
+                    binding.imageLogo.loadImage(false, it.imageLogo)
+                    binding.sessionNumber.text = it.session
+                    val key = "${it.year}_${it.sessionNumber}"
                     viewModel.loadLeaderboard(key)
                     viewModel.loadRewards()
                 }
             }
         }
         lifecycleScope.launch {
-            viewModel.leaderboard.collect { resource ->
-                Timber.d("Leaderboard collected: $resource")
-                if (resource is Resource.Success) {
-                    adapter?.submitList(resource.data)
-                    adapter?.filterList = resource.data
-                }
+            viewModel.leaderboard.collect { list ->
+                adapter?.submitList(list)
+                adapter?.filterList = list
             }
         }
         lifecycleScope.launch {
-            viewModel.rewards.collect { resource ->
-                Timber.d("Rewards collected: $resource")
-                if (resource is Resource.Success) {
-                    val reward = resource.data
-                    reward.reward?.let { readReward(it, binding.reward) }
-                    reward.reward2?.let { readReward(it, binding.reward2) }
-                    reward.reward3?.let { readReward(it, binding.reward3) }
-                    reward.reward4?.let { readReward(it, binding.reward4) }
-                    reward.reward5?.let { readReward(it, binding.reward5) }
-                    reward.reward6?.let { readReward(it, binding.reward6) }
+            viewModel.rewards.collect { reward ->
+                reward?.let {
+                    it.reward?.let { id -> readReward(id, binding.reward) }
+                    it.reward2?.let { id -> readReward(id, binding.reward2) }
+                    it.reward3?.let { id -> readReward(id, binding.reward3) }
+                    it.reward4?.let { id -> readReward(id, binding.reward4) }
+                    it.reward5?.let { id -> readReward(id, binding.reward5) }
+                    it.reward6?.let { id -> readReward(id, binding.reward6) }
                 }
             }
         }

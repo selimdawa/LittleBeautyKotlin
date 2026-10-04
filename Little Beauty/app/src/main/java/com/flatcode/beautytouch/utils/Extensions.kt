@@ -3,16 +3,19 @@ package com.flatcode.beautytouch.utils
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Parcelable
 import android.widget.ImageView
-import androidx.core.net.toUri
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
+import androidx.core.net.toUri
 import coil3.load
 import coil3.request.crossfade
+import coil3.request.error
+import coil3.request.fallback
 import coil3.request.placeholder
 import coil3.size.Size
 import coil3.transform.Transformation
@@ -48,9 +51,19 @@ inline fun <reified T : Activity> Context.openActivity(
     startActivity(intent)
 }
 
+fun Context.findActivity(): Activity? {
+    var ctx = this
+    while (ctx is ContextWrapper) {
+        if (ctx is Activity) return ctx
+        ctx = ctx.baseContext
+    }
+    return null
+}
+
 fun Context.isNetworkAvailable(): Boolean {
     val connectivityManager =
-        getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager ?: return false
+        getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
+            ?: return false
     val network = connectivityManager.activeNetwork ?: return false
     val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
     return capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -58,20 +71,29 @@ fun Context.isNetworkAvailable(): Boolean {
 
 fun ImageView.loadImage(isUser: Boolean, url: String?) {
     try {
-        if (url == DATA.BASIC) {
+        val activity = this.context.findActivity()
+        if (activity != null && (activity.isFinishing || activity.isDestroyed)) {
+            return
+        }
+        if (url.isNullOrEmpty() || url == DATA.BASIC) {
             if (isUser) {
                 this.setImageResource(R.drawable.basic_user)
             } else {
-                this.setImageResource(R.drawable.basic_user)
+                this.setImageResource(R.color.image_profile)
             }
         } else {
             this.load(url) {
                 placeholder(R.color.image_profile)
+                error(R.color.image_profile)
+                fallback(R.color.image_profile)
                 crossfade(true)
             }
         }
-    } catch (_: Exception) {
-        this.setImageResource(R.drawable.basic_user)
+    } catch (_: Throwable) {
+        try {
+            this.setImageResource(R.color.image_profile)
+        } catch (_: Throwable) {
+        }
     }
 }
 

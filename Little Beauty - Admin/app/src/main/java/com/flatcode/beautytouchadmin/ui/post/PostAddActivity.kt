@@ -9,17 +9,17 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.flatcode.beautytouchadmin.utils.BaseActivity
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.canhub.cropper.CropImageContract
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
-import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
 import com.flatcode.beautytouchadmin.utils.isNetworkAvailable
 import com.flatcode.beautytouchadmin.utils.setMessage
+import com.flatcode.beautytouchadmin.utils.startCropActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import com.flatcode.beautytouchadmin.utils.loadingDialog
@@ -45,18 +45,26 @@ class PostAddActivity : BaseActivity() {
         }
     }
 
-    private fun pickImage() {
-        cropImage.launch(cropImageSquareOptions())
-    }
-
-    private val cropImage = registerForActivityResult(CropImageContract()) { result ->
-        if (result.isSuccessful) {
-            imageUri = result.uriContent
-            binding!!.image.setImageURI(imageUri)
-        } else {
-            val error = result.error
-            Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
+    private val cropImageLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                imageUri = result.data?.let { intent ->
+                    IntentCompat.getParcelableExtra(intent, "CROP_RESULT_URI", Uri::class.java)
+                }
+                binding!!.image.setImageURI(null)
+                binding!!.image.setImageURI(imageUri)
+            }
         }
+
+    private val pickImageLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                cropImageLauncher.launch(context.startCropActivity(it, 10, 14, false))
+            }
+        }
+
+    private fun pickImage() {
+        pickImageLauncher.launch("image/*")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

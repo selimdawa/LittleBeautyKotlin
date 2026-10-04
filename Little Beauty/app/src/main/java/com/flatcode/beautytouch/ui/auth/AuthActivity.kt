@@ -5,18 +5,21 @@ import android.os.Bundle
 import com.flatcode.beautytouch.databinding.ActivityAuthBinding
 import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.openActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class AuthActivity : BaseActivity() {
+    private var binding: ActivityAuthBinding? = null
 
-    private lateinit var binding: ActivityAuthBinding
-    private val context: Context = this@AuthActivity
+    var context: Context = this@AuthActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAuthBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        val view = binding!!.root
+        setContentView(view)
 
-        binding.loginBtn.setOnClickListener { context.openActivity<LoginActivity>() }
-        binding.skipBtn.setOnClickListener { context.openActivity<RegisterActivity>() }
+        binding!!.loginBtn.setOnClickListener { context.openActivity<LoginActivity>() }
+        binding!!.skipBtn.setOnClickListener { context.openActivity<RegisterActivity>() }
     }
 }

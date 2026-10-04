@@ -15,20 +15,18 @@ import androidx.lifecycle.lifecycleScope
 import coil3.load
 import com.flatcode.beautytouch.databinding.ActivityProfileBinding
 import com.flatcode.beautytouch.utils.BaseActivity
-import com.flatcode.beautytouch.utils.LoadingDialog
-import com.flatcode.beautytouch.utils.Resource
+import com.flatcode.beautytouch.utils.ProgressDialog
 import com.flatcode.beautytouch.utils.isNetworkAvailable
 import com.flatcode.beautytouch.utils.startCropActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class ProfileActivity : BaseActivity() {
 
     private lateinit var binding: ActivityProfileBinding
     private var imageUri: Uri? = null
-    private val dialog by lazy { LoadingDialog(this) }
+    private var dialog: ProgressDialog? = null
 
     private val viewModel: UserViewModel by viewModels()
 
@@ -88,6 +86,11 @@ class ProfileActivity : BaseActivity() {
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        dialog = ProgressDialog(this).apply {
+            setTitle("Please wait...")
+            setCanceledOnTouchOutside(false)
+        }
+
         binding.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding.editImageIcon.setOnClickListener {
             checkPermissionAndOpenGallery()
@@ -126,62 +129,27 @@ class ProfileActivity : BaseActivity() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.userInfo.collect { resource ->
-                Timber.d("User info collected: $resource")
-                if (resource is Resource.Success) {
-                    val user = resource.data
-                    binding.image.load(user.imageurl)
-                    binding.name.text = user.username
-                    binding.nameEdit.setText(user.username)
+            viewModel.userInfo.collect { user ->
+                user?.let {
+                    binding.image.load(it.imageurl)
+                    binding.name.text = it.username
+                    binding.nameEdit.setText(it.username)
                 }
             }
         }
         lifecycleScope.launch {
-            viewModel.uploadImageState.collect { resource ->
-                Timber.d("Upload image state collected: $resource")
-                when (resource) {
-                    is Resource.Loading -> {
-                        dialog.show("The image is uploading...")
-                    }
-
-                    is Resource.Success -> {
-                        dialog.dismiss()
-                    }
-
-                    is Resource.Error -> {
-                        dialog.dismiss()
-                        Timber.e("Upload image error: ${resource.message}")
-                        Toast.makeText(this@ProfileActivity, resource.message, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-
-                    else -> {}
-                }
-            }
-        }
-        lifecycleScope.launch {
-            viewModel.updateProfileState.collect { resource ->
-                Timber.d("Update profile state collected: $resource")
-                when (resource) {
-                    is Resource.Loading -> {
-                        dialog.show("Saving changes...")
-                    }
-
-                    is Resource.Success -> {
-                        dialog.dismiss()
+            viewModel.updateProfileState.collect { result ->
+                result?.let {
+                    dialog?.dismiss()
+                    if (it.isSuccess) {
                         Toast.makeText(this@ProfileActivity, "Profile Updated", Toast.LENGTH_SHORT)
                             .show()
                         imageUri = null
+                    } else {
+                        Toast.makeText(
+                            this@ProfileActivity, "Error updating profile", Toast.LENGTH_SHORT
+                        ).show()
                     }
-
-                    is Resource.Error -> {
-                        dialog.dismiss()
-                        Timber.e("Update profile error: ${resource.message}")
-                        Toast.makeText(this@ProfileActivity, resource.message, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-
-                    else -> {}
                 }
             }
         }
@@ -192,18 +160,25 @@ class ProfileActivity : BaseActivity() {
         if (username.isEmpty()) {
             Toast.makeText(this, "Please enter the name", Toast.LENGTH_SHORT).show()
         } else if (!isNetworkAvailable()) {
-            Toast.makeText(this, getString(com.flatcode.beautytouch.R.string.no_internet_connection), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                getString(com.flatcode.beautytouch.R.string.no_internet_connection),
+                Toast.LENGTH_SHORT
+            ).show()
         } else {
             val uri = imageUri
             if (uri == null) {
+                dialog?.setMessage("Saving changes...")
+                dialog?.show()
                 viewModel.updateProfile(username)
             } else {
-                dialog.show("Uploading image...")
+                dialog?.setMessage("Uploading image...")
+                dialog?.show()
                 viewModel.uploadProfileImageCloudinary(uri) { uploadedUrl ->
                     if (uploadedUrl != null) {
                         viewModel.updateProfile(username, uploadedUrl)
                     } else {
-                        dialog.dismiss()
+                        dialog?.dismiss()
                         Toast.makeText(this, "Failed to upload image", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -214,10 +189,5 @@ class ProfileActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.loadUserInfo()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        dialog.dismiss()
     }
 }

@@ -31,7 +31,7 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "beauty_touch_db"
-        ).fallbackToDestructiveMigration(true).build()
+        ).build()
     }
 
     @Provides

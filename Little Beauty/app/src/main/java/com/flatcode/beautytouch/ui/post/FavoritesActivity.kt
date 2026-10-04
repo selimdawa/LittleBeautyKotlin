@@ -10,12 +10,10 @@ import com.flatcode.beautytouch.databinding.ActivityFavoritesBinding
 import com.flatcode.beautytouch.ui.adapter.ProductsStaggeredAdapter
 import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.bannerAd
 import com.flatcode.beautytouch.utils.openActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class FavoritesActivity : BaseActivity() {
@@ -47,41 +45,23 @@ class FavoritesActivity : BaseActivity() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.favoritePosts.collect { resource ->
-                Timber.d("Favorite posts collected: $resource")
-                when (resource) {
-                    is Resource.Loading -> {
-                        binding.bar.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.GONE
-                        binding.emptyText.visibility = View.GONE
-                    }
-
-                    is Resource.Success -> {
-                        val posts = resource.data.reversed()
-                        binding.bar.visibility = View.GONE
-                        if (posts.isNotEmpty()) {
-                            binding.recyclerView.visibility = View.VISIBLE
-                            binding.emptyText.visibility = View.GONE
-                        } else {
-                            binding.recyclerView.visibility = View.GONE
-                            binding.emptyText.visibility = View.VISIBLE
-                        }
-                        adapter?.submitList(posts)
-                    }
-
-                    is Resource.Error -> {
-                        binding.bar.visibility = View.GONE
-                        Timber.e("Favorite posts error: ${resource.message}")
-                    }
-
-                    else -> {}
+            viewModel.postsByCategory.collect { list ->
+                val posts = list.reversed()
+                binding.bar.visibility = View.GONE
+                if (posts.isNotEmpty()) {
+                    binding.recyclerView.visibility = View.VISIBLE
+                    binding.emptyText.visibility = View.GONE
+                } else {
+                    binding.recyclerView.visibility = View.GONE
+                    binding.emptyText.visibility = View.VISIBLE
                 }
+                adapter?.submitList(posts)
             }
         }
     }
 
     override fun onResume() {
-        viewModel.loadFavoritePosts(publisher, appName)
+        viewModel.loadPostsByCategory(DATA.SKIN_PRODUCTS, publisher, appName)
         super.onResume()
     }
 }

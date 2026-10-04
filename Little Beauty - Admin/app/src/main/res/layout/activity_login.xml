@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".auth.LoginActivity">
+    tools:context=".ui.auth.LoginActivity">
 
     <ImageView
         android:id="@+id/background"
@@ -51,7 +51,7 @@
                 android:layout_height="150dp"
                 android:layout_centerHorizontal="true"
                 android:contentDescription="@null"
-                android:src="@drawable/icon" />
+                android:src="@drawable/logo" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -84,11 +84,11 @@
                     android:layout_margin="10dp"
                     android:drawablePadding="5dp"
                     android:gravity="center_vertical"
-                    android:text="@string/number_phone"
+                    android:text="@string/email"
                     android:textColor="?colorError"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    app:drawableStartCompat="@drawable/ic_phone"
+                    app:drawableStartCompat="@drawable/ic_email_gray"
                     app:drawableTint="?colorError" />
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -99,14 +99,14 @@
                     app:hintEnabled="false">
 
                     <EditText
-                        android:id="@+id/phoneEt"
+                        android:id="@+id/emailEt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:autofillHints="phone"
+                        android:autofillHints="emailAddress"
                         android:background="@drawable/button"
-                        android:hint="@string/my_number"
-                        android:inputType="phone"
-                        android:maxLength="10"
+                        android:hint="@string/email_example"
+                        android:inputType="textEmailAddress"
+                        android:maxLength="50"
                         android:padding="15dp"
                         android:textColor="?colorError"
                         android:textColorHint="?colorError"

@@ -27,7 +27,6 @@ import com.flatcode.beautytouch.ui.profile.UserViewModel
 import com.flatcode.beautytouch.ui.reward.RewardActivity
 import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.interstitialAd
 import com.flatcode.beautytouch.utils.interstitialShow
 import com.flatcode.beautytouch.utils.openActivity
@@ -42,7 +41,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.selimdawa.bubblebottom.BubbleBottomNavigation
 import io.selimdawa.bubblebottom.Model
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -66,7 +64,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -102,32 +99,26 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
         binding.reward.setOnClickListener { context.openActivity<RewardActivity>() }
         binding.aboutApp.setOnClickListener {
-            showDialogAboutApp(
-                onDesignClick = {
-                    startActivity(
-                        getOpenFacebookIntent(
-                            DATA.FB_DESIGNER,
-                            DATA.FB_DESIGNER_2
-                        )
+            showDialogAboutApp(onDesignClick = {
+                startActivity(
+                    getOpenFacebookIntent(
+                        DATA.FB_DESIGNER, DATA.FB_DESIGNER_2
                     )
-                },
-                onProgrammerClick = {
-                    startActivity(
-                        getOpenFacebookIntent(
-                            DATA.FB_PROGRAMMER,
-                            DATA.FB_PROGRAMMER_2
-                        )
+                )
+            }, onProgrammerClick = {
+                startActivity(
+                    getOpenFacebookIntent(
+                        DATA.FB_PROGRAMMER, DATA.FB_PROGRAMMER_2
                     )
-                }
-            )
+                )
+            })
         }
         binding.shareApp.setOnClickListener { shareApp() }
         binding.aboutMy.setOnClickListener {
             lifecycleScope.launch {
-                userViewModel.appTools.collect { resource ->
-                    if (resource is Resource.Success) {
-                        val tools = resource.data
-                        showDialogAboutMy(tools.imageMe, tools.aboutMe)
+                userViewModel.appTools.collect { tools ->
+                    tools?.let {
+                        showDialogAboutMy(it.imageMe, it.aboutMe)
                     }
                 }
             }
@@ -165,13 +156,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         bottomNavigation.setOnClickMenuListener { item: Model ->
             when (item.id) {
                 1 -> Toast.makeText(applicationContext, skinProduct, Toast.LENGTH_SHORT).show()
-
-                2 -> {
-                    Toast.makeText(applicationContext, home, Toast.LENGTH_SHORT).show()
-                }
-
+                2 -> Toast.makeText(applicationContext, home, Toast.LENGTH_SHORT).show()
                 3 -> Toast.makeText(applicationContext, hairProduct, Toast.LENGTH_SHORT).show()
-
                 4 -> {
                     Toast.makeText(applicationContext, shoppingCenter, Toast.LENGTH_SHORT).show()
                     interstitialShow(DATA.INTERSTITIAL_HOME)
@@ -181,10 +167,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         bottomNavigation.setOnReselectListener { item: Model ->
             when (item.id) {
                 1 -> Toast.makeText(applicationContext, skinProduct, Toast.LENGTH_SHORT).show()
-
                 2 -> Toast.makeText(applicationContext, home, Toast.LENGTH_SHORT).show()
                 3 -> Toast.makeText(applicationContext, hairProduct, Toast.LENGTH_SHORT).show()
-
                 4 -> Toast.makeText(applicationContext, shoppingCenter, Toast.LENGTH_SHORT).show()
             }
         }
@@ -199,54 +183,20 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.imageDrawer.setOnClickListener { context.openActivity<ProfileActivity>() }
 
         observeViewModels()
-        postViewModel.loadCategoryCounts(
-            publisher, appName, DATA.SKIN_PRODUCTS, DATA.HAIR_PRODUCTS, DATA.SHOPPING_CENTERS
-        )
         userViewModel.loadUserInfo()
     }
 
     private fun observeViewModels() {
-        val bottomNavigation = this.bottomNavigation
         lifecycleScope.launch {
-            postViewModel.skinCount.collect { resource ->
-                Timber.d("Skin count collected: $resource")
-                if (resource is Resource.Success) {
-                    binding.numberProductSkin.text = resource.data.toString()
-                    bottomNavigation?.setCount(1, resource.data.toString())
-                }
-            }
-        }
-        lifecycleScope.launch {
-            postViewModel.hairCount.collect { resource ->
-                Timber.d("Hair count collected: $resource")
-                if (resource is Resource.Success) {
-                    binding.numberProductHair.text = resource.data.toString()
-                    bottomNavigation?.setCount(3, resource.data.toString())
-                }
-            }
-        }
-        lifecycleScope.launch {
-            postViewModel.shoppingCount.collect { resource ->
-                Timber.d("Shopping count collected: $resource")
-                if (resource is Resource.Success) {
-                    binding.numberShoppingCenters.text = resource.data.toString()
-                    bottomNavigation?.setCount(4, resource.data.toString())
-                }
-            }
-        }
-        lifecycleScope.launch {
-            userViewModel.userInfo.collect { resource ->
-                Timber.d("User info collected: $resource")
-                if (resource is Resource.Success) {
-                    val user = resource.data
-                    binding.imageDrawer.load(user.imageurl)
-                    binding.toolbar.image.load(user.imageurl)
-                    binding.name.text = user.username
+            userViewModel.userInfo.collect { user ->
+                user?.let {
+                    binding.imageDrawer.load(it.imageurl)
+                    binding.toolbar.image.load(it.imageurl)
+                    binding.name.text = it.username
                 }
             }
         }
     }
-
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         binding.drawerLayout.closeDrawer(GravityCompat.START)

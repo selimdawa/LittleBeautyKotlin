@@ -4,12 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.repository.PostRepository
-import com.flatcode.beautytouch.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,33 +15,25 @@ class HomeViewModel @Inject constructor(
     private val repository: PostRepository
 ) : ViewModel() {
 
-    private val _hotProducts = MutableStateFlow<Resource<List<Post>>?>(null)
-    val hotProducts: StateFlow<Resource<List<Post>>?> = _hotProducts
+    private val _hotProducts = MutableStateFlow<List<Post>>(emptyList())
+    val hotProducts: StateFlow<List<Post>> = _hotProducts
 
-    private val _allPosts = MutableStateFlow<Resource<List<Post>>?>(null)
-    val allPosts: StateFlow<Resource<List<Post>>?> = _allPosts
+    private val _allPosts = MutableStateFlow<List<Post>>(emptyList())
+    val allPosts: StateFlow<List<Post>> = _allPosts
 
-    private val _sliderImages = MutableStateFlow<Resource<List<String>>?>(null)
-    val sliderImages: StateFlow<Resource<List<String>>?> = _sliderImages
+    private val _sliderImages = MutableStateFlow<List<String>>(emptyList())
+    val sliderImages: StateFlow<List<String>> = _sliderImages
 
     fun loadHomeData(publisher: String, appName: String) {
-        Timber.d("Loading home data for publisher: $publisher, appName: $appName")
-        viewModelScope.launch {
-            repository.getHotProducts(publisher, appName).collect {
-                _hotProducts.value = it
-                Timber.d("Hot products state updated: $it")
-            }
-        }
         viewModelScope.launch {
             repository.getAllPosts(publisher, appName).collect {
+                _hotProducts.value = it
                 _allPosts.value = it
-                Timber.d("All posts state updated: $it")
             }
         }
         viewModelScope.launch {
             repository.getImageSliderUrls().collect {
                 _sliderImages.value = it
-                Timber.d("Slider images state updated: $it")
             }
         }
     }

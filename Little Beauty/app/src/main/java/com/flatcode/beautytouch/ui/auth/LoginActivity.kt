@@ -2,99 +2,68 @@ package com.flatcode.beautytouch.ui.auth
 
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Patterns
 import android.widget.Toast
-import androidx.activity.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.databinding.ActivityLoginBinding
 import com.flatcode.beautytouch.ui.main.MainActivity
 import com.flatcode.beautytouch.utils.BaseActivity
-import com.flatcode.beautytouch.utils.LoadingDialog
-import com.flatcode.beautytouch.utils.Resource
+import com.flatcode.beautytouch.utils.DATA
+import com.flatcode.beautytouch.utils.ProgressDialog
 import com.flatcode.beautytouch.utils.openActivity
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class LoginActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityLoginBinding
-    private val context: Context = this@LoginActivity
-    private val viewModel: AuthViewModel by viewModels()
-    private val dialog by lazy { LoadingDialog(this) }
+    private var binding: ActivityLoginBinding? = null
+    var context: Context = this@LoginActivity
+    private var auth: FirebaseAuth? = null
+    private var dialog: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        val view = binding!!.root
+        setContentView(view)
 
-        binding.forget.setOnClickListener {
-            context.openActivity<ForgetPasswordActivity>()
-        }
-        binding.noAccount.setOnClickListener {
-            context.openActivity<RegisterActivity>()
-        }
-        binding.loginBtn.setOnClickListener { validateDate() }
+        auth = FirebaseAuth.getInstance()
+        dialog = ProgressDialog(this)
+        dialog!!.setTitle("Please wait...")
+        dialog!!.setCanceledOnTouchOutside(false)
 
-        observeViewModel()
+        binding!!.forget.setOnClickListener { context.openActivity<ForgetPasswordActivity>() }
+        binding!!.noAccount.setOnClickListener { context.openActivity<RegisterActivity>() }
+        binding!!.loginBtn.setOnClickListener { validateDate() }
     }
 
-    private fun observeViewModel() {
-        lifecycleScope.launch {
-            viewModel.loginState.collect { resource ->
-                Timber.d("Login state collected: $resource")
-                when (resource) {
-                    is Resource.Loading -> {
-                        dialog.show("Signed in...")
-                    }
-
-                    is Resource.Success -> {
-                        dialog.dismiss()
-                        context.openActivity<MainActivity>(clear = true)
-                    }
-
-                    is Resource.Error -> {
-                        dialog.dismiss()
-                        Timber.e("Login error: ${resource.message}")
-                        Toast.makeText(context, resource.message, Toast.LENGTH_SHORT).show()
-                    }
-
-                    else -> {}
-                }
-            }
-        }
-    }
-
-    private var number = "0111111111"
     private var email = ""
     private var password = ""
     private fun validateDate() {
 
         //get data
-        email = binding.emailEt.text.toString().trim() + "@flatcodetest.com"
-        number = binding.emailEt.text.toString().trim()
-        password = binding.passwordEt.text.toString().trim()
+        email = binding!!.emailEt.text.toString().trim { it <= ' ' }
+        password = binding!!.passwordEt.text.toString().trim { it <= ' ' }
 
         //validate data
-        if (password.isEmpty()) {
-            Toast.makeText(context, "Password entry error!", Toast.LENGTH_SHORT).show()
-        } else if (number.isEmpty()) {
-            Toast.makeText(context, "Error entering the number!", Toast.LENGTH_SHORT).show()
-        } else if (number.length != 10) {
-            Toast.makeText(context, "Please enter a 10 digit number!", Toast.LENGTH_SHORT).show()
-        } else if (number == "0111111111") {
-            Toast.makeText(context, "Please enter a valid number!", Toast.LENGTH_SHORT).show()
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(context, "Invalid email pattern...!", Toast.LENGTH_SHORT).show()
+        } else if (TextUtils.isEmpty(password)) {
+            Toast.makeText(context, "Enter password...!", Toast.LENGTH_SHORT).show()
         } else {
-            val digit = number[0].toString().toIntOrNull() ?: -1
-            val digit2 = number[1].toString().toIntOrNull() ?: -1
-            val digit3 = number[2].toString().toIntOrNull() ?: -1
-            if (digit == 0 && digit2 == 9 && (digit3 == 3 || digit3 == 4 || digit3 == 5 || digit3 == 6 || digit3 == 8 || digit3 == 9)) {
-                viewModel.login(email, password)
-            } else {
-                Toast.makeText(
-                    context, "Please enter a valid phone number and password! ", Toast.LENGTH_SHORT
-                ).show()
-            }
+            loginUser()
         }
+    }
+
+    private fun loginUser() {
+        dialog!!.setMessage("Logging In...")
+        dialog!!.show()
+        auth!!.signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener { context.openActivity<MainActivity>(clear = true) }
+            .addOnFailureListener { e: Exception ->
+                dialog!!.dismiss()
+                Toast.makeText(context, DATA.EMPTY + e.message, Toast.LENGTH_SHORT).show()
+            }
     }
 }

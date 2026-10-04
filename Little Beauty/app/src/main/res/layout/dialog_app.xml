@@ -21,7 +21,7 @@
             android:layout_height="300dp"
             android:contentDescription="@null"
             android:scaleType="centerCrop"
-            android:src="@drawable/icon" />
+            android:src="@drawable/logo" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"

@@ -6,7 +6,6 @@ import com.flatcode.beautytouch.model.Reward
 import com.flatcode.beautytouch.model.Tools
 import com.flatcode.beautytouch.model.User
 import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Resource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -17,8 +16,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,68 +32,54 @@ class UserRepository @Inject constructor(
 
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
 
-    fun getUserInfo(): Flow<Resource<User>> = callbackFlow {
-        trySend(Resource.Loading)
+    fun getUserInfo(): Flow<User?> {
         val uid = auth.currentUser?.uid
-        if (uid == null) {
-            trySend(Resource.Error("User not logged in"))
-            close()
-            return@callbackFlow
+        if (uid != null) {
+            syncUser(uid)
+            return userDao.getUserById(uid)
         }
-
-        repositoryScope.launch {
-            userDao.getUserById(uid).first()?.let {
-                trySend(Resource.Success(it))
-            }
+        return callbackFlow {
+            trySend(null)
+            awaitClose()
         }
-
-        val reference = database.getReference(DATA.USERS).child(uid)
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val user = snapshot.getValue(User::class.java)
-                if (user != null) {
-                    repositoryScope.launch {
-                        userDao.insertUser(user)
-                    }
-                    trySend(Resource.Success(user))
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                trySend(Resource.Error(error.message))
-            }
-        }
-        reference.addValueEventListener(listener)
-        awaitClose { reference.removeEventListener(listener) }
     }
 
-    fun getAppTools(): Flow<Resource<Tools>> = callbackFlow {
-        trySend(Resource.Loading)
-
-        repositoryScope.launch {
-            toolsDao.getTools().first()?.let {
-                trySend(Resource.Success(it))
-            }
-        }
-
-        val reference = database.getReference(DATA.M_TOOLS)
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val tools = snapshot.getValue(Tools::class.java)
-                if (tools != null) {
-                    repositoryScope.launch {
-                        toolsDao.insertTools(tools)
+    private fun syncUser(uid: String) {
+        database.getReference(DATA.USERS).child(uid)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    snapshot.getValue(User::class.java)?.let { user ->
+                        repositoryScope.launch {
+                            userDao.insertUser(user)
+                        }
                     }
-                    trySend(Resource.Success(tools))
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                trySend(Resource.Error(error.message))
-            }
-        }
-        reference.addValueEventListener(listener)
-        awaitClose { reference.removeEventListener(listener) }
+                override fun onCancelled(error: DatabaseError) {
+                    Timber.e(error.toException(), "syncUser failed")
+                }
+            })
+    }
+
+    fun getAppTools(): Flow<Tools?> {
+        syncTools()
+        return toolsDao.getTools()
+    }
+
+    private fun syncTools() {
+        database.getReference(DATA.M_TOOLS).addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    snapshot.getValue(Tools::class.java)?.let { tools ->
+                        repositoryScope.launch {
+                            toolsDao.insertTools(tools)
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Timber.e(error.toException(), "syncTools failed")
+                }
+            })
     }
 
     fun logout() {
@@ -104,34 +90,37 @@ class UserRepository @Inject constructor(
         }
     }
 
-    fun updateProfile(username: String, imageUrl: String?): Flow<Resource<Boolean>> = callbackFlow {
-        trySend(Resource.Loading)
-        val uid = auth.currentUser?.uid ?: return@callbackFlow
-        val hashMap = HashMap<String, Any>()
-        hashMap[DATA.USER_NAME] = username
-        if (imageUrl != null) {
-            hashMap[DATA.IMAGE_URL] = imageUrl
+    suspend fun updateProfile(username: String, imageUrl: String?): Result<Unit> {
+        val uid = auth.currentUser?.uid ?: return Result.failure(Exception("User not logged in"))
+        return try {
+            val hashMap = HashMap<String, Any>()
+            hashMap[DATA.USER_NAME] = username
+            if (imageUrl != null) {
+                hashMap[DATA.IMAGE_URL] = imageUrl
+            }
+            database.getReference(DATA.USERS).child(uid).updateChildren(hashMap).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
-        database.getReference(DATA.USERS).child(uid).updateChildren(hashMap).addOnSuccessListener {
-            trySend(Resource.Success(true))
-            // Local update will be triggered by ValueEventListener in getUserInfo
-        }.addOnFailureListener { trySend(Resource.Error(it.message ?: "Update failed")) }
-        awaitClose()
     }
 
-    fun getPoints(year: String, session: String): Flow<Resource<String>> = callbackFlow {
-        trySend(Resource.Loading)
-        val uid = auth.currentUser?.uid ?: return@callbackFlow
+    fun getPoints(year: String, session: String): Flow<String> = callbackFlow {
+        val uid = auth.currentUser?.uid
+        if (uid.isNullOrEmpty()) {
+            trySend("0")
+            return@callbackFlow
+        }
         val reference = database.getReference(DATA.USERS).child(uid)
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val key = "${year}_$session"
                 val value = snapshot.child(key).value?.toString() ?: "0"
-                trySend(Resource.Success(value))
+                trySend(value)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                trySend(Resource.Error(error.message))
+                trySend("0")
             }
         }
         reference.addValueEventListener(listener)
@@ -152,10 +141,9 @@ class UserRepository @Inject constructor(
         })
     }
 
-    fun getLeaderboard(orderBy: String, limit: Int): Flow<Resource<List<User>>> = callbackFlow {
-        trySend(Resource.Loading)
+    fun getLeaderboard(orderBy: String, limit: Int): Flow<List<User>> = callbackFlow {
         val query = database.getReference(DATA.USERS).orderByChild(orderBy).limitToLast(limit)
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
+        val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val list = mutableListOf<User>()
                 for (child in snapshot.children) {
@@ -169,31 +157,27 @@ class UserRepository @Inject constructor(
                 repositoryScope.launch {
                     userDao.insertUsers(list)
                 }
-                trySend(Resource.Success(list.reversed())) // Top users first
+                trySend(list.reversed())
             }
 
             override fun onCancelled(error: DatabaseError) {
-                trySend(Resource.Error(error.message))
+                trySend(emptyList())
             }
-        })
-        awaitClose()
+        }
+        query.addValueEventListener(listener)
+        awaitClose { query.removeEventListener(listener) }
     }
 
-    fun getRewards(): Flow<Resource<Reward>> = callbackFlow {
-        trySend(Resource.Loading)
+    fun getRewards(): Flow<Reward?> = callbackFlow {
         val reference = database.getReference(DATA.M_REWARD)
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val reward = snapshot.getValue(Reward::class.java)
-                if (reward != null) {
-                    trySend(Resource.Success(reward))
-                } else {
-                    trySend(Resource.Error("Reward data not found"))
-                }
+                trySend(reward)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                trySend(Resource.Error(error.message))
+                trySend(null)
             }
         }
         reference.addValueEventListener(listener)

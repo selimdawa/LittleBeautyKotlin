@@ -1,36 +1,40 @@
 package com.flatcode.beautytouchadmin.ui.auth
 
-import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.viewModels
-import com.flatcode.beautytouchadmin.utils.BaseActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.ui.main.MainActivity
-import com.flatcode.beautytouchadmin.utils.DATA
-import com.flatcode.beautytouchadmin.utils.loadingDialog
-import com.flatcode.beautytouchadmin.utils.openActivity
-import com.flatcode.beautytouchadmin.utils.setMessage
-import com.flatcode.beautytouchadmin.utils.viewBinding
 import com.flatcode.beautytouchadmin.databinding.ActivityLoginBinding
+import com.flatcode.beautytouchadmin.ui.main.MainActivity
+import com.flatcode.beautytouchadmin.utils.BaseActivity
+import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.ProgressDialog
+import com.flatcode.beautytouchadmin.utils.openActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginActivity : BaseActivity() {
 
-    private val binding by viewBinding(ActivityLoginBinding::inflate)
+    private lateinit var binding: ActivityLoginBinding
     private val context: Context = this@LoginActivity
-    private var dialog: Dialog? = null
+    private var dialog: ProgressDialog? = null
     private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        dialog = loadingDialog(context)
+        dialog = ProgressDialog(this).apply {
+            setTitle("Please wait...")
+            setCanceledOnTouchOutside(false)
+        }
 
         binding.forget.setOnClickListener { openActivity<ForgetPasswordActivity>() }
         binding.loginBtn.setOnClickListener { validateDate() }
@@ -42,7 +46,7 @@ class LoginActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.actionStatus.collect { result ->
-                    dialog!!.dismiss()
+                    dialog?.dismiss()
                     result.onSuccess {
                         openActivity<MainActivity>(clear = true)
                     }.onFailure {
@@ -54,28 +58,17 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun validateDate() {
-        val number = binding.phoneEt.text.toString().trim()
+        val email = binding.emailEt.text.toString().trim()
         val password = binding.passwordEt.text.toString().trim()
 
-        if (password.isEmpty()) {
-            Toast.makeText(context, "Password entry error!", Toast.LENGTH_SHORT).show()
-        } else if (number.isEmpty()) {
-            Toast.makeText(context, "Error entering the phone number!", Toast.LENGTH_SHORT).show()
-        } else if (number.length != 10) {
-            Toast.makeText(context, "Please enter a valid phone number!", Toast.LENGTH_SHORT).show()
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(context, "Invalid email pattern...!", Toast.LENGTH_SHORT).show()
+        } else if (TextUtils.isEmpty(password)) {
+            Toast.makeText(context, "Enter password...!", Toast.LENGTH_SHORT).show()
         } else {
-            val digit = number[0].toString().toInt()
-            val digit2 = number[1].toString().toInt()
-            val digit3 = number[2].toString().toInt()
-            if (digit == 0 && digit2 == 9 && (digit3 == 3 || digit3 == 4 || digit3 == 5 || digit3 == 6 || digit3 == 8 || digit3 == 9)) {
-                dialog!!.setMessage("Signed in...")
-                dialog!!.show()
-                viewModel.login(number, password)
-            } else {
-                Toast.makeText(
-                    context, "Please enter a valid phone number and password!", Toast.LENGTH_SHORT
-                ).show()
-            }
+            dialog?.setMessage("Logging In...")
+            dialog?.show()
+            viewModel.login(email, password)
         }
     }
 }

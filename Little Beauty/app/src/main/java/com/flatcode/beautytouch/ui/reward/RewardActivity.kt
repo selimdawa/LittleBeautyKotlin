@@ -12,8 +12,7 @@ import com.flatcode.beautytouch.ui.profile.LeaderboardActivity
 import com.flatcode.beautytouch.ui.profile.LeaderboardOldActivity
 import com.flatcode.beautytouch.ui.profile.UserViewModel
 import com.flatcode.beautytouch.utils.BaseActivity
-import com.flatcode.beautytouch.utils.LoadingDialog
-import com.flatcode.beautytouch.utils.Resource
+import com.flatcode.beautytouch.utils.ProgressDialog
 import com.flatcode.beautytouch.utils.openActivity
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -32,7 +31,7 @@ class RewardActivity : BaseActivity() {
     private lateinit var binding: ActivityRewardBinding
 
     private val viewModel: UserViewModel by viewModels()
-    private val dialog by lazy { LoadingDialog(this) }
+    private var dialog: ProgressDialog? = null
 
     private var mRewardedAd: RewardedAd? = null
     private var currentYear = ""
@@ -42,6 +41,11 @@ class RewardActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRewardBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        dialog = ProgressDialog(this).apply {
+            setTitle("Please wait...")
+            setCanceledOnTouchOutside(false)
+        }
 
         binding.toolbar.nameSpace.setText(R.string.earn_points)
         binding.leaderboardCard.setOnClickListener {
@@ -58,20 +62,21 @@ class RewardActivity : BaseActivity() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.appTools.collect { resource ->
-                if (resource is Resource.Success) {
-                    val tools = resource.data
-                    currentYear = tools.year.orEmpty()
-                    currentSession = tools.sessionNumber.orEmpty()
-                    val oldYear = tools.oldYear
-                    val oldSession = tools.oldSessionNumber
+            viewModel.appTools.collect { tools ->
+                tools?.let {
+                    currentYear = it.year.orEmpty()
+                    currentSession = it.sessionNumber.orEmpty()
+                    val oldYear = it.oldYear
+                    val oldSession = it.oldSessionNumber
                     if (currentSession != oldSession || currentYear != oldYear) {
                         binding.leaderboardCardOld.visibility = View.VISIBLE
                     } else {
                         binding.leaderboardCardOld.visibility = View.GONE
                     }
-                    binding.sessionInfo.text = getString(R.string.session_format, currentYear, currentSession)
-                    binding.sessionInfoOld.text = getString(R.string.session_format, oldYear, oldSession)
+                    binding.sessionInfo.text =
+                        getString(R.string.session_format, currentYear, currentSession)
+                    binding.sessionInfoOld.text =
+                        getString(R.string.session_format, oldYear, oldSession)
                     viewModel.loadPoints(currentYear, currentSession)
                     binding.rewardCard.setOnClickListener {
                         loadAndShowRewardedAd()
@@ -85,10 +90,8 @@ class RewardActivity : BaseActivity() {
             }
         }
         lifecycleScope.launch {
-            viewModel.points.collect { resource ->
-                if (resource is Resource.Success) {
-                    binding.myPoints.text = getString(R.string.my_points_format, resource.data)
-                }
+            viewModel.points.collect { points ->
+                binding.myPoints.text = getString(R.string.my_points_format, points)
             }
         }
     }
@@ -131,7 +134,8 @@ class RewardActivity : BaseActivity() {
     }
 
     private fun loadAndShowRewardedAd() {
-        dialog.show("Loading Rewarded Ad")
+        dialog?.setMessage("Loading Rewarded Ad...")
+        dialog?.show()
         RewardedAd.load(
             context,
             resources.getString(R.string.admob_reward),
@@ -140,14 +144,14 @@ class RewardActivity : BaseActivity() {
                 override fun onAdLoaded(rewardedAd: RewardedAd) {
                     super.onAdLoaded(rewardedAd)
                     mRewardedAd = rewardedAd
-                    dialog.dismiss()
+                    dialog?.dismiss()
                     showRewardedAd()
                 }
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     super.onAdFailedToLoad(loadAdError)
                     mRewardedAd = null
-                    dialog.dismiss()
+                    dialog?.dismiss()
                 }
             })
     }

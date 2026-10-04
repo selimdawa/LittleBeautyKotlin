@@ -13,11 +13,9 @@ import com.flatcode.beautytouch.ui.adapter.PostHotAdapter
 import com.flatcode.beautytouch.ui.adapter.PostLinearAdapter
 import com.flatcode.beautytouch.ui.post.PostDetailsActivity
 import com.flatcode.beautytouch.utils.DATA
-import com.flatcode.beautytouch.utils.Resource
 import com.flatcode.beautytouch.utils.openActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -55,59 +53,26 @@ class HomeFragment : Fragment() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.sliderImages.collect { resource ->
-                Timber.d("Slider images collected: $resource")
-                if (resource is Resource.Success) {
-                    binding.imageSlider.setSliderAdapter(ImageSliderAdapter(resource.data))
+            viewModel.sliderImages.collect { images ->
+                if (images.isNotEmpty()) {
+                    binding.imageSlider.setSliderAdapter(ImageSliderAdapter(images))
                 }
             }
         }
         lifecycleScope.launch {
-            viewModel.hotProducts.collect { resource ->
-                Timber.d("Hot products collected: $resource")
-                when (resource) {
-                    is Resource.Loading -> {
-                        binding.progressCircular.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.GONE
-                    }
-
-                    is Resource.Success -> {
-                        hotPostAdapter?.submitList(resource.data)
-                        binding.progressCircular.visibility = View.GONE
-                        binding.recyclerView.visibility = View.VISIBLE
-                    }
-
-                    is Resource.Error -> {
-                        binding.progressCircular.visibility = View.GONE
-                        Timber.e("Hot products error: ${resource.message}")
-                    }
-
-                    else -> {}
-                }
+            viewModel.hotProducts.collect { posts ->
+                binding.progressCircular.visibility = View.GONE
+                binding.recyclerView.visibility =
+                    if (posts.isNotEmpty()) View.VISIBLE else View.GONE
+                hotPostAdapter?.submitList(posts)
             }
         }
         lifecycleScope.launch {
-            viewModel.allPosts.collect { resource ->
-                Timber.d("All posts collected: $resource")
-                when (resource) {
-                    is Resource.Loading -> {
-                        binding.progressCircular2.visibility = View.VISIBLE
-                        binding.recyclerView2.visibility = View.GONE
-                    }
-
-                    is Resource.Success -> {
-                        allPostAdapter?.submitList(resource.data)
-                        binding.progressCircular2.visibility = View.GONE
-                        binding.recyclerView2.visibility = View.VISIBLE
-                    }
-
-                    is Resource.Error -> {
-                        binding.progressCircular2.visibility = View.GONE
-                        Timber.e("All posts error: ${resource.message}")
-                    }
-
-                    else -> {}
-                }
+            viewModel.allPosts.collect { posts ->
+                binding.progressCircular2.visibility = View.GONE
+                binding.recyclerView2.visibility =
+                    if (posts.isNotEmpty()) View.VISIBLE else View.GONE
+                allPostAdapter?.submitList(posts)
             }
         }
     }
