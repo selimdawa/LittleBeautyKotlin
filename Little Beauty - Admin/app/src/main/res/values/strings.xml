@@ -109,7 +109,6 @@
     <string name="about_me">About Me</string>
     <string name="show_sheet">Show Sheet</string>
     <string name="about_my">Who Am I</string>
-    <string name="loading">Please wait…</string>
     <!-- Crop Strings -->
     <string name="close">Close</string>
     <string name="crop_image">Crop Image</string>
@@ -119,4 +118,8 @@
     <string name="label_home">Home</string>
     <string name="no_internet_connection">No internet connection</string>
 
+    <string name="back">Back</string>
+    <string name="do_you_want_to_logout">Do you want to logout?</string>
+    <string name="please_wait">Please wait&#8230;</string>
+    <string name="loading">Loading&#8230;</string>
 </resources>

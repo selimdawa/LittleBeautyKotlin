@@ -74,15 +74,16 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/profileImage"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:scaleType="centerCrop"
-                android:contentDescription="@null"
-                android:src="@color/image_profile"
-                app:strokeColor="@color/white"
-                app:strokeWidth="2dp"
+                android:layout_width="82dp"
+                android:layout_height="82dp"
                 android:background="@color/black"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
+                android:contentDescription="@null"
+                android:padding="2dp"
+                android:scaleType="centerCrop"
+                android:src="@color/image_profile"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
+                app:strokeColor="@color/white"
+                app:strokeWidth="2dp" />
 
             <TextView
                 android:id="@+id/username"

@@ -39,29 +39,20 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/image_one"
+                        android:id="@+id/image_logo"
                         android:layout_width="150dp"
                         android:layout_height="150dp"
+                        android:padding="5dp"
                         android:contentDescription="@null"
-                        android:src="?mc_track"
+                        android:src="@color/image_profile"
+                        android:visibility="visible"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
-
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/image_logo"
-                        android:layout_width="140dp"
-                        android:layout_height="140dp"
-                        android:contentDescription="@null"
-                        android:src="@color/image_profile"
-                        android:visibility="visible"
-                        app:layout_constraintBottom_toBottomOf="@+id/image_one"
-                        app:layout_constraintEnd_toEndOf="@+id/image_one"
-                        app:layout_constraintStart_toStartOf="@+id/image_one"
-                        app:layout_constraintTop_toTopOf="@+id/image_one"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
+                        app:strokeColor="?mc_track"
+                        app:strokeWidth="5dp" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -97,7 +88,7 @@
                 android:fontFamily="@font/kufi"
                 android:gravity="center"
                 android:padding="5sp"
-                android:textColor="?color"
+                android:textColor="@color/white"
                 android:textSize="26sp" />
 
             <LinearLayout
@@ -133,7 +124,7 @@
                         android:fontFamily="@font/kufi"
                         android:gravity="center"
                         android:text="@string/plus"
-                        android:textColor="?color"
+                        android:textColor="@color/white"
                         android:textSize="30sp" />
 
                     <com.google.android.material.imageview.ShapeableImageView
@@ -153,7 +144,7 @@
                         android:fontFamily="@font/kufi"
                         android:gravity="center"
                         android:text="@string/plus"
-                        android:textColor="?color"
+                        android:textColor="@color/white"
                         android:textSize="30sp" />
 
                     <com.google.android.material.imageview.ShapeableImageView
@@ -173,7 +164,7 @@
                         android:fontFamily="@font/kufi"
                         android:gravity="center"
                         android:text="@string/reward_one"
-                        android:textColor="?color"
+                        android:textColor="@color/white"
                         android:textSize="30sp" />
 
                 </LinearLayout>
@@ -201,7 +192,8 @@
                         android:fontFamily="@font/kufi"
                         android:gravity="center"
                         android:text="@string/plus"
-                        android:textColor="?color"
+                        android:textColor="@color/white"
+
                         android:textSize="30sp" />
 
                     <com.google.android.material.imageview.ShapeableImageView
@@ -221,7 +213,7 @@
                         android:fontFamily="@font/kufi"
                         android:gravity="center"
                         android:text="@string/reward_two"
-                        android:textColor="?color"
+                        android:textColor="@color/white"
                         android:textSize="30sp" />
 
                 </LinearLayout>
@@ -249,7 +241,7 @@
                         android:fontFamily="@font/kufi"
                         android:gravity="center"
                         android:text="@string/reward_three"
-                        android:textColor="?color"
+                        android:textColor="@color/white"
                         android:textSize="30sp" />
 
                 </LinearLayout>

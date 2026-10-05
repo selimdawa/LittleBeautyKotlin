@@ -1,6 +1,5 @@
 package com.flatcode.beautytouchadmin.ui.auth
 
-import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Patterns
@@ -12,7 +11,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.databinding.ActivityLoginBinding
 import com.flatcode.beautytouchadmin.ui.main.MainActivity
 import com.flatcode.beautytouchadmin.utils.BaseActivity
-import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.ProgressDialog
 import com.flatcode.beautytouchadmin.utils.openActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,9 +20,8 @@ import kotlinx.coroutines.launch
 class LoginActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private val context: Context = this@LoginActivity
+    private val viewModel: LoginViewModel by viewModels()
     private var dialog: ProgressDialog? = null
-    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,22 +36,7 @@ class LoginActivity : BaseActivity() {
         binding.forget.setOnClickListener { openActivity<ForgetPasswordActivity>() }
         binding.loginBtn.setOnClickListener { validateDate() }
 
-        observeViewModel()
-    }
-
-    private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.actionStatus.collect { result ->
-                    dialog?.dismiss()
-                    result.onSuccess {
-                        openActivity<MainActivity>(clear = true)
-                    }.onFailure {
-                        Toast.makeText(context, DATA.EMPTY + it.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
+        observeState()
     }
 
     private fun validateDate() {
@@ -62,13 +44,35 @@ class LoginActivity : BaseActivity() {
         val password = binding.passwordEt.text.toString().trim()
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(context, "Invalid email pattern...!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Invalid email pattern...!", Toast.LENGTH_SHORT).show()
         } else if (TextUtils.isEmpty(password)) {
-            Toast.makeText(context, "Enter password...!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Enter password...!", Toast.LENGTH_SHORT).show()
         } else {
             dialog?.setMessage("Logging In...")
             dialog?.show()
-            viewModel.login(email, password)
+            viewModel.login(email, password) { success, message ->
+                dialog?.dismiss()
+                if (success) {
+                    openActivity<MainActivity>(clear = true)
+                } else {
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun observeState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    if (state.isLoading) {
+                        dialog?.setMessage("Logging In...")
+                        dialog?.show()
+                    } else {
+                        dialog?.dismiss()
+                    }
+                }
+            }
         }
     }
 }

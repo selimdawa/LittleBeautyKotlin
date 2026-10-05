@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import com.flatcode.beautytouchadmin.utils.BaseActivity
 import androidx.lifecycle.lifecycleScope
-import com.flatcode.beautytouchadmin.ui.auth.LoginActivity
 import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ActivitySplashBinding
 import dagger.hilt.android.AndroidEntryPoint

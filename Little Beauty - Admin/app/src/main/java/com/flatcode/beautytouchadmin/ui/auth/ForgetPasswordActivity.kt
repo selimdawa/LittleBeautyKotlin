@@ -11,63 +11,66 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.databinding.ActivityForgetPasswordBinding
 import com.flatcode.beautytouchadmin.utils.BaseActivity
 import com.flatcode.beautytouchadmin.utils.ProgressDialog
-import com.flatcode.beautytouchadmin.utils.openActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ForgetPasswordActivity : BaseActivity() {
 
-    private var binding: ActivityForgetPasswordBinding? = null
+    private lateinit var binding: ActivityForgetPasswordBinding
     private val context: Context = this@ForgetPasswordActivity
+    private val viewModel: ForgetPasswordViewModel by viewModels()
     private var dialog: ProgressDialog? = null
-    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityForgetPasswordBinding.inflate(layoutInflater)
-        setContentView(binding!!.root)
+        setContentView(binding.root)
 
         dialog = ProgressDialog(this).apply {
             setTitle("Please wait...")
             setCanceledOnTouchOutside(false)
         }
 
-        binding!!.login.setOnClickListener {
-            openActivity<LoginActivity>()
-            finish()
-        }
-        binding!!.go.setOnClickListener { validateDate() }
+        binding.go.setOnClickListener { validateDate() }
+        binding.login.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        observeViewModel()
-    }
-
-    private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.actionStatus.collect { result ->
-                    dialog?.dismiss()
-                    result.onSuccess {
-                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-                    }.onFailure {
-                        Toast.makeText(context, "Failed: " + it.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
+        observeState()
     }
 
     private var email = ""
     private fun validateDate() {
-        email = binding!!.emailEt.text.toString().trim()
+        email = binding.emailEt.text.toString().trim()
         if (email.isEmpty()) {
             Toast.makeText(context, "Enter email...!", Toast.LENGTH_SHORT).show()
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             Toast.makeText(context, "Invalid email format...!", Toast.LENGTH_SHORT).show()
         } else {
-            dialog?.setMessage("Sending password recovery instructions to $email")
-            dialog?.show()
-            viewModel.forgetPassword(email)
+            recoverPassword()
+        }
+    }
+
+    private fun recoverPassword() {
+        dialog?.setMessage("Sending password recovery instructions to $email")
+        dialog?.show()
+        viewModel.recoverPassword(email) { _, message ->
+            dialog?.dismiss()
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun observeState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    if (state.isLoading) {
+                        dialog?.setMessage("Sending password recovery instructions to $email")
+                        dialog?.show()
+                    } else {
+                        dialog?.dismiss()
+                    }
+                }
+            }
         }
     }
 }

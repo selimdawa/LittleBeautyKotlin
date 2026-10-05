@@ -82,7 +82,7 @@
         android:layout_width="230dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="?mc_bg"
+        android:background="?mc_track"
         android:fitsSystemWindows="false">
 
         <androidx.core.widget.NestedScrollView
@@ -110,10 +110,11 @@
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/imageDrawer"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
                         android:layout_marginTop="-36dp"
                         android:contentDescription="@string/user_profile_image"
+                        android:padding="5dp"
                         android:scaleType="centerCrop"
                         android:src="@color/image_profile"
                         app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
@@ -132,7 +133,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-                            android:textColor="?color"
+                            android:textColor="@color/white"
                             app:fontFamily="sans-serif-medium" />
 
                     </LinearLayout>
@@ -164,7 +165,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kufi"
                         android:text="@string/my_account"
-                        android:textColor="?color" />
+                        android:textColor="@color/white" />
 
                 </LinearLayout>
 
@@ -197,7 +198,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kufi"
                         android:text="@string/favorites"
-                        android:textColor="?color" />
+                        android:textColor="@color/white" />
 
                 </LinearLayout>
 
@@ -226,7 +227,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kufi"
                         android:text="@string/messenger"
-                        android:textColor="?color" />
+                        android:textColor="@color/white" />
 
                 </LinearLayout>
 
@@ -259,7 +260,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kufi"
                         android:text="@string/earn_points"
-                        android:textColor="?color" />
+                        android:textColor="@color/white" />
 
                 </LinearLayout>
 
@@ -288,7 +289,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kufi"
                         android:text="@string/about_app"
-                        android:textColor="?color" />
+                        android:textColor="@color/white" />
 
                 </LinearLayout>
 
@@ -317,7 +318,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kufi"
                         android:text="@string/share_app"
-                        android:textColor="?color" />
+                        android:textColor="@color/white" />
 
                 </LinearLayout>
 
@@ -346,7 +347,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kufi"
                         android:text="@string/about_my"
-                        android:textColor="?color" />
+                        android:textColor="@color/white" />
 
                 </LinearLayout>
 
@@ -375,7 +376,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kufi"
                         android:text="@string/logout"
-                        android:textColor="?color" />
+                        android:textColor="@color/white" />
 
                 </LinearLayout>
 
@@ -401,7 +402,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kufi"
                         android:text="@string/version"
-                        android:textColor="?color"
+                        android:textColor="@color/white"
                         android:textSize="16sp" />
 
                 </LinearLayout>

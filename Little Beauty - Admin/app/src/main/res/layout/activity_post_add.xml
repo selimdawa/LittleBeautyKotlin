@@ -39,6 +39,7 @@
                         android:background="@color/white"
                         android:contentDescription="@null"
                         android:scaleType="centerCrop"
+                        android:padding="5dp"
                         android:src="@color/image_profile"
                         app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
                         app:strokeColor="?mc_track"
