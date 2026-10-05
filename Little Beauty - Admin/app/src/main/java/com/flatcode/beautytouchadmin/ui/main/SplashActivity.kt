@@ -7,6 +7,7 @@ import com.flatcode.beautytouchadmin.utils.BaseActivity
 import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.databinding.ActivitySplashBinding
+import com.flatcode.beautytouchadmin.ui.auth.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

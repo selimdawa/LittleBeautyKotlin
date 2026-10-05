@@ -10,7 +10,6 @@ class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
         auth.signInWithEmailAndPassword(email, password).await()
     }
 
-    suspend fun sendPasswordReset(email: String) {
+    suspend fun sendPasswordResetEmail(email: String): Void? =
         auth.sendPasswordResetEmail(email).await()
-    }
 }
