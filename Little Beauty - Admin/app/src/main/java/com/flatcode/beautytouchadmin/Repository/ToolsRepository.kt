@@ -17,8 +17,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ToolsRepository @Inject constructor(
-    private val database: FirebaseDatabase,
-    private val cloudinary: Cloudinary
+    private val database: FirebaseDatabase, private val cloudinary: Cloudinary
 ) {
 
     fun getTools(): Flow<Tools?> = callbackFlow {
@@ -29,26 +28,25 @@ class ToolsRepository @Inject constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(null)
             }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    suspend fun uploadImage(path: String, imageUri: Uri): String =
-        withContext(Dispatchers.IO) {
-            try {
-                val options = mapOf(
-                    "public_id" to path.substringAfterLast("/"),
-                    "folder" to path.substringBeforeLast("/", "Tools")
-                )
-                val result = cloudinary.uploader().upload(imageUri.toString(), options)
-                result["secure_url"] as String
-            } catch (_: Exception) {
-                ""
-            }
+    suspend fun uploadImage(path: String, imageUri: Uri): String = withContext(Dispatchers.IO) {
+        try {
+            val options = mapOf(
+                "public_id" to path.substringAfterLast("/"),
+                "folder" to path.substringBeforeLast("/", "Tools")
+            )
+            val result = cloudinary.uploader().upload(imageUri.toString(), options)
+            result["secure_url"] as String
+        } catch (_: Exception) {
+            ""
         }
+    }
 
     suspend fun updateTools(data: Map<String, Any?>) {
         database.getReference(DATA.M_TOOLS).updateChildren(data).await()

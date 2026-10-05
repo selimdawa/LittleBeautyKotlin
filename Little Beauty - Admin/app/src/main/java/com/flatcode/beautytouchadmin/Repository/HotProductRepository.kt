@@ -26,7 +26,7 @@ class HotProductRepository @Inject constructor(private val database: FirebaseDat
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(emptyList())
             }
         }
         reference.addValueEventListener(listener)
@@ -40,7 +40,10 @@ class HotProductRepository @Inject constructor(private val database: FirebaseDat
                 val list = mutableListOf<Post>()
                 for (data in snapshot.children) {
                     val post = data.getValue(Post::class.java)
-                    if (post?.publisher == DATA.PUBLISHER && post.aname == DATA.APP_NAME) {
+                    if (post != null) {
+                        if (post.postid.isEmpty()) {
+                            post.postid = data.key ?: ""
+                        }
                         list.add(post)
                     }
                 }
@@ -48,7 +51,7 @@ class HotProductRepository @Inject constructor(private val database: FirebaseDat
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(emptyList())
             }
         }
         reference.addValueEventListener(listener)

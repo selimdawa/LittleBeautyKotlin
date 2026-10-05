@@ -2,8 +2,6 @@ package com.flatcode.beautytouch.ui.main
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
@@ -19,7 +17,6 @@ import coil3.load
 import com.flatcode.beautytouch.BuildConfig
 import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.databinding.ActivityMainBinding
-import com.flatcode.beautytouch.ui.auth.LoginActivity
 import com.flatcode.beautytouch.ui.post.FavoritesActivity
 import com.flatcode.beautytouch.ui.post.PostViewModel
 import com.flatcode.beautytouch.ui.profile.ProfileActivity
@@ -27,13 +24,13 @@ import com.flatcode.beautytouch.ui.profile.UserViewModel
 import com.flatcode.beautytouch.ui.reward.RewardActivity
 import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.DATA
+import com.flatcode.beautytouch.utils.closeApp
+import com.flatcode.beautytouch.utils.dialogAboutApp
+import com.flatcode.beautytouch.utils.dialogLogout
 import com.flatcode.beautytouch.utils.interstitialAd
 import com.flatcode.beautytouch.utils.interstitialShow
 import com.flatcode.beautytouch.utils.openActivity
-import com.flatcode.beautytouch.utils.showCloseAppDialog
-import com.flatcode.beautytouch.utils.showDialogAboutApp
 import com.flatcode.beautytouch.utils.showDialogAboutMy
-import com.flatcode.beautytouch.utils.showDialogLogout
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.material.navigation.NavigationView
@@ -70,7 +67,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                 if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     binding.drawerLayout.closeDrawer(GravityCompat.START)
                 } else {
-                    showCloseAppDialog()
+                    closeApp()
                 }
             }
         })
@@ -98,21 +95,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             startActivity(i)
         }
         binding.reward.setOnClickListener { context.openActivity<RewardActivity>() }
-        binding.aboutApp.setOnClickListener {
-            showDialogAboutApp(onDesignClick = {
-                startActivity(
-                    getOpenFacebookIntent(
-                        DATA.FB_DESIGNER, DATA.FB_DESIGNER_2
-                    )
-                )
-            }, onProgrammerClick = {
-                startActivity(
-                    getOpenFacebookIntent(
-                        DATA.FB_PROGRAMMER, DATA.FB_PROGRAMMER_2
-                    )
-                )
-            })
-        }
+        binding.aboutApp.setOnClickListener { dialogAboutApp() }
         binding.shareApp.setOnClickListener { shareApp() }
         binding.aboutMy.setOnClickListener {
             lifecycleScope.launch {
@@ -124,13 +107,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             }
             userViewModel.loadAppTools()
         }
-        binding.logout.setOnClickListener {
-            showDialogLogout {
-                userViewModel.logout()
-                context.openActivity<LoginActivity>(clear = true)
-                finish()
-            }
-        }
+        binding.logout.setOnClickListener { dialogLogout() }
 
         val bottomNavigation = binding.bottomNavigation
         this.bottomNavigation = bottomNavigation
@@ -212,21 +189,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             " Little Beauty: beauty care application, download it now from Google Play " + " https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID
         )
         startActivity(Intent.createChooser(shareIntent, "Choose how to share"))
-    }
-
-    private fun getOpenFacebookIntent(url: String, fallbackUrl: String): Intent {
-        return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager.getPackageInfo(
-                    "com.facebook.katana", PackageManager.PackageInfoFlags.of(0)
-                )
-            } else {
-                packageManager.getPackageInfo("com.facebook.katana", 0)
-            }
-            Intent(Intent.ACTION_VIEW, url.toUri())
-        } catch (_: Exception) {
-            Intent(Intent.ACTION_VIEW, fallbackUrl.toUri())
-        }
     }
 
     companion object {

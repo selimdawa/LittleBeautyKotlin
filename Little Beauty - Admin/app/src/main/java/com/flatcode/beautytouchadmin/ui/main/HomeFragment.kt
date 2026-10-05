@@ -10,7 +10,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.FragmentHomeBinding
 import com.flatcode.beautytouchadmin.model.Main
+import com.flatcode.beautytouchadmin.ui.profile.ProfileActivity
+import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.loadImage
+import com.flatcode.beautytouchadmin.utils.openActivity
 import com.flatcode.beautytouchadmin.utils.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -27,7 +30,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.image.setOnClickListener {
-            // TODO: Use NavController to navigate to Profile
+            requireContext().openActivity<ProfileActivity>(
+                extras = arrayOf(DATA.PROFILE_ID to DATA.FirebaseUserUid)
+            )
         }
 
         adapter = MainAdapter(requireContext())
@@ -49,9 +54,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun updateUI(state: MainState) {
-        state.user?.let { user ->
-            binding.toolbar.image.loadImage(true, user.imageurl)
-        }
+        binding.toolbar.image.loadImage(true, state.user?.imageurl)
 
         list.clear()
         list.add(Main(R.drawable.ic_person_white, "Users", state.usersCount))

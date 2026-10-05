@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouch.databinding.FragmentShoppingCentersBinding
 import com.flatcode.beautytouch.ui.adapter.ShoppingCentersAdapter
 import com.flatcode.beautytouch.ui.post.PostViewModel
@@ -44,18 +46,22 @@ class ShoppingCentersFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        lifecycleScope.launch {
-            viewModel.shoppingCenters.collect { list ->
-                val items = list.reversed()
-                binding.bar.visibility = View.GONE
-                if (items.isNotEmpty()) {
-                    binding.recyclerView.visibility = View.VISIBLE
-                    binding.emptyText.visibility = View.GONE
-                } else {
-                    binding.recyclerView.visibility = View.GONE
-                    binding.emptyText.visibility = View.VISIBLE
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.shoppingCenters.collect { list ->
+                    _binding?.let { binding ->
+                        val items = list.reversed()
+                        binding.bar.visibility = View.GONE
+                        if (items.isNotEmpty()) {
+                            binding.recyclerView.visibility = View.VISIBLE
+                            binding.emptyText.visibility = View.GONE
+                        } else {
+                            binding.recyclerView.visibility = View.GONE
+                            binding.emptyText.visibility = View.VISIBLE
+                        }
+                        adapter?.submitList(items)
+                    }
                 }
-                adapter?.submitList(items)
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.flatcode.beautytouchadmin.repository
 
-import com.flatcode.beautytouchadmin.model.Post
 import com.flatcode.beautytouchadmin.model.User
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.google.firebase.database.DataSnapshot
@@ -21,13 +20,13 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
                 var count = 0
                 for (data in snapshot.children) {
                     val user = data.getValue(User::class.java)
-                    if (user?.id != null) count++
+                    if (user != null) count++
                 }
-                trySend(count - 1)
+                trySend(if (count > 0) count - 1 else 0)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(0)
             }
         }
         reference.addValueEventListener(listener)
@@ -42,7 +41,7 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(0)
             }
         }
         reference.addValueEventListener(listener)
@@ -53,16 +52,11 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
         val reference = database.getReference(DATA.POSTS)
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                var count = 0
-                for (data in snapshot.children) {
-                    val item = data.getValue(Post::class.java)
-                    if (item?.publisher == userId) count++
-                }
-                trySend(count)
+                trySend(snapshot.childrenCount.toInt())
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(0)
             }
         }
         reference.addValueEventListener(listener)
@@ -73,16 +67,11 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
         val reference = database.getReference(DATA.SHOPPING_CENTERS)
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                var count = 0
-                for (data in snapshot.children) {
-                    val item = data.getValue(Post::class.java)
-                    if (item?.publisher == userId) count++
-                }
-                trySend(count)
+                trySend(snapshot.childrenCount.toInt())
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(0)
             }
         }
         reference.addValueEventListener(listener)
@@ -97,7 +86,7 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(0)
             }
         }
         reference.addValueEventListener(listener)
@@ -112,7 +101,7 @@ class MainRepository @Inject constructor(private val database: FirebaseDatabase)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(null)
             }
         }
         reference.addValueEventListener(listener)

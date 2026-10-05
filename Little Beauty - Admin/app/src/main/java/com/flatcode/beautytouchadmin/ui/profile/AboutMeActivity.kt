@@ -3,8 +3,8 @@ package com.flatcode.beautytouchadmin.ui.profile
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
-import androidx.core.graphics.drawable.toDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.Window
@@ -14,21 +14,24 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.flatcode.beautytouchadmin.utils.BaseActivity
+import androidx.core.content.IntentCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.canhub.cropper.CropImageContract
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityAboutMeBinding
 import com.flatcode.beautytouchadmin.ui.other.ToolsViewModel
+import com.flatcode.beautytouchadmin.utils.BaseActivity
+import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
-import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
+import com.flatcode.beautytouchadmin.utils.cropImage
 import com.flatcode.beautytouchadmin.utils.loadImage
+import com.flatcode.beautytouchadmin.utils.loadingDialog
+import com.flatcode.beautytouchadmin.utils.pickImage
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import com.flatcode.beautytouchadmin.utils.loadingDialog
 
 @AndroidEntryPoint
 class AboutMeActivity : BaseActivity() {
@@ -51,16 +54,31 @@ class AboutMeActivity : BaseActivity() {
     }
 
     private fun pickImage() {
-        cropImage.launch(cropImageSquareOptions())
+        pickImage(DATA.MIN_SQUARE)
     }
 
-    private val cropImage = registerForActivityResult(CropImageContract()) { result ->
-        if (result.isSuccessful) {
-            imageUri = result.uriContent
-            binding!!.image.setImageURI(imageUri)
-        } else {
-            val error = result.error
-            Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DATA.MIN_SQUARE && resultCode == RESULT_OK && data != null) {
+            val uri = data.data
+            if (uri != null) {
+                cropImage(
+                    uri = uri,
+                    aspectRatioX = 1,
+                    aspectRatioY = 1,
+                    isOval = true,
+                    minWidth = DATA.MIN_SQUARE,
+                    minHeight = DATA.MIN_SQUARE,
+                    requestCode = DATA.MIN_SQUARE
+                )
+            } else {
+                val resultUri =
+                    IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
+                if (resultUri != null) {
+                    imageUri = resultUri
+                    binding!!.image.setImageURI(imageUri)
+                }
+            }
         }
     }
 

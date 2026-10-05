@@ -3,25 +3,28 @@ package com.flatcode.beautytouchadmin.ui.other
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.flatcode.beautytouchadmin.utils.BaseActivity
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.canhub.cropper.CropImageContract
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityToolsBinding
+import com.flatcode.beautytouchadmin.utils.BaseActivity
+import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
-import com.flatcode.beautytouchadmin.utils.cropImageSessionOptions
+import com.flatcode.beautytouchadmin.utils.cropImage
 import com.flatcode.beautytouchadmin.utils.loadImage
+import com.flatcode.beautytouchadmin.utils.loadingDialog
+import com.flatcode.beautytouchadmin.utils.pickImage
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import com.flatcode.beautytouchadmin.utils.loadingDialog
 
 @AndroidEntryPoint
 class ToolsActivity : BaseActivity() {
@@ -55,36 +58,50 @@ class ToolsActivity : BaseActivity() {
     }
 
     private fun pickImage() {
-        cropImage.launch(cropImageSessionOptions())
+        pickImage(DATA.MIN_SQUARE)
     }
 
-    private val cropImage = registerForActivityResult(CropImageContract()) { result ->
-        if (result.isSuccessful) {
-            val uri = result.uriContent
-            when (imageNumber) {
-                IMAGE_NOW -> {
-                    imageUri = uri
-                    binding!!.imageSessionNow.setImageURI(imageUri)
-                }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DATA.MIN_SQUARE && resultCode == RESULT_OK && data != null) {
+            val uri = data.data
+            if (uri != null) {
+                cropImage(
+                    uri = uri,
+                    aspectRatioX = 1,
+                    aspectRatioY = 1,
+                    isOval = true,
+                    minWidth = DATA.MIN_SQUARE,
+                    minHeight = DATA.MIN_SQUARE,
+                    requestCode = DATA.MIN_SQUARE
+                )
+            } else {
+                val resultUri =
+                    IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
+                if (resultUri != null) {
+                    when (imageNumber) {
+                        IMAGE_NOW -> {
+                            imageUri = resultUri
+                            binding!!.imageSessionNow.setImageURI(imageUri)
+                        }
 
-                IMAGE_OLD -> {
-                    imageUri2 = uri
-                    binding!!.imageSessionOld.setImageURI(imageUri2)
-                }
+                        IMAGE_OLD -> {
+                            imageUri2 = resultUri
+                            binding!!.imageSessionOld.setImageURI(imageUri2)
+                        }
 
-                LOGO_NOW -> {
-                    imageUri3 = uri
-                    binding!!.logoSessionNow.setImageURI(imageUri3)
-                }
+                        LOGO_NOW -> {
+                            imageUri3 = resultUri
+                            binding!!.logoSessionNow.setImageURI(imageUri3)
+                        }
 
-                LOGO_OLD -> {
-                    imageUri4 = uri
-                    binding!!.logoSessionOld.setImageURI(imageUri4)
+                        LOGO_OLD -> {
+                            imageUri4 = resultUri
+                            binding!!.logoSessionOld.setImageURI(imageUri4)
+                        }
+                    }
                 }
             }
-        } else {
-            val error = result.error
-            Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
         }
     }
 

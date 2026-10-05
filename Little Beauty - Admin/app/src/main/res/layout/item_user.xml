@@ -32,6 +32,7 @@
                     android:layout_height="0dp"
                     android:contentDescription="@null"
                     android:src="@color/image_profile"
+                    android:scaleType="centerCrop"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintDimensionRatio="1:1"
                     tools:ignore="MissingConstraints" />

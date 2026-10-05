@@ -3,26 +3,28 @@ package com.flatcode.beautytouchadmin.ui.post
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.flatcode.beautytouchadmin.utils.BaseActivity
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
+import com.flatcode.beautytouchadmin.utils.BaseActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
+import com.flatcode.beautytouchadmin.utils.cropImage
 import com.flatcode.beautytouchadmin.utils.isNetworkAvailable
+import com.flatcode.beautytouchadmin.utils.loadingDialog
+import com.flatcode.beautytouchadmin.utils.pickImage
 import com.flatcode.beautytouchadmin.utils.setMessage
-import com.flatcode.beautytouchadmin.utils.startCropActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import com.flatcode.beautytouchadmin.utils.loadingDialog
 
 @AndroidEntryPoint
 class PostAddActivity : BaseActivity() {
@@ -45,26 +47,33 @@ class PostAddActivity : BaseActivity() {
         }
     }
 
-    private val cropImageLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                imageUri = result.data?.let { intent ->
-                    IntentCompat.getParcelableExtra(intent, "CROP_RESULT_URI", Uri::class.java)
-                }
-                binding!!.image.setImageURI(null)
-                binding!!.image.setImageURI(imageUri)
-            }
-        }
-
-    private val pickImageLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                cropImageLauncher.launch(context.startCropActivity(it, 10, 14, false))
-            }
-        }
-
     private fun pickImage() {
-        pickImageLauncher.launch("image/*")
+        pickImage(DATA.MIN_SQUARE)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DATA.MIN_SQUARE && resultCode == RESULT_OK && data != null) {
+            val uri = data.data
+            if (uri != null) {
+                cropImage(
+                    uri = uri,
+                    aspectRatioX = 1,
+                    aspectRatioY = 1,
+                    isOval = true,
+                    minWidth = DATA.MIN_SQUARE,
+                    minHeight = DATA.MIN_SQUARE,
+                    requestCode = DATA.MIN_SQUARE
+                )
+            } else {
+                val resultUri =
+                    IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
+                if (resultUri != null) {
+                    imageUri = resultUri
+                    binding!!.image.setImageURI(imageUri)
+                }
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,7 +139,8 @@ class PostAddActivity : BaseActivity() {
         } else if (imageUri == null) {
             Toast.makeText(context, R.string.no_picture, Toast.LENGTH_SHORT).show()
         } else if (!isNetworkAvailable()) {
-            Toast.makeText(context, getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.no_internet_connection), Toast.LENGTH_SHORT)
+                .show()
         } else {
             dialog!!.setMessage(getString(R.string.post_created))
             dialog!!.show()

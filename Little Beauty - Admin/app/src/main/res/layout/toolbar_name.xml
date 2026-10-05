@@ -37,7 +37,6 @@
         android:layout_marginEnd="15dp"
         android:contentDescription="@null"
         android:src="@color/image_profile"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
-        app:tint="@color/white" />
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
 
 </com.google.android.material.appbar.MaterialToolbar>

@@ -27,8 +27,13 @@ class UserRepository @Inject constructor(
                 val list = mutableListOf<User>()
                 for (snapshot in dataSnapshot.children) {
                     val user = snapshot.getValue(User::class.java)
-                    if (user != null && user.id != DATA.FirebaseUserUid) {
-                        list.add(user)
+                    if (user != null) {
+                        if (user.id.isEmpty()) {
+                            user.id = snapshot.key ?: ""
+                        }
+                        if (user.id != DATA.FirebaseUserUid && snapshot.key != DATA.FirebaseUserUid) {
+                            list.add(user)
+                        }
                     }
                 }
                 list.reverse()
@@ -36,7 +41,7 @@ class UserRepository @Inject constructor(
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                close(databaseError.toException())
+                trySend(emptyList())
             }
         }
         reference.addValueEventListener(listener)
@@ -47,11 +52,15 @@ class UserRepository @Inject constructor(
         val reference = database.getReference(DATA.USERS).child(userId)
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                trySend(snapshot.getValue(User::class.java))
+                val user = snapshot.getValue(User::class.java)
+                if (user != null && user.id.isEmpty()) {
+                    user.id = snapshot.key ?: ""
+                }
+                trySend(user)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(null)
             }
         }
         reference.addValueEventListener(listener)
@@ -86,14 +95,19 @@ class UserRepository @Inject constructor(
                 for (data in snapshot.children) {
                     if (data.child(orderBy).exists()) {
                         val item = data.getValue(User::class.java)
-                        if (item != null) list.add(item)
+                        if (item != null) {
+                            if (item.id.isEmpty()) {
+                                item.id = data.key ?: ""
+                            }
+                            list.add(item)
+                        }
                     }
                 }
                 trySend(list)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(emptyList())
             }
         }
         query.addValueEventListener(listener)

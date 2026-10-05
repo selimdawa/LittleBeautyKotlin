@@ -32,9 +32,9 @@ object DATA {
     const val HAIR = "Hair"
 
     //Other
-    val AUTH: FirebaseAuth = FirebaseAuth.getInstance()
-    val FIREBASE_USER = AUTH.currentUser
-    val FirebaseUserUid = FIREBASE_USER!!.uid
+    val AUTH: FirebaseAuth get() = FirebaseAuth.getInstance()
+    val FIREBASE_USER get() = AUTH.currentUser
+    val FirebaseUserUid: String get() = FIREBASE_USER?.uid ?: ""
 
     //Database
     var SKIN_PRODUCTS = "Skin Products"

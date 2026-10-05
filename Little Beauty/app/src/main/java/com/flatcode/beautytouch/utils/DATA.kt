@@ -35,10 +35,8 @@ object DATA {
     var ID = "id"
     var PUBLISHER_NAME = "KTWe3PaSUSbv3xulRKSwUgConC92" //id_
     var APP_NAME = "Little Beauty" //app_
-    var FB_DESIGNER = "fb://profile/100037312172320" //Facebook_designer
-    var FB_DESIGNER_2 = "https://www.facebook.com/mohamed.deeb.50115" //Facebook_designer
-    var FB_PROGRAMMER = "fb://profile/100075460898489" //Facebook_programmer
-    var FB_PROGRAMMER_2 = "https://www.facebook.com/100075460898489" //Facebook_programmer
+    var FB_ID = ""
+    var WEB_SITE = ""
     var MIN_SQUARE = 500
 
     //Cloudinary

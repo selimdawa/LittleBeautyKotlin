@@ -3,26 +3,28 @@ package com.flatcode.beautytouchadmin.ui.post
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.flatcode.beautytouchadmin.utils.BaseActivity
+import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.canhub.cropper.CropImageContract
 import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
+import com.flatcode.beautytouchadmin.utils.BaseActivity
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
-import com.flatcode.beautytouchadmin.utils.cropImageSquareOptions
+import com.flatcode.beautytouchadmin.utils.cropImage
 import com.flatcode.beautytouchadmin.utils.loadImage
+import com.flatcode.beautytouchadmin.utils.loadingDialog
+import com.flatcode.beautytouchadmin.utils.pickImage
 import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import com.flatcode.beautytouchadmin.utils.loadingDialog
 
 @AndroidEntryPoint
 class PostEditActivity : BaseActivity() {
@@ -47,16 +49,31 @@ class PostEditActivity : BaseActivity() {
     }
 
     private fun pickImage() {
-        cropImage.launch(cropImageSquareOptions())
+        pickImage(DATA.MIN_SQUARE)
     }
 
-    private val cropImage = registerForActivityResult(CropImageContract()) { result ->
-        if (result.isSuccessful) {
-            imageUri = result.uriContent
-            binding!!.image.setImageURI(imageUri)
-        } else {
-            val error = result.error
-            Toast.makeText(this, "Something went wrong! $error", Toast.LENGTH_SHORT).show()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == DATA.MIN_SQUARE && resultCode == RESULT_OK && data != null) {
+            val uri = data.data
+            if (uri != null) {
+                cropImage(
+                    uri = uri,
+                    aspectRatioX = 1,
+                    aspectRatioY = 1,
+                    isOval = true,
+                    minWidth = DATA.MIN_SQUARE,
+                    minHeight = DATA.MIN_SQUARE,
+                    requestCode = DATA.MIN_SQUARE
+                )
+            } else {
+                val resultUri =
+                    IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
+                if (resultUri != null) {
+                    imageUri = resultUri
+                    binding!!.image.setImageURI(imageUri)
+                }
+            }
         }
     }
 
@@ -83,8 +100,6 @@ class PostEditActivity : BaseActivity() {
             binding!!.typeTwo.setText(R.string.hair_products_selected)
         }
 
-        binding!!.toolbar.nameSpace.setText(R.string.edit_post)
-        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding!!.go.setOnClickListener { validateData() }
         binding!!.layoutImageProfile.setOnClickListener {
             checkStoragePermission(requestPermissionLauncher) { pickImage() }

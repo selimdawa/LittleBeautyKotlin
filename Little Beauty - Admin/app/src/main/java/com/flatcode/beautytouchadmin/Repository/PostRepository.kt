@@ -29,11 +29,15 @@ class PostRepository @Inject constructor(
                 val list = mutableListOf<Post>()
                 for (snapshot in dataSnapshot.children) {
                     val post = snapshot.getValue(Post::class.java)
-                    if (post?.aname == DATA.BEAUTY_TOUCH) {
+                    if (post != null) {
+                        if (post.postid.isEmpty()) {
+                            post.postid = snapshot.key ?: ""
+                        }
                         when (type) {
                             DATA.ALL -> list.add(post)
                             DATA.SKIN -> if (post.category == DATA.SKIN_PRODUCTS) list.add(post)
                             DATA.HAIR -> if (post.category == DATA.HAIR_PRODUCTS) list.add(post)
+                            else -> list.add(post)
                         }
                     }
                 }
@@ -41,7 +45,7 @@ class PostRepository @Inject constructor(
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                close(databaseError.toException())
+                trySend(emptyList())
             }
         }
         reference.addValueEventListener(listener)
@@ -56,26 +60,24 @@ class PostRepository @Inject constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(null)
             }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    suspend fun uploadImage(postId: String, imageUri: Uri): String =
-        withContext(Dispatchers.IO) {
-            try {
-                val options = mapOf(
-                    "public_id" to postId,
-                    "folder" to "Posts"
-                )
-                val result = cloudinary.uploader().upload(imageUri.toString(), options)
-                result["secure_url"] as String
-            } catch (_: Exception) {
-                ""
-            }
+    suspend fun uploadImage(postId: String, imageUri: Uri): String = withContext(Dispatchers.IO) {
+        try {
+            val options = mapOf(
+                "public_id" to postId, "folder" to "Posts"
+            )
+            val result = cloudinary.uploader().upload(imageUri.toString(), options)
+            result["secure_url"] as String
+        } catch (_: Exception) {
+            ""
         }
+    }
 
     suspend fun addPost(postData: Map<String, Any?>) {
         val ref = database.getReference(DATA.POSTS)
@@ -102,7 +104,7 @@ class PostRepository @Inject constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(emptyList())
             }
         }
         reference.addValueEventListener(listener)
@@ -116,13 +118,18 @@ class PostRepository @Inject constructor(
                 val list = mutableListOf<Post>()
                 for (data in snapshot.children) {
                     val post = data.getValue(Post::class.java)
-                    if (post != null) list.add(post)
+                    if (post != null) {
+                        if (post.postid.isEmpty()) {
+                            post.postid = data.key ?: ""
+                        }
+                        list.add(post)
+                    }
                 }
                 trySend(list)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(emptyList())
             }
         }
         reference.addValueEventListener(listener)
@@ -137,7 +144,7 @@ class PostRepository @Inject constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(0L)
             }
         }
         reference.addValueEventListener(listener)
@@ -152,7 +159,7 @@ class PostRepository @Inject constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(false)
             }
         }
         reference.addValueEventListener(listener)

@@ -28,7 +28,10 @@ class ShoppingRepository @Inject constructor(
                 val list = mutableListOf<ShoppingCenter>()
                 for (snapshot in dataSnapshot.children) {
                     val shoppingCenter = snapshot.getValue(ShoppingCenter::class.java)
-                    if (shoppingCenter?.publisher == DATA.FirebaseUserUid && shoppingCenter.aname == DATA.APP_NAME) {
+                    if (shoppingCenter != null) {
+                        if (shoppingCenter.id.isEmpty()) {
+                            shoppingCenter.id = snapshot.key ?: ""
+                        }
                         list.add(shoppingCenter)
                     }
                 }
@@ -37,7 +40,7 @@ class ShoppingRepository @Inject constructor(
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                close(databaseError.toException())
+                trySend(emptyList())
             }
         }
         reference.addValueEventListener(listener)
@@ -52,7 +55,7 @@ class ShoppingRepository @Inject constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(null)
             }
         }
         reference.addValueEventListener(listener)

@@ -26,11 +26,16 @@ class SliderRepository @Inject constructor(
             override fun onDataChange(snapshot: DataSnapshot) {
                 val map = mutableMapOf<String, String>()
                 for (data in snapshot.children) {
-                    map[data.key!!] = data.value.toString()
+                    if (data.key != null && data.value != null) {
+                        map[data.key!!] = data.value.toString()
+                    }
                 }
                 trySend(map)
             }
-            override fun onCancelled(error: DatabaseError) { close(error.toException()) }
+
+            override fun onCancelled(error: DatabaseError) {
+                trySend(emptyMap())
+            }
         }
         reference.addValueEventListener(listener)
         awaitClose { reference.removeEventListener(listener) }
