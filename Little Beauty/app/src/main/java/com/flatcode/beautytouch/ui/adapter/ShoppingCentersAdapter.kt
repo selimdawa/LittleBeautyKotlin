@@ -26,7 +26,13 @@ class ShoppingCentersAdapter(
             imageProduct.loadImage(false, item.imageurl)
             imageProduct2.loadImage(false, item.imageurl2)
             name.text = item.name
-            location.text = item.location
+            val locations = listOfNotNull(item.location, item.location2, item.location3)
+                .filter { !it.isNullOrBlank() }
+            location.text = if (locations.isNotEmpty()) {
+                locations.joinToString(" - ")
+            } else {
+                ""
+            }
             numberPhone.text = item.numberPhone
 
             root.setOnClickListener { onItemClick(item) }

@@ -26,8 +26,12 @@ class HomeViewModel @Inject constructor(
 
     fun loadHomeData(publisher: String, appName: String) {
         viewModelScope.launch {
-            repository.getAllPosts(publisher, appName).collect {
+            repository.getHotPosts(publisher, appName).collect {
                 _hotProducts.value = it
+            }
+        }
+        viewModelScope.launch {
+            repository.getAllPosts(publisher, appName).collect {
                 _allPosts.value = it
             }
         }

@@ -45,7 +45,7 @@ class FavoritesActivity : BaseActivity() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.postsByCategory.collect { list ->
+            viewModel.favoritePosts.collect { list ->
                 val posts = list.reversed()
                 binding.bar.visibility = View.GONE
                 if (posts.isNotEmpty()) {
@@ -61,7 +61,7 @@ class FavoritesActivity : BaseActivity() {
     }
 
     override fun onResume() {
-        viewModel.loadPostsByCategory(DATA.SKIN_PRODUCTS, publisher, appName)
+        viewModel.loadFavoritePosts()
         super.onResume()
     }
 }

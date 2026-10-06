@@ -89,7 +89,7 @@
         android:layout_width="230dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="?mc_track"
+        android:background="?mc_bg"
         android:fitsSystemWindows="false">
 
         <androidx.core.widget.NestedScrollView
@@ -111,7 +111,6 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="90dp"
-                        android:background="?mc_track"
                         android:contentDescription="@null"
                         android:scaleType="centerCrop" />
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.model.ShoppingCenter
 import com.flatcode.beautytouch.repository.PostRepository
+import com.flatcode.beautytouch.utils.DATA
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +20,15 @@ class PostViewModel @Inject constructor(
     private val _postsByCategory = MutableStateFlow<List<Post>>(emptyList())
     val postsByCategory: StateFlow<List<Post>> = _postsByCategory
 
+    private val _favoritePosts = MutableStateFlow<List<Post>>(emptyList())
+    val favoritePosts: StateFlow<List<Post>> = _favoritePosts
+
+    private val _skinProducts = MutableStateFlow<List<Post>>(emptyList())
+    val skinProducts: StateFlow<List<Post>> = _skinProducts
+
+    private val _hairProducts = MutableStateFlow<List<Post>>(emptyList())
+    val hairProducts: StateFlow<List<Post>> = _hairProducts
+
     private val _shoppingCenters = MutableStateFlow<List<ShoppingCenter>>(emptyList())
     val shoppingCenters: StateFlow<List<ShoppingCenter>> = _shoppingCenters
 
@@ -26,6 +36,46 @@ class PostViewModel @Inject constructor(
         viewModelScope.launch {
             repository.getPostsByCategory(category, publisher, appName).collect {
                 _postsByCategory.value = it
+            }
+        }
+    }
+
+    fun loadHotProducts(publisher: String, appName: String) {
+        viewModelScope.launch {
+            repository.getHotPosts(publisher, appName).collect {
+                _postsByCategory.value = it
+            }
+        }
+    }
+
+    fun loadAllPosts(publisher: String, appName: String) {
+        viewModelScope.launch {
+            repository.getAllPosts(publisher, appName).collect {
+                _postsByCategory.value = it
+            }
+        }
+    }
+
+    fun loadFavoritePosts() {
+        viewModelScope.launch {
+            repository.getFavoritePosts().collect {
+                _favoritePosts.value = it
+            }
+        }
+    }
+
+    fun loadSkinProducts(publisher: String, appName: String) {
+        viewModelScope.launch {
+            repository.getPostsByCategory(DATA.SKIN_PRODUCTS, publisher, appName).collect {
+                _skinProducts.value = it
+            }
+        }
+    }
+
+    fun loadHairProducts(publisher: String, appName: String) {
+        viewModelScope.launch {
+            repository.getPostsByCategory(DATA.HAIR_PRODUCTS, publisher, appName).collect {
+                _hairProducts.value = it
             }
         }
     }

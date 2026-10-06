@@ -4,14 +4,13 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
-import com.flatcode.beautytouchadmin.utils.BaseActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.flatcode.beautytouchadmin.model.Post
-import com.flatcode.beautytouchadmin.R
-import com.flatcode.beautytouchadmin.utils.DATA
 import com.flatcode.beautytouchadmin.databinding.ActivityPostDetailsBinding
+import com.flatcode.beautytouchadmin.model.Post
+import com.flatcode.beautytouchadmin.utils.BaseActivity
+import com.flatcode.beautytouchadmin.utils.DATA
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -32,18 +31,18 @@ class PostDetailsActivity : BaseActivity() {
 
         postId = intent.getStringExtra(DATA.POST_ID)
 
-        binding!!.toolbar.nameSpace.setText(R.string.post_detail)
-        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        adapter = PostDetailAdapter(
+            context,
+            mutableListOf(),
+            object : PostDetailAdapter.OnItemClickListener {
+                override fun onLikeClick(post: Post) {
+                    viewModel.toggleLike(post.postid)
+                }
 
-        adapter = PostDetailAdapter(context, mutableListOf(), object : PostDetailAdapter.OnItemClickListener {
-            override fun onLikeClick(post: Post) {
-                viewModel.toggleLike(post.postid)
-            }
-
-            override fun onSaveClick(post: Post) {
-                viewModel.toggleSave(post.postid)
-            }
-        })
+                override fun onSaveClick(post: Post) {
+                    viewModel.toggleSave(post.postid)
+                }
+            })
         binding!!.recyclerView.adapter = adapter
 
         postId?.let { viewModel.loadPost(it) }

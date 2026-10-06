@@ -82,9 +82,9 @@
     <string name="new_user_signup">New user? Register</string>
     <string name="session_format">%1$s | %2$s</string>
     <string name="my_points_format">My Points : %1$s</string>
-    <string name="price_syp_format">%1$s SYP</string>
+    <string name="price_syp_format">%1$s $</string>
     <string name="no_internet_connection">No internet connection</string>
-
+    <string name="search">Search</string>
     <string name="website">Website</string>
     <string name="facebook">Facebook</string>
     <string name="do_you_want_to_exit">Do you want to Exit ?</string>

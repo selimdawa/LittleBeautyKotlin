@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.flatcode.beautytouch.db.ADsDao
 import com.flatcode.beautytouch.db.AppDatabase
 import com.flatcode.beautytouch.db.FavoriteDao
+import com.flatcode.beautytouch.db.HotProductDao
 import com.flatcode.beautytouch.db.InterestedDao
 import com.flatcode.beautytouch.db.PointsDao
 import com.flatcode.beautytouch.db.PostDao
@@ -63,4 +64,7 @@ object DatabaseModule {
 
     @Provides
     fun provideSliderDao(database: AppDatabase): SliderDao = database.sliderDao()
+
+    @Provides
+    fun provideHotProductDao(database: AppDatabase): HotProductDao = database.hotProductDao()
 }

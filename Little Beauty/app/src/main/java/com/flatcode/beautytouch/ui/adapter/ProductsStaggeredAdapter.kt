@@ -18,6 +18,25 @@ class ProductsStaggeredAdapter(
     private val onSaveClick: (Post) -> Unit
 ) : ListAdapter<Post, ProductsStaggeredAdapter.ViewHolder>(PostDiffCallback()) {
 
+    private var fullList: List<Post> = emptyList()
+
+    fun setFullList(list: List<Post>) {
+        fullList = list
+        submitList(list)
+    }
+
+    fun filter(query: String?) {
+        if (query.isNullOrEmpty()) {
+            submitList(fullList)
+        } else {
+            val q = query.uppercase(java.util.Locale.getDefault())
+            val filtered = fullList.filter {
+                it.name?.uppercase(java.util.Locale.getDefault())?.contains(q) == true
+            }
+            submitList(filtered)
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
             ItemProductGridBinding.inflate(LayoutInflater.from(parent.context), parent, false)

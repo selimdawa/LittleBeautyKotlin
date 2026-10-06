@@ -1,9 +1,11 @@
 package com.flatcode.beautytouch.repository
 
 import com.flatcode.beautytouch.db.FavoriteDao
+import com.flatcode.beautytouch.db.HotProductDao
 import com.flatcode.beautytouch.db.PostDao
 import com.flatcode.beautytouch.db.ShoppingCenterDao
 import com.flatcode.beautytouch.model.FavoriteEntity
+import com.flatcode.beautytouch.model.HotProductEntity
 import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.model.ShoppingCenter
 import com.flatcode.beautytouch.utils.DATA
@@ -29,7 +31,8 @@ class PostRepository @Inject constructor(
     private val auth: FirebaseAuth,
     private val postDao: PostDao,
     private val shoppingCenterDao: ShoppingCenterDao,
-    private val favoriteDao: FavoriteDao
+    private val favoriteDao: FavoriteDao,
+    private val hotProductDao: HotProductDao
 ) {
 
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
@@ -44,6 +47,17 @@ class PostRepository @Inject constructor(
         return postDao.getAllPosts()
     }
 
+    fun getFavoritePosts(): Flow<List<Post>> {
+        val uid = auth.currentUser?.uid ?: ""
+        return favoriteDao.getFavoritePosts(uid)
+    }
+
+    fun getHotPosts(publisher: String, appName: String): Flow<List<Post>> {
+        syncPosts(publisher, appName)
+        syncHotProducts()
+        return hotProductDao.getHotPosts()
+    }
+
     fun getShoppingCenters(publisher: String, appName: String): Flow<List<ShoppingCenter>> {
         syncShoppingCenters(publisher, appName)
         return shoppingCenterDao.getAllShoppingCenters()
@@ -55,41 +69,149 @@ class PostRepository @Inject constructor(
     }
 
     private fun syncPostById(postId: String) {
-        database.getReference(DATA.POSTS).child(postId)
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    snapshot.getValue(Post::class.java)?.let { post ->
-                        repositoryScope.launch {
-                            postDao.insertPost(post)
-                        }
-                    }
+        val uid = auth.currentUser?.uid ?: ""
+        val postRef = database.getReference(DATA.POSTS).child(postId)
+        val likesRef = database.getReference(DATA.LIKES).child(postId)
+        val savesRef = if (uid.isNotEmpty()) database.getReference(DATA.SAVES).child(uid)
+            .child(postId) else null
+
+        postRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val post = snapshot.getValue(Post::class.java) ?: return
+                if (post.postid.isEmpty() && snapshot.key != null) {
+                    post.postid = snapshot.key!!
                 }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Timber.e(error.toException(), "syncPostById failed")
-                }
-            })
+                likesRef.addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(likesSnapshot: DataSnapshot) {
+                        val processPost: (Boolean) -> Unit = { isSaved ->
+                            post.isLiked = uid.isNotEmpty() && likesSnapshot.child(uid).exists()
+                            post.nrLikes = likesSnapshot.childrenCount.toInt()
+                            post.isSaved = isSaved
+
+                            repositoryScope.launch {
+                                postDao.insertPost(post)
+                            }
+                        }
+
+                        if (savesRef != null) {
+                            savesRef.addValueEventListener(object : ValueEventListener {
+                                override fun onDataChange(savesSnapshot: DataSnapshot) {
+                                    processPost(savesSnapshot.exists())
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    processPost(false)
+                                }
+                            })
+                        } else {
+                            processPost(false)
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {}
+                })
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Timber.e(error.toException(), "syncPostById failed")
+            }
+        })
     }
 
     fun syncPosts(publisher: String, appName: String) {
-        database.getReference(DATA.POSTS).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val list = mutableListOf<Post>()
-                for (child in snapshot.children) {
-                    val post = child.getValue(Post::class.java)
-                    if (post != null) {
-                        if (post.publisher.isNullOrEmpty() || post.publisher == publisher) {
-                            list.add(post)
+        val uid = auth.currentUser?.uid ?: ""
+        val postsRef = database.getReference(DATA.POSTS)
+        val likesRef = database.getReference(DATA.LIKES)
+        val savesRef = if (uid.isNotEmpty()) database.getReference(DATA.SAVES).child(uid) else null
+
+        postsRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(postsSnapshot: DataSnapshot) {
+                likesRef.addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(likesSnapshot: DataSnapshot) {
+                        val processWithSaves: (DataSnapshot?) -> Unit = { savesSnapshot ->
+                            val list = mutableListOf<Post>()
+                            val favoriteEntities = mutableListOf<FavoriteEntity>()
+
+                            for (child in postsSnapshot.children) {
+                                val post = child.getValue(Post::class.java)
+                                if (post != null) {
+                                    if (post.postid.isEmpty() && child.key != null) {
+                                        post.postid = child.key!!
+                                    }
+                                    if ((post.publisher.isNullOrEmpty() || post.publisher == publisher) &&
+                                        (post.appName.isNullOrEmpty() || post.appName == appName)
+                                    ) {
+                                        post.isLiked =
+                                            uid.isNotEmpty() && likesSnapshot.child(post.postid)
+                                                .child(uid).exists()
+                                        post.nrLikes =
+                                            likesSnapshot.child(post.postid).childrenCount.toInt()
+                                        post.isSaved =
+                                            uid.isNotEmpty() && (savesSnapshot?.child(post.postid)
+                                                ?.exists() == true)
+
+                                        if (post.isSaved && uid.isNotEmpty()) {
+                                            favoriteEntities.add(FavoriteEntity(uid, post.postid))
+                                        }
+                                        list.add(post)
+                                    }
+                                }
+                            }
+
+                            repositoryScope.launch {
+                                postDao.insertPosts(list)
+                                if (uid.isNotEmpty()) {
+                                    favoriteDao.insertFavorites(favoriteEntities)
+                                }
+                            }
+                        }
+
+                        if (savesRef != null) {
+                            savesRef.addValueEventListener(object : ValueEventListener {
+                                override fun onDataChange(savesSnapshot: DataSnapshot) {
+                                    processWithSaves(savesSnapshot)
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    processWithSaves(null)
+                                }
+                            })
+                        } else {
+                            processWithSaves(null)
                         }
                     }
-                }
-                repositoryScope.launch {
-                    postDao.insertPosts(list)
-                }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Timber.e(error.toException(), "syncLikes failed")
+                    }
+                })
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Timber.e(error.toException(), "syncPosts failed")
+            }
+        })
+    }
+
+    fun syncHotProducts() {
+        val hotRef = database.getReference(DATA.HOT_PRODUCT)
+        hotRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val list = mutableListOf<HotProductEntity>()
+                for (child in snapshot.children) {
+                    child.key?.let {
+                        list.add(HotProductEntity(id = it))
+                    }
+                }
+                repositoryScope.launch {
+                    hotProductDao.deleteAllHotProducts()
+                    hotProductDao.insertHotProducts(list)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Timber.e(error.toException(), "syncHotProducts failed")
             }
         })
     }
@@ -102,7 +224,12 @@ class PostRepository @Inject constructor(
                     for (child in snapshot.children) {
                         val center = child.getValue(ShoppingCenter::class.java)
                         if (center != null) {
-                            if (center.publisher.isNullOrEmpty() || center.publisher == publisher) {
+                            if (center.id.isEmpty() && child.key != null) {
+                                center.id = child.key!!
+                            }
+                            if ((center.publisher.isNullOrEmpty() || center.publisher == publisher) &&
+                                (center.appName.isNullOrEmpty() || center.appName == appName)
+                            ) {
                                 list.add(center)
                             }
                         }

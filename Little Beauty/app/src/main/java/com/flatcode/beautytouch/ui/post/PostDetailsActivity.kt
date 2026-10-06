@@ -26,7 +26,6 @@ class PostDetailsActivity : BaseActivity() {
         setContentView(binding.root)
 
         postId = intent.getStringExtra(DATA.POST_ID)
-        binding.toolbar.nameSpace.setText(R.string.post_detail)
 
         adapter = PostDetailAdapter(
             onLikeClick = { post -> viewModel.toggleLike(post) },

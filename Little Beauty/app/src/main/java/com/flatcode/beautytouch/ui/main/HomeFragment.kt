@@ -13,7 +13,9 @@ import com.flatcode.beautytouch.databinding.FragmentHomeBinding
 import com.flatcode.beautytouch.ui.adapter.ImageSliderAdapter
 import com.flatcode.beautytouch.ui.adapter.PostHotAdapter
 import com.flatcode.beautytouch.ui.adapter.PostLinearAdapter
+import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.ui.post.PostDetailsActivity
+import com.flatcode.beautytouch.ui.post.ShowMoreActivity
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.openActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,6 +51,20 @@ class HomeFragment : Fragment() {
             onSaveClick = { post -> viewModel.toggleSave(post) })
         binding.recyclerView2.adapter = allPostAdapter
 
+        binding.hotProduct.setOnClickListener {
+            context?.openActivity<ShowMoreActivity>(
+                DATA.SHOW_MORE_TYPE to DATA.HOT_PRODUCT,
+                DATA.SHOW_MORE_NAME to getString(R.string.most_hot)
+            )
+        }
+
+        binding.showMoreProduct.setOnClickListener {
+            context?.openActivity<ShowMoreActivity>(
+                DATA.SHOW_MORE_TYPE to DATA.ALL,
+                DATA.SHOW_MORE_NAME to getString(R.string.show_more)
+            )
+        }
+
         observeViewModel()
         return binding.root
     }
@@ -68,7 +84,7 @@ class HomeFragment : Fragment() {
                 launch {
                     viewModel.hotProducts.collect { posts ->
                         _binding?.let { binding ->
-                            binding.progressCircular.visibility = View.GONE
+                            binding.bar.visibility = View.GONE
                             binding.recyclerView.visibility =
                                 if (posts.isNotEmpty()) View.VISIBLE else View.GONE
                             hotPostAdapter?.submitList(posts)
@@ -78,7 +94,7 @@ class HomeFragment : Fragment() {
                 launch {
                     viewModel.allPosts.collect { posts ->
                         _binding?.let { binding ->
-                            binding.progressCircular2.visibility = View.GONE
+                            binding.bar2.visibility = View.GONE
                             binding.recyclerView2.visibility =
                                 if (posts.isNotEmpty()) View.VISIBLE else View.GONE
                             allPostAdapter?.submitList(posts)

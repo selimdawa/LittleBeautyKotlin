@@ -51,7 +51,6 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private val skinProduct = "Skin Products"
     private val hairProduct = "Hair Products"
     private val shoppingCenter = "Shopping Centers"
-    private val numberProduct = DATA.EMPTY
     private var bottomNavigation: BubbleBottomNavigation? = null
     private val publisher: String = DATA.PUBLISHER_NAME
     private val appName: String = DATA.APP_NAME
@@ -70,6 +69,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     binding.drawerLayout.closeDrawer(GravityCompat.START)
                 } else if (navController.currentDestination?.id != R.id.homeFragment) {
                     bottomNavigation?.show(2, true)
+                    navController.popBackStack(R.id.homeFragment, false)
                 } else {
                     closeApp()
                 }
@@ -120,30 +120,29 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         bottomNavigation.add(Model(4, R.drawable.ic_shopping_centers))
 
         bottomNavigation.setOnShowListener { item: Model ->
-            val navOptions = NavOptions.Builder()
-                .setLaunchSingleTop(true)
-                .setPopUpTo(R.id.homeFragment, false)
-                .build()
+            val navOptions =
+                NavOptions.Builder().setLaunchSingleTop(true).setPopUpTo(R.id.homeFragment, false)
+                    .build()
             when (item.id) {
                 1 -> if (navController.currentDestination?.id != R.id.skinProductsFragment) {
                     navController.navigate(R.id.skinProductsFragment, null, navOptions)
                 }
+
                 2 -> if (navController.currentDestination?.id != R.id.homeFragment) {
-                    navController.navigate(R.id.homeFragment, null, navOptions)
+                    navController.popBackStack(R.id.homeFragment, false)
                 }
+
                 3 -> if (navController.currentDestination?.id != R.id.hairProductsFragment) {
                     navController.navigate(R.id.hairProductsFragment, null, navOptions)
                 }
+
                 4 -> if (navController.currentDestination?.id != R.id.shoppingCentersFragment) {
                     navController.navigate(R.id.shoppingCentersFragment, null, navOptions)
                 }
             }
         }
 
-        bottomNavigation.setCount(1, numberProduct)
-        bottomNavigation.setCount(3, numberProduct)
-        bottomNavigation.setCount(4, numberProduct)
-        bottomNavigation.show(2, true)
+        bottomNavigation.show(2, false)
 
         bottomNavigation.setOnClickMenuListener { item: Model ->
             when (item.id) {
@@ -172,6 +171,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         observeViewModels()
         userViewModel.loadUserInfo()
+        postViewModel.loadSkinProducts(publisher, appName)
+        postViewModel.loadHairProducts(publisher, appName)
+        postViewModel.loadShoppingCenters(publisher, appName)
     }
 
     private fun observeViewModels() {
@@ -182,6 +184,27 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
                     binding.toolbar.image.loadImage(true, it.imageurl)
                     binding.name.text = it.username
                 }
+            }
+        }
+
+        lifecycleScope.launch {
+            postViewModel.skinProducts.collect { list ->
+                bottomNavigation?.setCount(1, list.size.toString())
+                binding.numberProductSkin.text = list.size.toString()
+            }
+        }
+
+        lifecycleScope.launch {
+            postViewModel.hairProducts.collect { list ->
+                bottomNavigation?.setCount(3, list.size.toString())
+                binding.numberProductHair.text = list.size.toString()
+            }
+        }
+
+        lifecycleScope.launch {
+            postViewModel.shoppingCenters.collect { list ->
+                bottomNavigation?.setCount(4, list.size.toString())
+                binding.numberShoppingCenters.text = list.size.toString()
             }
         }
     }

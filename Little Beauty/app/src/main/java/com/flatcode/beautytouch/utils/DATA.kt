@@ -6,6 +6,7 @@ object DATA {
     //Database
     var USERS = "Users"
     var POSTS = "Posts"
+    var HOT_PRODUCT = "HotProduct"
     var SKIN_PRODUCTS = "Skin Products"
     var HAIR_PRODUCTS = "Hair Products"
     var SHOPPING_CENTERS = "ShoppingCenters"
@@ -26,6 +27,9 @@ object DATA {
     var SAVES = "Saves"
     var LIKES = "Likes"
     var POST_ID = "postId"
+    const val SHOW_MORE_TYPE = "showMoreType"
+    const val SHOW_MORE_NAME = "showMoreName"
+    var searchStatus = false
     var CURRENT_VERSION = 2
     var BASIC = "basic"
     var USER_NAME = "username"
