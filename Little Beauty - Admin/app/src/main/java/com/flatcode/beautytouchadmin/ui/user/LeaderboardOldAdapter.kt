@@ -50,13 +50,19 @@ class LeaderboardOldAdapter(
             holder.username.visibility = View.GONE
         }
 
+        holder.clearListeners()
         if (pointsKey != null) {
-            fetchPoints(pointsKey, holder.numberADsLoad, id)
+            fetchPoints(holder, pointsKey, id)
         }
 
         holder.item.setOnClickListener {
             mContext.openActivity<ADsInfoActivity>(DATA.PROFILE_ID to id)
         }
+    }
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        holder.clearListeners()
     }
 
     override fun getFilter(): Filter {
@@ -96,22 +102,38 @@ class LeaderboardOldAdapter(
         val numberADsLoad: TextView = binding.numberADsLoad
         val rank: TextView = binding.rank
         val item: LinearLayout = binding.item
+
+        private var pointsRef: com.google.firebase.database.DatabaseReference? = null
+        private var pointsListener: ValueEventListener? = null
+
+        fun bindPoints(ref: com.google.firebase.database.DatabaseReference, listener: ValueEventListener) {
+            pointsRef = ref
+            pointsListener = listener
+            ref.addValueEventListener(listener)
+        }
+
+        fun clearListeners() {
+            pointsListener?.let { pointsRef?.removeEventListener(it) }
+            pointsRef = null
+            pointsListener = null
+        }
     }
 
-    private fun fetchPoints(key: String, points: TextView, id: String) {
+    private fun fetchPoints(holder: ViewHolder, key: String, id: String) {
         val reference = FirebaseDatabase.getInstance().getReference(DATA.USERS).child(id)
-        reference.addValueEventListener(object : ValueEventListener {
+        val listener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val value = dataSnapshot.child(key).value?.toString() ?: "0"
                 if (dataSnapshot.child(key).exists()) {
-                    points.text = value
+                    holder.numberADsLoad.text = value
                 } else {
-                    points.text = "0"
+                    holder.numberADsLoad.text = "0"
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
-        })
+        }
+        holder.bindPoints(reference, listener)
     }
 
     companion object DiffCallback : DiffUtil.ItemCallback<User>() {

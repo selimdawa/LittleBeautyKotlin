@@ -28,8 +28,8 @@ class PostRepository @Inject constructor(
                 for (snapshot in dataSnapshot.children) {
                     val post = snapshot.getValue(Post::class.java)
                     if (post != null) {
-                        if (post.postid.isEmpty()) {
-                            post.postid = snapshot.key ?: ""
+                        if (snapshot.key != null) {
+                            post.postid = snapshot.key!!
                         }
                         when (type) {
                             DATA.ALL -> list.add(post)
@@ -54,7 +54,13 @@ class PostRepository @Inject constructor(
         val reference = database.getReference(DATA.POSTS).child(postId)
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                trySend(snapshot.getValue(Post::class.java))
+                val post = snapshot.getValue(Post::class.java)
+                post?.let {
+                    if (snapshot.key != null) {
+                        it.postid = snapshot.key!!
+                    }
+                }
+                trySend(post)
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -103,6 +109,21 @@ class PostRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
+    fun isSaved(postId: String, userId: String): Flow<Boolean> = callbackFlow {
+        val reference = database.getReference(DATA.SAVES).child(userId).child(postId)
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                trySend(snapshot.exists())
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                trySend(false)
+            }
+        }
+        reference.addValueEventListener(listener)
+        awaitClose { reference.removeEventListener(listener) }
+    }
+
     fun getAllPosts(): Flow<List<Post>> = callbackFlow {
         val reference = database.getReference(DATA.POSTS)
         val listener = object : ValueEventListener {
@@ -111,8 +132,8 @@ class PostRepository @Inject constructor(
                 for (data in snapshot.children) {
                     val post = data.getValue(Post::class.java)
                     if (post != null) {
-                        if (post.postid.isEmpty()) {
-                            post.postid = data.key ?: ""
+                        if (data.key != null) {
+                            post.postid = data.key!!
                         }
                         list.add(post)
                     }

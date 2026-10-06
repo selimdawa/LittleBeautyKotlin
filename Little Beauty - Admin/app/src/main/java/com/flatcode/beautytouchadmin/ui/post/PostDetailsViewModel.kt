@@ -45,8 +45,8 @@ class PostDetailsViewModel @Inject constructor(private val repository: PostRepos
         }
 
         viewModelScope.launch {
-            repository.getSavedPostIds(DATA.FirebaseUserUid).collect { ids ->
-                _isSaved.value = postId in ids
+            repository.isSaved(postId, DATA.FirebaseUserUid).collect {
+                _isSaved.value = it
             }
         }
 

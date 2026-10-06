@@ -52,8 +52,9 @@ class MyPostsAdapter(
             holder.price.text = mContext.getString(R.string.price_format, post.price)
         }
 
-        nrLikes(holder.likes, post.postid)
-        isLiked(post.postid, holder.like)
+        holder.clearListeners()
+        nrLikes(holder, post.postid)
+        isLiked(holder, post.postid)
 
         holder.like.setOnClickListener {
             val isCurrentlyLiked = holder.like.tag == "liked"
@@ -66,6 +67,11 @@ class MyPostsAdapter(
         }
     }
 
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        holder.clearListeners()
+    }
+
     class ViewHolder(binding: ItemMyPostBinding) : RecyclerView.ViewHolder(binding.root) {
         var imageProduct: ImageView = binding.imageProduct
         var more: ImageView = binding.more
@@ -74,34 +80,62 @@ class MyPostsAdapter(
         var name: TextView = binding.name
         var price: TextView = binding.price
         var card: MaterialCardView = binding.card
+
+        private var likesRef: com.google.firebase.database.DatabaseReference? = null
+        private var likesListener: ValueEventListener? = null
+        private var likeRef: com.google.firebase.database.DatabaseReference? = null
+        private var likeListener: ValueEventListener? = null
+
+        fun bindLikes(ref: com.google.firebase.database.DatabaseReference, listener: ValueEventListener) {
+            likesRef = ref
+            likesListener = listener
+            ref.addValueEventListener(listener)
+        }
+
+        fun bindIsLiked(ref: com.google.firebase.database.DatabaseReference, listener: ValueEventListener) {
+            likeRef = ref
+            likeListener = listener
+            ref.addValueEventListener(listener)
+        }
+
+        fun clearListeners() {
+            likesListener?.let { likesRef?.removeEventListener(it) }
+            likeListener?.let { likeRef?.removeEventListener(it) }
+            likesRef = null
+            likesListener = null
+            likeRef = null
+            likeListener = null
+        }
     }
 
-    private fun nrLikes(likes: TextView, postId: String) {
+    private fun nrLikes(holder: ViewHolder, postId: String) {
         val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId)
-        reference.addValueEventListener(object : ValueEventListener {
+        val listener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                likes.text = dataSnapshot.childrenCount.toString()
+                holder.likes.text = dataSnapshot.childrenCount.toString()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
-        })
+        }
+        holder.bindLikes(reference, listener)
     }
 
-    private fun isLiked(postId: String, imageView: ImageView) {
+    private fun isLiked(holder: ViewHolder, postId: String) {
         val reference = FirebaseDatabase.getInstance().getReference(DATA.LIKES).child(postId)
-        reference.addValueEventListener(object : ValueEventListener {
+        val listener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.child(DATA.FirebaseUserUid).exists()) {
-                    imageView.setImageResource(R.drawable.ic_heart_selected)
-                    imageView.tag = "liked"
+                    holder.like.setImageResource(R.drawable.ic_heart_selected)
+                    holder.like.tag = "liked"
                 } else {
-                    imageView.setImageResource(R.drawable.ic_heart_unselected)
-                    imageView.tag = "like"
+                    holder.like.setImageResource(R.drawable.ic_heart_unselected)
+                    holder.like.tag = "like"
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
-        })
+        }
+        holder.bindIsLiked(reference, listener)
     }
 
     companion object DiffCallback : DiffUtil.ItemCallback<Post>() {

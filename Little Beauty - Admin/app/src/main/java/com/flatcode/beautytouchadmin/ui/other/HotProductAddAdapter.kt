@@ -54,11 +54,17 @@ class HotProductAddAdapter(
             holder.price.text = mContext.getString(R.string.price_format, post.price)
         }
 
-        nrLikes(holder.likes, id)
+        holder.clearListeners()
+        nrLikes(holder, id)
         holder.add.setOnClickListener { listener.onAddClick(post) }
         holder.card.setOnClickListener {
             mContext.openActivity<PostDetailsActivity>(DATA.POST_ID to id)
         }
+    }
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        holder.clearListeners()
     }
 
     class ViewHolder(binding: ItemProductAddBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -68,17 +74,33 @@ class HotProductAddAdapter(
         val name: TextView = binding.name
         val price: TextView = binding.price
         val add: ImageButton = binding.add
+
+        private var likesRef: com.google.firebase.database.DatabaseReference? = null
+        private var likesListener: ValueEventListener? = null
+
+        fun bindLikes(ref: com.google.firebase.database.DatabaseReference, listener: ValueEventListener) {
+            likesRef = ref
+            likesListener = listener
+            ref.addValueEventListener(listener)
+        }
+
+        fun clearListeners() {
+            likesListener?.let { likesRef?.removeEventListener(it) }
+            likesRef = null
+            likesListener = null
+        }
     }
 
-    private fun nrLikes(likes: TextView, postId: String) {
+    private fun nrLikes(holder: ViewHolder, postId: String) {
         val reference = FirebaseDatabase.getInstance().reference.child(DATA.LIKES).child(postId)
-        reference.addValueEventListener(object : ValueEventListener {
+        val listener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                likes.text = dataSnapshot.childrenCount.toString()
+                holder.likes.text = dataSnapshot.childrenCount.toString()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
-        })
+        }
+        holder.bindLikes(reference, listener)
     }
 
     companion object DiffCallback : DiffUtil.ItemCallback<Post>() {

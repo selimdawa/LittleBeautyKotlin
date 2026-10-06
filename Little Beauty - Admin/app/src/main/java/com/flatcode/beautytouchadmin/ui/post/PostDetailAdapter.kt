@@ -45,7 +45,9 @@ class PostDetailAdapter(
         this.isLiked = isLiked
         this.isSaved = isSaved
         this.likesCount = likesCount
-        submitList(list.filterNotNull())
+        if (itemCount > 0) {
+            notifyItemChanged(0)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

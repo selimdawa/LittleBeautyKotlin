@@ -40,10 +40,16 @@ class UsersAdapter(private val mContext: Context) :
             holder.name.text = user.username
         }
 
-        nrFavorites(holder.favorites, id)
+        holder.clearListeners()
+        nrFavorites(holder, id)
         holder.card.setOnClickListener {
             mContext.openActivity<UserDetailActivity>(DATA.PROFILE_ID to id)
         }
+    }
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        holder.clearListeners()
     }
 
     class ViewHolder(binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -51,17 +57,33 @@ class UsersAdapter(private val mContext: Context) :
         var name: TextView = binding.name
         var favorites: TextView = binding.favorites
         var card: MaterialCardView = binding.card
+
+        private var favRef: com.google.firebase.database.DatabaseReference? = null
+        private var favListener: ValueEventListener? = null
+
+        fun bindFavorites(ref: com.google.firebase.database.DatabaseReference, listener: ValueEventListener) {
+            favRef = ref
+            favListener = listener
+            ref.addValueEventListener(listener)
+        }
+
+        fun clearListeners() {
+            favListener?.let { favRef?.removeEventListener(it) }
+            favRef = null
+            favListener = null
+        }
     }
 
-    private fun nrFavorites(favorites: TextView, userid: String) {
+    private fun nrFavorites(holder: ViewHolder, userid: String) {
         val reference = FirebaseDatabase.getInstance().getReference(DATA.SAVES).child(userid)
-        reference.addValueEventListener(object : ValueEventListener {
+        val listener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                favorites.text = "${dataSnapshot.childrenCount}"
+                holder.favorites.text = "${dataSnapshot.childrenCount}"
             }
 
             override fun onCancelled(databaseError: DatabaseError) {}
-        })
+        }
+        holder.bindFavorites(reference, listener)
     }
 
     companion object DiffCallback : DiffUtil.ItemCallback<User>() {
