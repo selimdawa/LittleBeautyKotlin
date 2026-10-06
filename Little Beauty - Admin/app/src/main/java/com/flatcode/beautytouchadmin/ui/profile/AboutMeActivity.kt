@@ -1,21 +1,15 @@
 package com.flatcode.beautytouchadmin.ui.profile
 
 import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.view.Window
-import android.view.WindowManager
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
-import androidx.core.graphics.drawable.toDrawable
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -24,12 +18,12 @@ import com.flatcode.beautytouchadmin.databinding.ActivityAboutMeBinding
 import com.flatcode.beautytouchadmin.ui.other.ToolsViewModel
 import com.flatcode.beautytouchadmin.utils.BaseActivity
 import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.ProgressDialog
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
 import com.flatcode.beautytouchadmin.utils.cropImage
 import com.flatcode.beautytouchadmin.utils.loadImage
-import com.flatcode.beautytouchadmin.utils.loadingDialog
 import com.flatcode.beautytouchadmin.utils.pickImage
-import com.flatcode.beautytouchadmin.utils.setMessage
+import com.flatcode.beautytouchadmin.utils.showAboutMeDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -40,7 +34,8 @@ class AboutMeActivity : BaseActivity() {
     private var activity: Activity? = null
     private val context: Context = also { activity = it }
     private var imageUri: Uri? = null
-    private var dialog: Dialog? = null
+    private var isDataLoaded = false
+    private var dialog: ProgressDialog? = null
     private val viewModel: ToolsViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -59,25 +54,30 @@ class AboutMeActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == DATA.MIN_SQUARE && resultCode == RESULT_OK && data != null) {
-            val uri = data.data
-            if (uri != null) {
-                cropImage(
-                    uri = uri,
-                    aspectRatioX = 1,
-                    aspectRatioY = 1,
-                    isOval = true,
-                    minWidth = DATA.MIN_SQUARE,
-                    minHeight = DATA.MIN_SQUARE,
-                    requestCode = DATA.MIN_SQUARE
-                )
-            } else {
-                val resultUri =
-                    IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
-                if (resultUri != null) {
-                    imageUri = resultUri
-                    binding!!.image.setImageURI(imageUri)
+        if (requestCode == DATA.MIN_SQUARE) {
+            if (resultCode == RESULT_OK && data != null) {
+                val uri = data.data
+                if (uri != null) {
+                    imageUri = uri
+                    cropImage(
+                        uri = uri,
+                        aspectRatioX = 1,
+                        aspectRatioY = 1,
+                        isOval = true,
+                        minWidth = DATA.MIN_SQUARE,
+                        minHeight = DATA.MIN_SQUARE,
+                        requestCode = DATA.MIN_SQUARE
+                    )
+                } else {
+                    val resultUri =
+                        IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
+                    if (resultUri != null) {
+                        imageUri = resultUri
+                        binding!!.image.setImageURI(imageUri)
+                    }
                 }
+            } else if (resultCode == RESULT_CANCELED) {
+                imageUri = null
             }
         }
     }
@@ -87,7 +87,16 @@ class AboutMeActivity : BaseActivity() {
         binding = ActivityAboutMeBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        dialog = loadingDialog(context)
+        if (savedInstanceState != null) {
+            isDataLoaded = savedInstanceState.getBoolean("IS_DATA_LOADED", false)
+            imageUri = BundleCompat.getParcelable(savedInstanceState, "IMAGE_URI", Uri::class.java)
+            imageUri?.let { binding!!.image.setImageURI(it) }
+        }
+
+        dialog = ProgressDialog(context).apply {
+            setTitle("Please wait...")
+            setCanceledOnTouchOutside(false)
+        }
 
         binding!!.toolbar.nameSpace.setText(R.string.about_me)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
@@ -100,13 +109,22 @@ class AboutMeActivity : BaseActivity() {
         observeViewModel()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("IS_DATA_LOADED", isDataLoaded)
+        imageUri?.let { outState.putParcelable("IMAGE_URI", it) }
+    }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.tools.collect { tools ->
                     tools?.let {
-                        binding!!.image.loadImage(true, it.imageMe)
-                        binding!!.name.setText(it.aboutMe)
+                        if (!isDataLoaded) {
+                            binding!!.image.loadImage(true, it.imageMe)
+                            binding!!.name.setText(it.aboutMe)
+                            isDataLoaded = true
+                        }
                     }
                 }
             }
@@ -115,9 +133,11 @@ class AboutMeActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.actionStatus.collect { result ->
-                    dialog!!.dismiss()
+                    dialog?.dismiss()
                     result.onSuccess {
                         Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                        imageUri = null
+                        isDataLoaded = false
                     }.onFailure {
                         Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
                     }
@@ -132,31 +152,15 @@ class AboutMeActivity : BaseActivity() {
         if (name.isEmpty()) {
             Toast.makeText(context, R.string.enter_name, Toast.LENGTH_SHORT).show()
         } else {
-            dialog!!.setMessage(getString(R.string.loading))
-            dialog!!.show()
+            dialog?.setMessage(getString(R.string.loading))
+            dialog?.show()
             viewModel.updateAboutMe(name, imageUri)
         }
     }
 
     private fun showDialogAboutMy() {
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.dialog_about)
-        dialog.setCancelable(true)
-        dialog.window!!.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
-        val lp = WindowManager.LayoutParams()
-        lp.copyFrom(dialog.window!!.attributes)
-        lp.width = WindowManager.LayoutParams.WRAP_CONTENT
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT
-        val image = dialog.findViewById<ImageView>(R.id.image)
-        val text = dialog.findViewById<TextView>(R.id.text)
-
         viewModel.tools.value?.let {
-            image.loadImage(true, it.imageMe)
-            text.text = it.aboutMe
+            showAboutMeDialog(it.imageMe, it.aboutMe)
         }
-
-        dialog.show()
-        dialog.window!!.attributes = lp
     }
 }

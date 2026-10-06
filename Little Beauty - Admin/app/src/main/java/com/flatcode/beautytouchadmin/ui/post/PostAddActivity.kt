@@ -1,7 +1,6 @@
 package com.flatcode.beautytouchadmin.ui.post
 
 import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -10,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,12 +17,11 @@ import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
 import com.flatcode.beautytouchadmin.utils.BaseActivity
 import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.ProgressDialog
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
 import com.flatcode.beautytouchadmin.utils.cropImage
 import com.flatcode.beautytouchadmin.utils.isNetworkAvailable
-import com.flatcode.beautytouchadmin.utils.loadingDialog
 import com.flatcode.beautytouchadmin.utils.pickImage
-import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -33,7 +32,7 @@ class PostAddActivity : BaseActivity() {
     private var activity: Activity? = null
     private var context: Context = also { activity = it }
     private var imageUri: Uri? = null
-    private var dialog: Dialog? = null
+    private var dialog: ProgressDialog? = null
     private var typePost = DATA.EMPTY
     private val viewModel: PostActionViewModel by viewModels()
 
@@ -53,25 +52,30 @@ class PostAddActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == DATA.MIN_SQUARE && resultCode == RESULT_OK && data != null) {
-            val uri = data.data
-            if (uri != null) {
-                cropImage(
-                    uri = uri,
-                    aspectRatioX = 1,
-                    aspectRatioY = 1,
-                    isOval = true,
-                    minWidth = DATA.MIN_SQUARE,
-                    minHeight = DATA.MIN_SQUARE,
-                    requestCode = DATA.MIN_SQUARE
-                )
-            } else {
-                val resultUri =
-                    IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
-                if (resultUri != null) {
-                    imageUri = resultUri
-                    binding!!.image.setImageURI(imageUri)
+        if (requestCode == DATA.MIN_SQUARE) {
+            if (resultCode == RESULT_OK && data != null) {
+                val uri = data.data
+                if (uri != null) {
+                    imageUri = uri
+                    cropImage(
+                        uri = uri,
+                        aspectRatioX = 1,
+                        aspectRatioY = 1,
+                        isOval = true,
+                        minWidth = DATA.MIN_SQUARE,
+                        minHeight = DATA.MIN_SQUARE,
+                        requestCode = DATA.MIN_SQUARE
+                    )
+                } else {
+                    val resultUri =
+                        IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
+                    if (resultUri != null) {
+                        imageUri = resultUri
+                        binding!!.image.setImageURI(imageUri)
+                    }
                 }
+            } else if (resultCode == RESULT_CANCELED) {
+                imageUri = null
             }
         }
     }
@@ -81,7 +85,16 @@ class PostAddActivity : BaseActivity() {
         binding = ActivityPostAddBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        dialog = loadingDialog(context)
+        if (savedInstanceState != null) {
+            typePost = savedInstanceState.getString("TYPE_POST", DATA.EMPTY)
+            imageUri = BundleCompat.getParcelable(savedInstanceState, "IMAGE_URI", Uri::class.java)
+            imageUri?.let { binding!!.image.setImageURI(it) }
+        }
+
+        dialog = ProgressDialog(context).apply {
+            setTitle("Please wait...")
+            setCanceledOnTouchOutside(false)
+        }
 
         binding!!.toolbar.nameSpace.setText(R.string.add_post)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
@@ -104,11 +117,17 @@ class PostAddActivity : BaseActivity() {
         observeViewModel()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("TYPE_POST", typePost)
+        imageUri?.let { outState.putParcelable("IMAGE_URI", it) }
+    }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.actionStatus.collect { result ->
-                    dialog!!.dismiss()
+                    dialog?.dismiss()
                     result.onSuccess {
                         Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                         finish()
@@ -142,8 +161,8 @@ class PostAddActivity : BaseActivity() {
             Toast.makeText(context, getString(R.string.no_internet_connection), Toast.LENGTH_SHORT)
                 .show()
         } else {
-            dialog!!.setMessage(getString(R.string.post_created))
-            dialog!!.show()
+            dialog?.setMessage(getString(R.string.post_created))
+            dialog?.show()
             viewModel.addPost(
                 name,
                 indications,

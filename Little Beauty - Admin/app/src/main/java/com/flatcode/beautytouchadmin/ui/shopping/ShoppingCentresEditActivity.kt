@@ -1,7 +1,6 @@
 package com.flatcode.beautytouchadmin.ui.shopping
 
 import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -10,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,12 +17,11 @@ import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityShoppingCentersAddBinding
 import com.flatcode.beautytouchadmin.utils.BaseActivity
 import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.ProgressDialog
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
 import com.flatcode.beautytouchadmin.utils.cropImage
 import com.flatcode.beautytouchadmin.utils.loadImage
-import com.flatcode.beautytouchadmin.utils.loadingDialog
 import com.flatcode.beautytouchadmin.utils.pickImage
-import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -35,7 +34,8 @@ class ShoppingCentresEditActivity : BaseActivity() {
     private var id: String? = null
     private var imageUri: Uri? = null
     private var imageUri2: Uri? = null
-    private var dialog: Dialog? = null
+    private var isDataLoaded = false
+    private var dialog: ProgressDialog? = null
     private val imagePic = 1
     private val imageMap = 2
     private var imageNumber = 0
@@ -57,28 +57,30 @@ class ShoppingCentresEditActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == DATA.MIN_SLIDER_X && resultCode == RESULT_OK && data != null) {
-            val uri = data.data
-            if (uri != null) {
-                cropImage(
-                    uri = uri,
-                    aspectRatioX = 2,
-                    aspectRatioY = 1,
-                    isOval = false,
-                    minWidth = DATA.MIN_SLIDER_X,
-                    minHeight = DATA.MIN_SLIDER_Y,
-                    requestCode = DATA.MIN_SLIDER_X
-                )
-            } else {
-                val resultUri =
-                    IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
-                if (resultUri != null) {
-                    if (imageNumber == imagePic) {
-                        imageUri = resultUri
-                        binding!!.imageOne.setImageURI(imageUri)
-                    } else if (imageNumber == imageMap) {
-                        imageUri2 = resultUri
-                        binding!!.imageTwo.setImageURI(imageUri2)
+        if (requestCode == DATA.MIN_SLIDER_X) {
+            if (resultCode == RESULT_OK && data != null) {
+                val uri = data.data
+                if (uri != null) {
+                    cropImage(
+                        uri = uri,
+                        aspectRatioX = 2,
+                        aspectRatioY = 1,
+                        isOval = false,
+                        minWidth = DATA.MIN_SLIDER_X,
+                        minHeight = DATA.MIN_SLIDER_Y,
+                        requestCode = DATA.MIN_SLIDER_X
+                    )
+                } else {
+                    val resultUri =
+                        IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
+                    if (resultUri != null) {
+                        if (imageNumber == imagePic) {
+                            imageUri = resultUri
+                            binding!!.imageOne.setImageURI(imageUri)
+                        } else if (imageNumber == imageMap) {
+                            imageUri2 = resultUri
+                            binding!!.imageTwo.setImageURI(imageUri2)
+                        }
                     }
                 }
             }
@@ -92,7 +94,19 @@ class ShoppingCentresEditActivity : BaseActivity() {
 
         id = intent.getStringExtra(DATA.SHOPPING_CENTER_ID)
 
-        dialog = loadingDialog(context)
+        if (savedInstanceState != null) {
+            isDataLoaded = savedInstanceState.getBoolean("IS_DATA_LOADED", false)
+            imageNumber = savedInstanceState.getInt("IMAGE_NUMBER", 0)
+            imageUri = BundleCompat.getParcelable(savedInstanceState, "IMAGE_URI", Uri::class.java)
+            imageUri2 = BundleCompat.getParcelable(savedInstanceState, "IMAGE_URI_2", Uri::class.java)
+            imageUri?.let { binding!!.imageOne.setImageURI(it) }
+            imageUri2?.let { binding!!.imageTwo.setImageURI(it) }
+        }
+
+        dialog = ProgressDialog(context).apply {
+            setTitle("Please wait...")
+            setCanceledOnTouchOutside(false)
+        }
 
         binding!!.addImage.setOnClickListener {
             imageNumber = imagePic
@@ -111,18 +125,29 @@ class ShoppingCentresEditActivity : BaseActivity() {
         observeViewModel()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("IS_DATA_LOADED", isDataLoaded)
+        outState.putInt("IMAGE_NUMBER", imageNumber)
+        imageUri?.let { outState.putParcelable("IMAGE_URI", it) }
+        imageUri2?.let { outState.putParcelable("IMAGE_URI_2", it) }
+    }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.center.collect { item ->
                     item?.let {
-                        binding!!.name.setText(it.name)
-                        binding!!.location.setText(it.location)
-                        binding!!.location2.setText(it.location2)
-                        binding!!.location3.setText(it.location3)
-                        binding!!.numberPhone.setText(it.numberPhone)
-                        binding!!.imageOne.loadImage(false, it.imageurl)
-                        binding!!.imageTwo.loadImage(false, it.imageurl2)
+                        if (!isDataLoaded) {
+                            binding!!.name.setText(it.name)
+                            binding!!.location.setText(it.location)
+                            binding!!.location2.setText(it.location2)
+                            binding!!.location3.setText(it.location3)
+                            binding!!.numberPhone.setText(it.numberPhone)
+                            binding!!.imageOne.loadImage(false, it.imageurl)
+                            binding!!.imageTwo.loadImage(false, it.imageurl2)
+                            isDataLoaded = true
+                        }
                     }
                 }
             }
@@ -131,7 +156,7 @@ class ShoppingCentresEditActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.actionStatus.collect { result ->
-                    dialog!!.dismiss()
+                    dialog?.dismiss()
                     result.onSuccess {
                         Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                         finish()
@@ -161,8 +186,8 @@ class ShoppingCentresEditActivity : BaseActivity() {
         } else if (numberPhone.isEmpty()) {
             Toast.makeText(context, "Enter a phone number", Toast.LENGTH_SHORT).show()
         } else {
-            dialog!!.setMessage(getString(R.string.loading))
-            dialog!!.show()
+            dialog?.setMessage(getString(R.string.loading))
+            dialog?.show()
             viewModel.updateShoppingCenter(
                 id!!,
                 name,

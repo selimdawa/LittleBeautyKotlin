@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.view.ViewGroup
 import androidx.core.net.toUri
-import com.flatcode.beautytouch.databinding.DialogAboutMyBinding
+import com.flatcode.beautytouch.databinding.DialogAboutMeBinding
 import com.flatcode.beautytouch.databinding.DialogLogoutBinding
 import com.flatcode.beautytouch.databinding.DialogAboutAppBinding
 import com.flatcode.beautytouch.databinding.DialogCloseAppBinding
@@ -40,7 +40,7 @@ fun Context.closeApp() {
 fun Activity.showDialogAboutMy(imageUrl: String?, aboutText: String?) {
     if (isFinishing || isDestroyed) return
 
-    val dialogBinding = DialogAboutMyBinding.inflate(layoutInflater)
+    val dialogBinding = DialogAboutMeBinding.inflate(layoutInflater)
     val alertDialog = MaterialAlertDialogBuilder(this).setView(dialogBinding.root).create()
 
     alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)

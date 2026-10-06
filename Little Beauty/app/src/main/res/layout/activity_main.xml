@@ -60,12 +60,11 @@
             app:defaultNavHost="true"
             app:navGraph="@navigation/nav_graph" />
 
-
         <FrameLayout
             android:id="@+id/bottomNavContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?mc_track">
+            android:background="?colorOnBackground">
 
             <io.selimdawa.bubblebottom.BubbleBottomNavigation
                 android:id="@+id/bottomNavigation"
@@ -139,6 +138,7 @@
                         <TextView
                             android:id="@+id/name"
                             android:layout_width="wrap_content"
+                            android:layout_marginBottom="10dp"
                             android:layout_height="wrap_content"
                             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                             android:textColor="@color/white"
@@ -148,6 +148,11 @@
 
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/white" />
+
                 <LinearLayout
                     android:id="@+id/myProfile"
                     android:layout_width="match_parent"
@@ -156,13 +161,10 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="30dp"
-                        android:layout_height="0dp" />
-
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
+                        android:layout_marginStart="@dimen/spacing_30"
                         android:layout_marginEnd="20dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_my_account"
@@ -171,15 +173,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/kufi"
+                        android:fontFamily="@font/bad_script"
                         android:text="@string/my_account"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
                 <View
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/spacing_medium" />
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/white" />
 
                 <LinearLayout
                     android:id="@+id/favorites"
@@ -189,13 +194,10 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="30dp"
-                        android:layout_height="0dp" />
-
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
+                        android:layout_marginStart="@dimen/spacing_30"
                         android:layout_marginEnd="20dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_favorites_selected"
@@ -204,11 +206,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/kufi"
+                        android:fontFamily="@font/bad_script"
                         android:text="@string/favorites"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/white" />
 
                 <LinearLayout
                     android:id="@+id/messenger"
@@ -218,13 +227,10 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="30dp"
-                        android:layout_height="0dp" />
-
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
+                        android:layout_marginStart="@dimen/spacing_30"
                         android:layout_marginEnd="20dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_chat"
@@ -233,15 +239,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/kufi"
+                        android:fontFamily="@font/bad_script"
                         android:text="@string/messenger"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
                 <View
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/spacing_medium" />
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/white" />
 
                 <LinearLayout
                     android:id="@+id/reward"
@@ -251,11 +260,8 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="30dp"
-                        android:layout_height="0dp" />
-
                     <ImageView
+                        android:layout_marginStart="@dimen/spacing_30"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_marginEnd="20dp"
@@ -266,11 +272,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/kufi"
+                        android:fontFamily="@font/bad_script"
                         android:text="@string/earn_points"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/white" />
 
                 <LinearLayout
                     android:id="@+id/aboutApp"
@@ -280,11 +293,8 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="30dp"
-                        android:layout_height="0dp" />
-
                     <ImageView
+                        android:layout_marginStart="@dimen/spacing_30"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_marginEnd="20dp"
@@ -295,11 +305,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/kufi"
+                        android:fontFamily="@font/bad_script"
                         android:text="@string/about_app"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/white" />
 
                 <LinearLayout
                     android:id="@+id/shareApp"
@@ -309,11 +326,8 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="30dp"
-                        android:layout_height="0dp" />
-
                     <ImageView
+                        android:layout_marginStart="@dimen/spacing_30"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_marginEnd="20dp"
@@ -324,11 +338,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/kufi"
+                        android:fontFamily="@font/bad_script"
                         android:text="@string/share_app"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/white" />
 
                 <LinearLayout
                     android:id="@+id/aboutMy"
@@ -338,11 +359,8 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="30dp"
-                        android:layout_height="0dp" />
-
                     <ImageView
+                        android:layout_marginStart="@dimen/spacing_30"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_marginEnd="20dp"
@@ -353,11 +371,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/kufi"
+                        android:fontFamily="@font/bad_script"
                         android:text="@string/about_my"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/white" />
 
                 <LinearLayout
                     android:id="@+id/logout"
@@ -367,11 +392,8 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <View
-                        android:layout_width="30dp"
-                        android:layout_height="0dp" />
-
                     <ImageView
+                        android:layout_marginStart="@dimen/spacing_30"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:layout_marginEnd="20dp"
@@ -382,15 +404,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/kufi"
+                        android:fontFamily="@font/bad_script"
                         android:text="@string/logout"
-                        android:textColor="@color/white" />
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
                 <View
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/spacing_medium" />
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/white" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

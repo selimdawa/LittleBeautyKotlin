@@ -70,23 +70,28 @@ fun Context.isNetworkAvailable(): Boolean {
 }
 
 fun ImageView.loadImage(isUser: Boolean, url: String?) {
-    val defaultRes = if (isUser) R.drawable.basic_user else R.color.image_profile
     try {
         val activity = this.context.findActivity()
         if (activity != null && (activity.isFinishing || activity.isDestroyed)) {
             return
         }
         if (url.isNullOrEmpty() || url == DATA.BASIC) {
-            this.setImageResource(defaultRes)
+            if (isUser) {
+                this.setImageResource(R.drawable.basic_user)
+            } else {
+                this.setImageResource(R.color.image_profile)
+            }
         } else {
-            this.setImageResource(defaultRes)
             this.load(url) {
+                placeholder(R.color.image_profile)
+                error(R.color.image_profile)
+                fallback(R.color.image_profile)
                 crossfade(true)
             }
         }
     } catch (_: Throwable) {
         try {
-            this.setImageResource(defaultRes)
+            this.setImageResource(R.color.image_profile)
         } catch (_: Throwable) {
         }
     }

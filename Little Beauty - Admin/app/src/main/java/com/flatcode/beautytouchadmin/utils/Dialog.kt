@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.TextView
 import com.flatcode.beautytouchadmin.R
+import com.flatcode.beautytouchadmin.databinding.DialogAboutMeBinding
 import com.flatcode.beautytouchadmin.databinding.DialogLoadingBinding
 import com.flatcode.beautytouchadmin.databinding.DialogLogoutBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -31,6 +32,23 @@ fun Activity.showDeleteDialog(titleResId: Int, onYesClick: () -> Unit) {
     dialogBinding.no.setOnClickListener {
         alertDialog.dismiss()
     }
+
+    alertDialog.show()
+
+    val widthPx = (300 * resources.displayMetrics.density).toInt()
+    alertDialog.window?.setLayout(widthPx, ViewGroup.LayoutParams.WRAP_CONTENT)
+}
+
+fun Activity.showAboutMeDialog(imageMe: String?, aboutMe: String?) {
+    if (isFinishing || isDestroyed) return
+
+    val dialogBinding = DialogAboutMeBinding.inflate(layoutInflater)
+    val alertDialog = MaterialAlertDialogBuilder(this).setView(dialogBinding.root).create()
+
+    alertDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+    dialogBinding.image.loadImage(true, imageMe)
+    dialogBinding.text.text = aboutMe
 
     alertDialog.show()
 

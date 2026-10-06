@@ -1,7 +1,6 @@
 package com.flatcode.beautytouchadmin.ui.post
 
 import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -10,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,12 +17,11 @@ import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivityPostAddBinding
 import com.flatcode.beautytouchadmin.utils.BaseActivity
 import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.ProgressDialog
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
 import com.flatcode.beautytouchadmin.utils.cropImage
 import com.flatcode.beautytouchadmin.utils.loadImage
-import com.flatcode.beautytouchadmin.utils.loadingDialog
 import com.flatcode.beautytouchadmin.utils.pickImage
-import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -34,7 +33,8 @@ class PostEditActivity : BaseActivity() {
     private var context: Context = also { activity = it }
     private var id: String? = null
     private var imageUri: Uri? = null
-    private var dialog: Dialog? = null
+    private var isDataLoaded = false
+    private var dialog: ProgressDialog? = null
     private var typePost: String? = DATA.EMPTY
     private val viewModel: PostActionViewModel by viewModels()
 
@@ -54,24 +54,26 @@ class PostEditActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == DATA.MIN_SQUARE && resultCode == RESULT_OK && data != null) {
-            val uri = data.data
-            if (uri != null) {
-                cropImage(
-                    uri = uri,
-                    aspectRatioX = 1,
-                    aspectRatioY = 1,
-                    isOval = true,
-                    minWidth = DATA.MIN_SQUARE,
-                    minHeight = DATA.MIN_SQUARE,
-                    requestCode = DATA.MIN_SQUARE
-                )
-            } else {
-                val resultUri =
-                    IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
-                if (resultUri != null) {
-                    imageUri = resultUri
-                    binding!!.image.setImageURI(imageUri)
+        if (requestCode == DATA.MIN_SQUARE) {
+            if (resultCode == RESULT_OK && data != null) {
+                val uri = data.data
+                if (uri != null) {
+                    cropImage(
+                        uri = uri,
+                        aspectRatioX = 1,
+                        aspectRatioY = 1,
+                        isOval = true,
+                        minWidth = DATA.MIN_SQUARE,
+                        minHeight = DATA.MIN_SQUARE,
+                        requestCode = DATA.MIN_SQUARE
+                    )
+                } else {
+                    val resultUri =
+                        IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
+                    if (resultUri != null) {
+                        imageUri = resultUri
+                        binding!!.image.setImageURI(imageUri)
+                    }
                 }
             }
         }
@@ -84,7 +86,17 @@ class PostEditActivity : BaseActivity() {
 
         id = intent.getStringExtra(DATA.POST_ID)
 
-        dialog = loadingDialog(context)
+        if (savedInstanceState != null) {
+            isDataLoaded = savedInstanceState.getBoolean("IS_DATA_LOADED", false)
+            typePost = savedInstanceState.getString("TYPE_POST", DATA.EMPTY)
+            imageUri = BundleCompat.getParcelable(savedInstanceState, "IMAGE_URI", Uri::class.java)
+            imageUri?.let { binding!!.image.setImageURI(it) }
+        }
+
+        dialog = ProgressDialog(context).apply {
+            setTitle("Please wait...")
+            setCanceledOnTouchOutside(false)
+        }
 
         binding!!.toolbar.nameSpace.setText(R.string.edit_post)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
@@ -109,23 +121,33 @@ class PostEditActivity : BaseActivity() {
         observeViewModel()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("IS_DATA_LOADED", isDataLoaded)
+        outState.putString("TYPE_POST", typePost)
+        imageUri?.let { outState.putParcelable("IMAGE_URI", it) }
+    }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.post.collect { item ->
                     item?.let {
-                        typePost = it.category
-                        binding!!.image.loadImage(true, it.postimage)
-                        binding!!.name.setText(it.name)
-                        binding!!.price.setText(it.price)
-                        binding!!.indications.setText(it.indications)
-                        binding!!.howToUse.setText(it.use)
-                        if (it.category == "Skin Products") {
-                            binding!!.typeOne.setText(R.string.skin_products_selected)
-                            binding!!.typeTwo.setText(R.string.hair_products)
-                        } else if (it.category == "Hair Products") {
-                            binding!!.typeOne.setText(R.string.skin_products)
-                            binding!!.typeTwo.setText(R.string.hair_products_selected)
+                        if (!isDataLoaded) {
+                            typePost = it.category
+                            binding!!.image.loadImage(true, it.postimage)
+                            binding!!.name.setText(it.name)
+                            binding!!.price.setText(it.price)
+                            binding!!.indications.setText(it.indications)
+                            binding!!.howToUse.setText(it.use)
+                            if (it.category == "Skin Products") {
+                                binding!!.typeOne.setText(R.string.skin_products_selected)
+                                binding!!.typeTwo.setText(R.string.hair_products)
+                            } else if (it.category == "Hair Products") {
+                                binding!!.typeOne.setText(R.string.skin_products)
+                                binding!!.typeTwo.setText(R.string.hair_products_selected)
+                            }
+                            isDataLoaded = true
                         }
                     }
                 }
@@ -135,7 +157,7 @@ class PostEditActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.actionStatus.collect { result ->
-                    dialog!!.dismiss()
+                    dialog?.dismiss()
                     result.onSuccess {
                         Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                         finish()
@@ -162,8 +184,8 @@ class PostEditActivity : BaseActivity() {
         } else if (price.isEmpty()) {
             Toast.makeText(context, R.string.enter_price, Toast.LENGTH_SHORT).show()
         } else {
-            dialog!!.setMessage(getString(R.string.post_updating))
-            dialog!!.show()
+            dialog?.setMessage(getString(R.string.post_updating))
+            dialog?.show()
             viewModel.updatePost(
                 id!!, name, indications, howToUse, price, typePost ?: "", imageUri
             )

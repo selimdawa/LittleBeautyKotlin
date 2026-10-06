@@ -1,7 +1,6 @@
 package com.flatcode.beautytouchadmin.ui.other
 
 import android.app.Activity
-import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -11,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.IntentCompat
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -18,12 +18,11 @@ import com.flatcode.beautytouchadmin.R
 import com.flatcode.beautytouchadmin.databinding.ActivitySliderShowBinding
 import com.flatcode.beautytouchadmin.utils.BaseActivity
 import com.flatcode.beautytouchadmin.utils.DATA
+import com.flatcode.beautytouchadmin.utils.ProgressDialog
 import com.flatcode.beautytouchadmin.utils.checkStoragePermission
 import com.flatcode.beautytouchadmin.utils.cropImage
 import com.flatcode.beautytouchadmin.utils.loadImage
-import com.flatcode.beautytouchadmin.utils.loadingDialog
 import com.flatcode.beautytouchadmin.utils.pickImage
-import com.flatcode.beautytouchadmin.utils.setMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -34,7 +33,7 @@ class SliderShowActivity : BaseActivity() {
     private var activity: Activity? = null
     private val context: Context = also { activity = it }
     private var imageUri: Uri? = null
-    private var dialog: Dialog? = null
+    private var dialog: ProgressDialog? = null
     private var imageNumber = 0
     private val viewModel: SliderViewModel by viewModels()
 
@@ -54,27 +53,31 @@ class SliderShowActivity : BaseActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == DATA.MIN_SLIDER_X && resultCode == RESULT_OK && data != null) {
-            val uri = data.data
-            if (uri != null) {
-                cropImage(
-                    uri = uri,
-                    aspectRatioX = 16,
-                    aspectRatioY = 9,
-                    isOval = false,
-                    minWidth = DATA.MIN_SLIDER_X,
-                    minHeight = DATA.MIN_SLIDER_Y,
-                    requestCode = DATA.MIN_SLIDER_X
-                )
-            } else {
-                val resultUri =
-                    IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
-                if (resultUri != null) {
-                    imageUri = resultUri
-                    dialog!!.setMessage("Posting photo...")
-                    dialog!!.show()
-                    viewModel.uploadSlider(imageNumber.toString(), imageUri!!)
+        if (requestCode == DATA.MIN_SLIDER_X) {
+            if (resultCode == RESULT_OK && data != null) {
+                val uri = data.data
+                if (uri != null) {
+                    cropImage(
+                        uri = uri,
+                        aspectRatioX = 16,
+                        aspectRatioY = 9,
+                        isOval = false,
+                        minWidth = DATA.MIN_SLIDER_X,
+                        minHeight = DATA.MIN_SLIDER_Y,
+                        requestCode = DATA.MIN_SLIDER_X
+                    )
+                } else {
+                    val resultUri =
+                        IntentCompat.getParcelableExtra(data, "CROP_RESULT_URI", Uri::class.java)
+                    if (resultUri != null) {
+                        imageUri = resultUri
+                        dialog?.setMessage("Posting photo...")
+                        dialog?.show()
+                        viewModel.uploadSlider(imageNumber.toString(), imageUri!!)
+                    }
                 }
+            } else if (resultCode == RESULT_CANCELED) {
+                imageUri = null
             }
         }
     }
@@ -84,13 +87,27 @@ class SliderShowActivity : BaseActivity() {
         binding = ActivitySliderShowBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
+        if (savedInstanceState != null) {
+            imageNumber = savedInstanceState.getInt("IMAGE_NUMBER", 0)
+            imageUri = BundleCompat.getParcelable(savedInstanceState, "IMAGE_URI", Uri::class.java)
+        }
+
         binding!!.toolbar.nameSpace.setText(R.string.slider_show)
         binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
-        dialog = loadingDialog(context)
+        dialog = ProgressDialog(context).apply {
+            setTitle("Please wait...")
+            setCanceledOnTouchOutside(false)
+        }
 
         setupClickListeners()
         observeViewModel()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("IMAGE_NUMBER", imageNumber)
+        imageUri?.let { outState.putParcelable("IMAGE_URI", it) }
     }
 
     private fun setupClickListeners() {
@@ -136,7 +153,7 @@ class SliderShowActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.actionStatus.collect { result ->
-                    dialog!!.dismiss()
+                    dialog?.dismiss()
                     result.onSuccess {
                         Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                     }.onFailure {

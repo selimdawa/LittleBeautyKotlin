@@ -12,6 +12,7 @@ import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.flatcode.beautytouch.BuildConfig
 import com.flatcode.beautytouch.R
@@ -37,6 +38,7 @@ import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import io.selimdawa.bubblebottom.BubbleBottomNavigation
 import io.selimdawa.bubblebottom.Model
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -66,6 +68,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             override fun handleOnBackPressed() {
                 if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     binding.drawerLayout.closeDrawer(GravityCompat.START)
+                } else if (navController.currentDestination?.id != R.id.homeFragment) {
+                    bottomNavigation?.show(2, true)
                 } else {
                     closeApp()
                 }
@@ -99,10 +103,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.shareApp.setOnClickListener { shareApp() }
         binding.aboutMy.setOnClickListener {
             lifecycleScope.launch {
-                userViewModel.appTools.collect { tools ->
-                    tools?.let {
-                        showDialogAboutMy(it.imageMe, it.aboutMe)
-                    }
+                val tools = userViewModel.appTools.first { it != null }
+                tools?.let {
+                    showDialogAboutMy(it.imageMe, it.aboutMe)
                 }
             }
             userViewModel.loadAppTools()
@@ -117,11 +120,23 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         bottomNavigation.add(Model(4, R.drawable.ic_shopping_centers))
 
         bottomNavigation.setOnShowListener { item: Model ->
+            val navOptions = NavOptions.Builder()
+                .setLaunchSingleTop(true)
+                .setPopUpTo(R.id.homeFragment, false)
+                .build()
             when (item.id) {
-                1 -> navController.navigate(R.id.skinProductsFragment)
-                2 -> navController.navigate(R.id.homeFragment)
-                3 -> navController.navigate(R.id.hairProductsFragment)
-                4 -> navController.navigate(R.id.shoppingCentersFragment)
+                1 -> if (navController.currentDestination?.id != R.id.skinProductsFragment) {
+                    navController.navigate(R.id.skinProductsFragment, null, navOptions)
+                }
+                2 -> if (navController.currentDestination?.id != R.id.homeFragment) {
+                    navController.navigate(R.id.homeFragment, null, navOptions)
+                }
+                3 -> if (navController.currentDestination?.id != R.id.hairProductsFragment) {
+                    navController.navigate(R.id.hairProductsFragment, null, navOptions)
+                }
+                4 -> if (navController.currentDestination?.id != R.id.shoppingCentersFragment) {
+                    navController.navigate(R.id.shoppingCentersFragment, null, navOptions)
+                }
             }
         }
 

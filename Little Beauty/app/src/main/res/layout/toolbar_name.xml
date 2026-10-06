@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="60dp"
-    android:background="?colorOnBackground">
+    android:background="?colorOnBackground"
+    android:minHeight="60dp">
 
     <io.selimdawa.multicolors.MultiColorButton
         android:layout_width="30dp"
@@ -14,13 +14,16 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/image"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="31dp"
+        android:layout_height="31dp"
         android:layout_gravity="end"
         android:layout_marginEnd="15sp"
         android:contentDescription="@string/profile_image"
+        android:padding="1dp"
         android:src="@color/image_profile"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle" />
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.App.Circle"
+        app:strokeColor="?colorError"
+        app:strokeWidth="1dp" />
 
     <TextView
         android:id="@+id/nameSpace"
