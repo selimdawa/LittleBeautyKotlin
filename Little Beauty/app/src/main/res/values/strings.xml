@@ -9,7 +9,6 @@
     //Post detail
     <string name="Indications">Indications</string>
     <string name="How_to_use">How To Use</string>
-    <string name="post_detail">Post Detail</string>
     <string name="favorites">Favorites</string>
     //Navigation
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -20,7 +19,6 @@
     <string name="share_app">Share App</string>
     <string name="about_my">About My</string>
     <string name="logout">Logout</string>
-    <string name="version">1.15v</string>
     <string name="version_format">%1$sv</string>
     <string name="share_app_text">Little Beauty: beauty care application, download it now from Google Play https://play.google.com/store/apps/details?id=%1$s</string>
     <string name="most_hot">Most Hot</string>
@@ -30,15 +28,10 @@
     <string name="skin_products">Skin Products</string>
     <string name="hair_products">Hair Products</string>
     <string name="shopping_centers">Shopping Centers</string>
-    //About App
-    <string name="rate_app">Rate App</string>
-    <string name="about_design">Image design : Mohamed Deeb</string>
-    <string name="about_programmer">Programming : Selim Dawa</string>
     //Dialog
     <string name="no">No</string>
     <string name="yes">Yes</string>
     <string name="logout_text">Do you want to log out?</string>
-    <string name="close_text">Do you want to exit the application?</string>
     //Login
     <string name="username">Username</string>
     <string name="password">Password</string>
@@ -46,13 +39,7 @@
     <string name="user_profile_image">User Profile Image</string>
     <string name="reward_info">Reward Info</string>
     <string name="profile_image">Profile Image</string>
-    <string name="edit_profile_image">Edit Profile Image</string>
-    <string name="edit_name">Edit Name</string>
-    <string name="cancel_edit">Cancel Edit</string>
-    <string name="save_name">Save Name</string>
     <string name="back">Back</string>
-    <string name="facebook_designer">Facebook for Designer</string>
-    <string name="facebook_programmer">Facebook for Programmer</string>
     <string name="open_menu">Open Menu</string>
     //Reward
     <string name="best_participants">Best Participants</string>
@@ -92,4 +79,5 @@
     <string name="do_you_want_to_exit">Do you want to Exit ?</string>
     <string name="please_wait">Please wait&#8230;</string>
     <string name="loading">Loading&#8230;</string>
+    <string name="all">All</string>
 </resources>

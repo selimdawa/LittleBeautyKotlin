@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <color name="dark">#000000</color>
     <color name="black">#212121</color>
     <color name="white">#ffffff</color>
     <color name="red">#FF5252</color>
     <color name="blue">#448AFF</color>
     <color name="image_profile">#e0e0e0</color>
-
 </resources>

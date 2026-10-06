@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.flatcode.beautytouch.databinding.ActivityShowMoreBinding
+import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.ui.adapter.ProductsStaggeredAdapter
 import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.DATA
@@ -33,6 +34,9 @@ class ShowMoreActivity : BaseActivity() {
     private var name: String? = null
     private val publisher = DATA.PUBLISHER_NAME
     private val appName = DATA.APP_NAME
+
+    private var selectedCategoryFilter: String = DATA.ALL
+    private var fullPostsList: List<Post> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,20 +89,39 @@ class ShowMoreActivity : BaseActivity() {
         })
 
         binding.all.setOnClickListener {
-            if (type == DATA.HOT_PRODUCT) {
-                viewModel.loadHotProducts(publisher, appName)
-            } else {
-                viewModel.loadAllPosts(publisher, appName)
-            }
+            selectedCategoryFilter = DATA.ALL
+            applyCategoryFilter()
         }
 
         binding.skin.setOnClickListener {
-            viewModel.loadPostsByCategory(DATA.SKIN_PRODUCTS, publisher, appName)
+            selectedCategoryFilter = DATA.SKIN_PRODUCTS
+            applyCategoryFilter()
         }
 
         binding.hair.setOnClickListener {
-            viewModel.loadPostsByCategory(DATA.HAIR_PRODUCTS, publisher, appName)
+            selectedCategoryFilter = DATA.HAIR_PRODUCTS
+            applyCategoryFilter()
         }
+    }
+
+    private fun applyCategoryFilter() {
+        val filtered = when (selectedCategoryFilter) {
+            DATA.SKIN_PRODUCTS -> fullPostsList.filter { it.category == DATA.SKIN_PRODUCTS }
+            DATA.HAIR_PRODUCTS -> fullPostsList.filter { it.category == DATA.HAIR_PRODUCTS }
+            else -> fullPostsList
+        }
+
+        adapter.setFullList(filtered)
+
+        binding.progress.visibility = View.GONE
+        if (filtered.isNotEmpty()) {
+            binding.recyclerView.visibility = View.VISIBLE
+            binding.emptyText.visibility = View.GONE
+        } else {
+            binding.recyclerView.visibility = View.GONE
+            binding.emptyText.visibility = View.VISIBLE
+        }
+        binding.toolbar.number.text = MessageFormat.format("( {0} )", filtered.size)
     }
 
     private fun setupAdapter() {
@@ -114,17 +137,8 @@ class ShowMoreActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.postsByCategory.collect { posts ->
-                    adapter.setFullList(posts)
-
-                    binding.progress.visibility = View.GONE
-                    if (posts.isNotEmpty()) {
-                        binding.recyclerView.visibility = View.VISIBLE
-                        binding.emptyText.visibility = View.GONE
-                    } else {
-                        binding.recyclerView.visibility = View.GONE
-                        binding.emptyText.visibility = View.VISIBLE
-                    }
-                    binding.toolbar.number.text = MessageFormat.format("( {0} )", posts.size)
+                    fullPostsList = posts
+                    applyCategoryFilter()
                 }
             }
         }

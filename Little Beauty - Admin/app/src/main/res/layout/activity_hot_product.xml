@@ -21,18 +21,18 @@
             android:orientation="vertical">
 
             <RelativeLayout
-                android:id="@+id/hotProduct"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp">
+                android:layout_margin="10sp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerInParent="true"
                     android:fontFamily="@font/kufi"
                     android:text="@string/most_popular"
-                    android:textColor="@color/basic2"
+                    android:textColor="?mc_track"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -60,26 +60,25 @@
                     android:layout_marginHorizontal="5sp"
                     android:orientation="horizontal"
                     android:visibility="gone"
-                    app:reverseLayout="true"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:listitem="@layout/item_product_remove" />
 
             </LinearLayout>
 
             <RelativeLayout
-                android:id="@+id/showMoreProduct"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp">
+                android:layout_marginHorizontal="10sp"
+                android:layout_marginBottom="10sp">
 
                 <TextView
-                    android:id="@+id/viewMore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerInParent="true"
                     android:fontFamily="@font/kufi"
                     android:text="@string/more"
-                    android:textColor="@color/basic2"
+                    android:textColor="?mc_track"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -102,7 +101,6 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerView2"
-                    app:reverseLayout="true"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="5sp"

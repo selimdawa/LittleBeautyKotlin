@@ -4,12 +4,17 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
@@ -22,7 +27,6 @@ import com.flatcode.beautytouch.ui.post.PostViewModel
 import com.flatcode.beautytouch.ui.profile.ProfileActivity
 import com.flatcode.beautytouch.ui.profile.UserViewModel
 import com.flatcode.beautytouch.ui.reward.RewardActivity
-import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.DATA
 import com.flatcode.beautytouch.utils.closeApp
 import com.flatcode.beautytouch.utils.dialogAboutApp
@@ -42,7 +46,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
@@ -59,9 +63,39 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private val postViewModel: PostViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            val toolbar = v.findViewById<View>(R.id.toolbar)
+            val bottomNav = v.findViewById<View>(R.id.bottomNavigation)
+            val navView = v.findViewById<View>(R.id.nav_view)
+
+            if (toolbar != null || bottomNav != null || navView != null) {
+                toolbar?.setPadding(
+                    toolbar.paddingLeft, systemBars.top, toolbar.paddingRight, toolbar.paddingBottom
+                )
+                bottomNav?.setPadding(
+                    bottomNav.paddingLeft,
+                    bottomNav.paddingTop,
+                    bottomNav.paddingRight,
+                    systemBars.bottom
+                )
+                navView?.setPadding(
+                    navView.paddingLeft, systemBars.top, navView.paddingRight, systemBars.bottom
+                )
+            } else {
+                v.setPadding(
+                    systemBars.left, systemBars.top, systemBars.right, systemBars.bottom
+                )
+            }
+            insets
+        }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -220,8 +254,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         shareIntent.type = "text/plain"
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "share app")
         shareIntent.putExtra(
-            Intent.EXTRA_TEXT,
-            getString(R.string.share_app_text, BuildConfig.APPLICATION_ID)
+            Intent.EXTRA_TEXT, getString(R.string.share_app_text, BuildConfig.APPLICATION_ID)
         )
         startActivity(Intent.createChooser(shareIntent, "Choose how to share"))
     }
