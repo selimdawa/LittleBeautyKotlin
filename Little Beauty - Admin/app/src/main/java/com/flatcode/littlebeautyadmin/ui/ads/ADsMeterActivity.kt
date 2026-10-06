@@ -1,0 +1,76 @@
+package com.flatcode.littlebeautyadmin.ui.ads
+
+import android.content.Context
+import android.os.Bundle
+import android.view.View
+import androidx.activity.viewModels
+import com.flatcode.littlebeautyadmin.utils.BaseActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.flatcode.littlebeautyadmin.R
+import com.flatcode.littlebeautyadmin.databinding.ActivityAdsMeterBinding
+import com.flatcode.littlebeautyadmin.utils.DATA
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+
+@AndroidEntryPoint
+class ADsMeterActivity : BaseActivity() {
+
+    private var binding: ActivityAdsMeterBinding? = null
+    private val context: Context = this@ADsMeterActivity
+    private var adapter: ADsUserAdapter? = null
+    private var type: String = DATA.AD_LOAD
+    private val viewModel: ADsViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityAdsMeterBinding.inflate(layoutInflater)
+        setContentView(binding!!.root)
+
+        binding!!.toolbar.nameSpace.setText(R.string.users_ads)
+        binding!!.toolbar.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+
+        adapter = ADsUserAdapter(context)
+        binding!!.recyclerView.adapter = adapter
+
+        binding!!.adLoad.setOnClickListener {
+            type = DATA.AD_LOAD
+            viewModel.fetchUsersWithAds(type)
+        }
+        binding!!.adClick.setOnClickListener {
+            type = DATA.AD_CLICK
+            viewModel.fetchUsersWithAds(type)
+        }
+        binding!!.timestamp.setOnClickListener {
+            type = DATA.STARTED
+            viewModel.fetchUsersWithAds(type)
+        }
+
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.users.collect { users ->
+                    adapter?.submitList(users)
+
+                    binding!!.progress.visibility = View.GONE
+                    if (users.isNotEmpty()) {
+                        binding!!.recyclerView.visibility = View.VISIBLE
+                        binding!!.emptyText.visibility = View.GONE
+                    } else {
+                        binding!!.recyclerView.visibility = View.GONE
+                        binding!!.emptyText.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.fetchUsersWithAds(type)
+    }
+}

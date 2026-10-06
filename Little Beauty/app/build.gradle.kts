@@ -8,15 +8,15 @@ plugins {
 }
 
 android {
-    namespace = "com.flatcode.beautytouch"
+    namespace = "com.flatcode.littlebeauty"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.flatcode.beautytouch"
+        applicationId = "com.flatcode.littlebeauty"
         minSdk = 24
         targetSdk = 37
-        versionCode = 5
-        versionName = "1.20"
+        versionCode = 6
+        versionName = "1.21"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

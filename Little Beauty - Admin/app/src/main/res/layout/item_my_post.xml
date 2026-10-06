@@ -64,7 +64,7 @@
                         android:gravity="center"
                         android:maxLines="2"
                         android:textColor="@color/white"
-                        android:textSize="14sp"
+                        android:textSize="18sp"
                         android:textStyle="normal" />
 
                     <ImageView

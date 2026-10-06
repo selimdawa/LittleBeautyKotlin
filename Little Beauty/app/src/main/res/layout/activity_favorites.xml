@@ -24,29 +24,11 @@
             android:paddingHorizontal="5sp"
             android:paddingBottom="10sp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:cardCornerRadius="10sp"
-                app:cardElevation="6sp"
-                app:cardUseCompatPadding="true"
-                app:strokeWidth="0dp">
-
-                <com.google.android.gms.ads.AdView
-                    android:id="@+id/adView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    ads:adSize="BANNER"
-                    ads:adUnitId="@string/admob_banner_favorites" />
-
-            </com.google.android.material.card.MaterialCardView>
-
             <HorizontalScrollView
                 android:id="@+id/scrollSwitchUser"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:orientation="horizontal"
                 android:paddingHorizontal="5dp"

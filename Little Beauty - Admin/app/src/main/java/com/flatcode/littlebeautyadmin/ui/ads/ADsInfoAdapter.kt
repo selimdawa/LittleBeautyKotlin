@@ -1,0 +1,84 @@
+package com.flatcode.littlebeautyadmin.ui.ads
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.flatcode.littlebeautyadmin.model.ADs
+import com.flatcode.littlebeautyadmin.databinding.ItemInfoAdsBinding
+
+class ADsInfoAdapter(private val context: Context) :
+    ListAdapter<ADs, ADsInfoAdapter.ViewHolder>(DiffCallback), Filterable {
+
+    private var originalList: List<ADs> = currentList
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemInfoAdsBinding.inflate(LayoutInflater.from(context), parent, false)
+        return ViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = getItem(position) ?: return
+
+        val name = item.name
+        val adsLoadedCount = item.adsLoadedCount
+        val adsClickedCount = item.adsClickedCount
+        holder.name.text = name
+        holder.numberADsLoad.text = "$adsLoadedCount"
+        holder.numberADsClick.text = "$adsClickedCount"
+    }
+
+    override fun getFilter(): Filter {
+        return object : Filter() {
+            override fun performFiltering(constraint: CharSequence?): FilterResults {
+                val results = FilterResults()
+                if (originalList.isEmpty() && currentList.isNotEmpty()) {
+                    originalList = ArrayList(currentList)
+                }
+
+                if (!constraint.isNullOrEmpty()) {
+                    val constraintStr = constraint.toString().uppercase()
+                    val filter = mutableListOf<ADs>()
+                    for (item in originalList) {
+                        if (item.name.uppercase().contains(constraintStr)) {
+                            filter.add(item)
+                        }
+                    }
+                    results.count = filter.size
+                    results.values = filter
+                } else {
+                    results.count = originalList.size
+                    results.values = originalList
+                }
+                return results
+            }
+
+            override fun publishResults(constraint: CharSequence?, results: FilterResults) {
+                submitList((results.values as? List<*>)?.filterIsInstance<ADs>())
+            }
+        }
+    }
+
+    class ViewHolder(binding: ItemInfoAdsBinding) : RecyclerView.ViewHolder(binding.root) {
+        val numberADsClick: TextView = binding.numberADsClick
+        val numberADsLoad: TextView = binding.numberADsLoad
+        val name: TextView = binding.name
+        val item: LinearLayout = binding.item
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback<ADs>() {
+        override fun areItemsTheSame(oldItem: ADs, newItem: ADs): Boolean {
+            return oldItem.name == newItem.name
+        }
+
+        override fun areContentsTheSame(oldItem: ADs, newItem: ADs): Boolean {
+            return oldItem == newItem
+        }
+    }
+}

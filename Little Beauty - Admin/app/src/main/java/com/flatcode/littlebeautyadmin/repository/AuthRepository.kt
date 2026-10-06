@@ -1,0 +1,15 @@
+package com.flatcode.littlebeautyadmin.repository
+
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+
+class AuthRepository @Inject constructor(private val auth: FirebaseAuth) {
+
+    suspend fun login(email: String, password: String) {
+        auth.signInWithEmailAndPassword(email, password).await()
+    }
+
+    suspend fun sendPasswordResetEmail(email: String): Void? =
+        auth.sendPasswordResetEmail(email).await()
+}

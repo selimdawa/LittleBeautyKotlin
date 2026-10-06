@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.flatcode.beautytouchadmin.ui.main.HomeFragment"
+        android:name="com.flatcode.littlebeautyadmin.ui.main.HomeFragment"
         android:label="@string/label_home"
         tools:layout="@layout/fragment_home" />
 

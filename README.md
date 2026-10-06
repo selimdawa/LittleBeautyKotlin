@@ -96,7 +96,6 @@ app/src/main/java/com/flatcode/beautytouch/
 #### Admin App
 ```text
 app/src/main/java/com/flatcode/beautytouchadmin/
-├── db/                 # Room Database Configuration & DAOs
 ├── di/                 # Dependency Injection (Hilt modules)
 ├── model/              # Data Entities & Models
 ├── repository/         # Repository Pattern Implementation

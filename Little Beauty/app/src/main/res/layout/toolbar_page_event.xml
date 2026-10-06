@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item"
     android:layout_width="match_parent"
     android:layout_height="45dp"
-    android:layout_margin="10dp"
+    android:background="?mc_bg"
     android:visibility="visible"
-    app:cardCornerRadius="6dp"
-    app:strokeWidth="0dp"
     tools:ignore="all">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?mc_bg"
         android:visibility="visible">
 
         <ImageView
@@ -73,7 +69,6 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?mc_bg"
         android:visibility="gone">
 
         <ImageView
@@ -103,4 +98,4 @@
 
     </com.google.android.material.appbar.MaterialToolbar>
 
-</com.google.android.material.card.MaterialCardView>
+</LinearLayout>

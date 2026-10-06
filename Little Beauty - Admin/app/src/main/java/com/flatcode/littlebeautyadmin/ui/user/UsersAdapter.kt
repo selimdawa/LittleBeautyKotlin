@@ -1,0 +1,98 @@
+package com.flatcode.littlebeautyadmin.ui.user
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import com.google.android.material.card.MaterialCardView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.flatcode.littlebeautyadmin.model.User
+import com.flatcode.littlebeautyadmin.utils.DATA
+import com.flatcode.littlebeautyadmin.utils.loadImage
+import com.flatcode.littlebeautyadmin.utils.openActivity
+import com.flatcode.littlebeautyadmin.databinding.ItemUserBinding
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+
+class UsersAdapter(private val mContext: Context) :
+    ListAdapter<User, UsersAdapter.ViewHolder>(DiffCallback) {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemUserBinding.inflate(LayoutInflater.from(mContext), parent, false)
+        return ViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val user = getItem(position) ?: return
+        val id = user.id
+
+        holder.image.loadImage(true, user.imageurl)
+        if (user.username.isNullOrEmpty()) {
+            holder.name.visibility = View.GONE
+        } else {
+            holder.name.visibility = View.VISIBLE
+            holder.name.text = user.username
+        }
+
+        holder.clearListeners()
+        nrFavorites(holder, id)
+        holder.card.setOnClickListener {
+            mContext.openActivity<UserDetailActivity>(DATA.PROFILE_ID to id)
+        }
+    }
+
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        holder.clearListeners()
+    }
+
+    class ViewHolder(binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
+        var image: ImageView = binding.image
+        var name: TextView = binding.name
+        var favorites: TextView = binding.favorites
+        var card: MaterialCardView = binding.card
+
+        private var favRef: com.google.firebase.database.DatabaseReference? = null
+        private var favListener: ValueEventListener? = null
+
+        fun bindFavorites(ref: com.google.firebase.database.DatabaseReference, listener: ValueEventListener) {
+            favRef = ref
+            favListener = listener
+            ref.addValueEventListener(listener)
+        }
+
+        fun clearListeners() {
+            favListener?.let { favRef?.removeEventListener(it) }
+            favRef = null
+            favListener = null
+        }
+    }
+
+    private fun nrFavorites(holder: ViewHolder, userid: String) {
+        val reference = FirebaseDatabase.getInstance().getReference(DATA.SAVES).child(userid)
+        val listener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                holder.favorites.text = "${dataSnapshot.childrenCount}"
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {}
+        }
+        holder.bindFavorites(reference, listener)
+    }
+
+    companion object DiffCallback : DiffUtil.ItemCallback<User>() {
+        override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
+            return oldItem == newItem
+        }
+    }
+}
