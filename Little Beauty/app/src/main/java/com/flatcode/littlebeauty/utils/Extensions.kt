@@ -1,7 +1,6 @@
 package com.flatcode.littlebeauty.utils
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
@@ -11,9 +10,11 @@ import android.os.Parcelable
 import android.widget.ImageView
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
-import androidx.core.net.toUri
 import coil3.load
 import coil3.request.crossfade
+import coil3.request.error
+import coil3.request.fallback
+import coil3.request.placeholder
 import coil3.size.Size
 import coil3.transform.Transformation
 import com.flatcode.littlebeauty.R
@@ -104,21 +105,6 @@ fun Context.startCropActivity(
         putExtra("IS_OVAL", isOval)
         putExtra("MIN_WIDTH", DATA.MIN_SQUARE)
         putExtra("MIN_HEIGHT", DATA.MIN_SQUARE)
-    }
-}
-
-fun Activity.rateUs() {
-    val uri = ("market://details?id=" + this.packageName).toUri()
-    val goToMarket = Intent(Intent.ACTION_VIEW, uri)
-    try {
-        this.startActivity(goToMarket)
-    } catch (_: ActivityNotFoundException) {
-        this.startActivity(
-            Intent(
-                Intent.ACTION_VIEW,
-                ("http://play.google.com/store/apps/details?id=" + this.packageName).toUri()
-            )
-        )
     }
 }
 
