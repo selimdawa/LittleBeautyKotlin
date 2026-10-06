@@ -4,7 +4,6 @@
     <string name="number_phone">Number phone</string>
     <string name="login">Login</string>
     <string name="forget_password">Forget Password?</string>
-    <string name="my_number">01********</string>
     <string name="none_display">There are no items to display</string>
     //Add
     <string name="name_product">Name Product</string>
@@ -12,7 +11,6 @@
     //Post detail
     <string name="Indications">Indications</string>
     <string name="How_to_use">How To Use</string>
-    <string name="post_detail">Post Detail</string>
     <string name="favorites">Favorites</string>
     //Login
     <string name="email">Email</string>
@@ -108,13 +106,10 @@
     <string name="center_name">Center Name</string>
     <string name="about_me">About Me</string>
     <string name="show_sheet">Show Sheet</string>
-    <string name="about_my">Who Am I</string>
     <!-- Crop Strings -->
     <string name="close">Close</string>
     <string name="crop_image">Crop Image</string>
     <!-- Navigation Labels -->
-    <string name="label_splash">Splash</string>
-    <string name="label_login">Login</string>
     <string name="label_home">Home</string>
     <string name="no_internet_connection">No internet connection</string>
 

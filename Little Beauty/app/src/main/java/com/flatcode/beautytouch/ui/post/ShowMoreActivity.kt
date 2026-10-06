@@ -83,6 +83,22 @@ class ShowMoreActivity : BaseActivity() {
 
             override fun afterTextChanged(s: Editable) {}
         })
+
+        binding.all.setOnClickListener {
+            if (type == DATA.HOT_PRODUCT) {
+                viewModel.loadHotProducts(publisher, appName)
+            } else {
+                viewModel.loadAllPosts(publisher, appName)
+            }
+        }
+
+        binding.skin.setOnClickListener {
+            viewModel.loadPostsByCategory(DATA.SKIN_PRODUCTS, publisher, appName)
+        }
+
+        binding.hair.setOnClickListener {
+            viewModel.loadPostsByCategory(DATA.HAIR_PRODUCTS, publisher, appName)
+        }
     }
 
     private fun setupAdapter() {

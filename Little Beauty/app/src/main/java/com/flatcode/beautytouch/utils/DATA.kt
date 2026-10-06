@@ -7,6 +7,7 @@ object DATA {
     var USERS = "Users"
     var POSTS = "Posts"
     var HOT_PRODUCT = "HotProduct"
+    var ALL = "All"
     var SKIN_PRODUCTS = "Skin Products"
     var HAIR_PRODUCTS = "Hair Products"
     var SHOPPING_CENTERS = "ShoppingCenters"

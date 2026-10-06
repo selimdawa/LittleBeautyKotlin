@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.databinding.ActivityFavoritesBinding
+import com.flatcode.beautytouch.model.Post
 import com.flatcode.beautytouch.ui.adapter.ProductsStaggeredAdapter
 import com.flatcode.beautytouch.utils.BaseActivity
 import com.flatcode.beautytouch.utils.DATA
@@ -25,6 +26,8 @@ class FavoritesActivity : BaseActivity() {
     private val appName = DATA.APP_NAME
 
     private val viewModel: PostViewModel by viewModels()
+    private var currentFilter = DATA.ALL
+    private var fullFavoritesList = emptyList<Post>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,22 +43,47 @@ class FavoritesActivity : BaseActivity() {
             onSaveClick = { post -> viewModel.toggleSave(post) })
         binding.recyclerView.adapter = adapter
 
+        setupCategoryFilter()
         observeViewModel()
+    }
+
+    private fun setupCategoryFilter() {
+        binding.all.setOnClickListener {
+            currentFilter = DATA.ALL
+            applyFilter()
+        }
+        binding.skin.setOnClickListener {
+            currentFilter = DATA.SKIN_PRODUCTS
+            applyFilter()
+        }
+        binding.hair.setOnClickListener {
+            currentFilter = DATA.HAIR_PRODUCTS
+            applyFilter()
+        }
+    }
+
+    private fun applyFilter() {
+        val filtered = when (currentFilter) {
+            DATA.SKIN_PRODUCTS -> fullFavoritesList.filter { it.category == DATA.SKIN_PRODUCTS }
+            DATA.HAIR_PRODUCTS -> fullFavoritesList.filter { it.category == DATA.HAIR_PRODUCTS }
+            else -> fullFavoritesList
+        }
+        binding.bar.visibility = View.GONE
+        if (filtered.isNotEmpty()) {
+            binding.recyclerView.visibility = View.VISIBLE
+            binding.emptyText.visibility = View.GONE
+        } else {
+            binding.recyclerView.visibility = View.GONE
+            binding.emptyText.visibility = View.VISIBLE
+        }
+        adapter?.submitList(filtered)
     }
 
     private fun observeViewModel() {
         lifecycleScope.launch {
             viewModel.favoritePosts.collect { list ->
-                val posts = list.reversed()
-                binding.bar.visibility = View.GONE
-                if (posts.isNotEmpty()) {
-                    binding.recyclerView.visibility = View.VISIBLE
-                    binding.emptyText.visibility = View.GONE
-                } else {
-                    binding.recyclerView.visibility = View.GONE
-                    binding.emptyText.visibility = View.VISIBLE
-                }
-                adapter?.submitList(posts)
+                fullFavoritesList = list.reversed()
+                applyFilter()
             }
         }
     }

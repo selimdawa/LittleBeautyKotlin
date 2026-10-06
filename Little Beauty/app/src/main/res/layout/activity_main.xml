@@ -430,10 +430,10 @@
                         android:layout_height="0dp" />
 
                     <TextView
+                        android:id="@+id/version"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/kufi"
-                        android:text="@string/version"
                         android:textColor="@color/white"
                         android:textSize="16sp" />
 

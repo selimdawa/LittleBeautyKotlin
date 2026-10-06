@@ -36,7 +36,7 @@ class PostHotAdapter(
             }
             price.apply {
                 visibility = if (post.price == DATA.EMPTY) View.GONE else View.VISIBLE
-                text = context.getString(R.string.price_syp_format, post.price)
+                text = context.getString(R.string.price_format, post.price)
             }
 
             // Bind status from model

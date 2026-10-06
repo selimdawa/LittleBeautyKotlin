@@ -168,6 +168,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         binding.imageDrawer.setOnClickListener { context.openActivity<ProfileActivity>() }
+        binding.version.text = getString(R.string.version_format, BuildConfig.VERSION_NAME)
 
         observeViewModels()
         userViewModel.loadUserInfo()
@@ -220,7 +221,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "share app")
         shareIntent.putExtra(
             Intent.EXTRA_TEXT,
-            " Little Beauty: beauty care application, download it now from Google Play " + " https://play.google.com/store/apps/details?id=" + BuildConfig.APPLICATION_ID
+            getString(R.string.share_app_text, BuildConfig.APPLICATION_ID)
         )
         startActivity(Intent.createChooser(shareIntent, "Choose how to share"))
     }
