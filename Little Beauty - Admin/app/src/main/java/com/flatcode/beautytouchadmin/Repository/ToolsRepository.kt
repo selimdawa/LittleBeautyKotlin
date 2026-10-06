@@ -2,22 +2,20 @@ package com.flatcode.beautytouchadmin.repository
 
 import android.net.Uri
 import com.flatcode.beautytouchadmin.model.Tools
+import com.flatcode.beautytouchadmin.utils.CloudinaryHelper
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.cloudinary.Cloudinary
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ToolsRepository @Inject constructor(
-    private val database: FirebaseDatabase, private val cloudinary: Cloudinary
+    private val database: FirebaseDatabase
 ) {
 
     fun getTools(): Flow<Tools?> = callbackFlow {
@@ -35,17 +33,10 @@ class ToolsRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    suspend fun uploadImage(path: String, imageUri: Uri): String = withContext(Dispatchers.IO) {
-        try {
-            val options = mapOf(
-                "public_id" to path.substringAfterLast("/"),
-                "folder" to path.substringBeforeLast("/", "Tools")
-            )
-            val result = cloudinary.uploader().upload(imageUri.toString(), options)
-            result["secure_url"] as String
-        } catch (_: Exception) {
-            ""
-        }
+    suspend fun uploadImage(path: String, imageUri: Uri): String = try {
+        CloudinaryHelper.uploadFile(imageUri)
+    } catch (_: Exception) {
+        ""
     }
 
     suspend fun updateTools(data: Map<String, Any?>) {

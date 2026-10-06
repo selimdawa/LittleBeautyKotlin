@@ -2,23 +2,20 @@ package com.flatcode.beautytouchadmin.repository
 
 import android.net.Uri
 import com.flatcode.beautytouchadmin.model.ShoppingCenter
+import com.flatcode.beautytouchadmin.utils.CloudinaryHelper
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.cloudinary.Cloudinary
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ShoppingRepository @Inject constructor(
-    private val database: FirebaseDatabase,
-    private val cloudinary: Cloudinary
+    private val database: FirebaseDatabase
 ) {
 
     fun getShoppingCenters(): Flow<List<ShoppingCenter>> = callbackFlow {
@@ -62,20 +59,11 @@ class ShoppingRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    suspend fun uploadImage(id: String, imageUri: Uri, index: String = ""): String =
-        withContext(Dispatchers.IO) {
-            try {
-                val publicId = if (index.isEmpty()) id else "${id}_$index"
-                val options = mapOf(
-                    "public_id" to publicId,
-                    "folder" to "ShoppingCenters"
-                )
-                val result = cloudinary.uploader().upload(imageUri.toString(), options)
-                result["secure_url"] as String
-            } catch (_: Exception) {
-                ""
-            }
-        }
+    suspend fun uploadImage(id: String, imageUri: Uri, index: String = ""): String = try {
+        CloudinaryHelper.uploadFile(imageUri)
+    } catch (_: Exception) {
+        ""
+    }
 
     suspend fun addShoppingCenter(data: Map<String, Any?>) {
         val ref = database.getReference(DATA.SHOPPING_CENTERS)

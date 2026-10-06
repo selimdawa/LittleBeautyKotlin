@@ -11,7 +11,6 @@ import com.flatcode.beautytouchadmin.repository.ToolsRepository
 import com.flatcode.beautytouchadmin.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.cloudinary.Cloudinary
 
 import dagger.Module
 import dagger.Provides
@@ -25,8 +24,8 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideUserRepository(database: FirebaseDatabase, cloudinary: Cloudinary): UserRepository {
-        return UserRepository(database, cloudinary)
+    fun provideUserRepository(database: FirebaseDatabase): UserRepository {
+        return UserRepository(database)
     }
 
     @Provides
@@ -37,8 +36,8 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun providePostRepository(database: FirebaseDatabase, cloudinary: Cloudinary): PostRepository {
-        return PostRepository(database, cloudinary)
+    fun providePostRepository(database: FirebaseDatabase): PostRepository {
+        return PostRepository(database)
     }
 
     @Provides
@@ -49,14 +48,14 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideShoppingRepository(database: FirebaseDatabase, cloudinary: Cloudinary): ShoppingRepository {
-        return ShoppingRepository(database, cloudinary)
+    fun provideShoppingRepository(database: FirebaseDatabase): ShoppingRepository {
+        return ShoppingRepository(database)
     }
 
     @Provides
     @Singleton
-    fun provideToolsRepository(database: FirebaseDatabase, cloudinary: Cloudinary): ToolsRepository {
-        return ToolsRepository(database, cloudinary)
+    fun provideToolsRepository(database: FirebaseDatabase): ToolsRepository {
+        return ToolsRepository(database)
     }
 
     @Provides
@@ -73,7 +72,7 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideSliderRepository(database: FirebaseDatabase, cloudinary: Cloudinary): SliderRepository {
-        return SliderRepository(database, cloudinary)
+    fun provideSliderRepository(database: FirebaseDatabase): SliderRepository {
+        return SliderRepository(database)
     }
 }

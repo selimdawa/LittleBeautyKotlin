@@ -6,6 +6,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ShoppingCenterDao {
+    @Query("SELECT * FROM shopping_centers")
+    fun getAllShoppingCenters(): Flow<List<ShoppingCenter>>
+
     @Query("SELECT * FROM shopping_centers WHERE publisher = :publisher AND appName = :appName")
     fun getShoppingCenters(publisher: String, appName: String): Flow<List<ShoppingCenter>>
 

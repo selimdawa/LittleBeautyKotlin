@@ -61,18 +61,26 @@
             app:navGraph="@navigation/nav_graph" />
 
 
-        <io.selimdawa.bubblebottom.BubbleBottomNavigation
-            android:id="@+id/bottomNavigation"
+        <FrameLayout
+            android:id="@+id/bottomNavContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:mbn_backgroundBottomColor="?mc_track"
-            app:mbn_circleColor="?mc_track"
-            app:mbn_countBackgroundColor="?colorOnBackground"
-            app:mbn_countTextColor="?colorError"
-            app:mbn_defaultIconColor="?colorOnBackground"
-            app:mbn_rippleColor="?colorOnBackground"
-            app:mbn_selectedIconColor="@color/white"
-            app:mbn_shadowColor="@color/shadow" />
+            android:background="?mc_track">
+
+            <io.selimdawa.bubblebottom.BubbleBottomNavigation
+                android:id="@+id/bottomNavigation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:mbn_backgroundBottomColor="?mc_track"
+                app:mbn_circleColor="?mc_track"
+                app:mbn_countBackgroundColor="?colorOnBackground"
+                app:mbn_countTextColor="?colorError"
+                app:mbn_defaultIconColor="?colorOnBackground"
+                app:mbn_rippleColor="?colorOnBackground"
+                app:mbn_selectedIconColor="@color/white"
+                app:mbn_shadowColor="@color/shadow" />
+
+        </FrameLayout>
 
     </LinearLayout>
 

@@ -1,7 +1,5 @@
 package com.flatcode.beautytouchadmin.di
 
-import com.cloudinary.Cloudinary
-import com.cloudinary.android.MediaManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import dagger.Module
@@ -21,8 +19,4 @@ object FirebaseModule {
     @Provides
     @Singleton
     fun provideFirebaseDatabase(): FirebaseDatabase = FirebaseDatabase.getInstance()
-
-    @Provides
-    @Singleton
-    fun provideCloudinary(): Cloudinary = MediaManager.get().cloudinary
 }

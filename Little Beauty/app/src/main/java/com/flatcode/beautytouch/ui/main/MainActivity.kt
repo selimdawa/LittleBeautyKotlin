@@ -13,7 +13,6 @@ import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import coil3.load
 import com.flatcode.beautytouch.BuildConfig
 import com.flatcode.beautytouch.R
 import com.flatcode.beautytouch.databinding.ActivityMainBinding
@@ -29,6 +28,7 @@ import com.flatcode.beautytouch.utils.dialogAboutApp
 import com.flatcode.beautytouch.utils.dialogLogout
 import com.flatcode.beautytouch.utils.interstitialAd
 import com.flatcode.beautytouch.utils.interstitialShow
+import com.flatcode.beautytouch.utils.loadImage
 import com.flatcode.beautytouch.utils.openActivity
 import com.flatcode.beautytouch.utils.showDialogAboutMy
 import com.google.android.gms.ads.MobileAds
@@ -132,11 +132,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
 
         bottomNavigation.setOnClickMenuListener { item: Model ->
             when (item.id) {
-                1 -> Toast.makeText(applicationContext, skinProduct, Toast.LENGTH_SHORT).show()
-                2 -> Toast.makeText(applicationContext, home, Toast.LENGTH_SHORT).show()
-                3 -> Toast.makeText(applicationContext, hairProduct, Toast.LENGTH_SHORT).show()
                 4 -> {
-                    Toast.makeText(applicationContext, shoppingCenter, Toast.LENGTH_SHORT).show()
                     interstitialShow(DATA.INTERSTITIAL_HOME)
                 }
             }
@@ -167,8 +163,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         lifecycleScope.launch {
             userViewModel.userInfo.collect { user ->
                 user?.let {
-                    binding.imageDrawer.load(it.imageurl)
-                    binding.toolbar.image.load(it.imageurl)
+                    binding.imageDrawer.loadImage(true, it.imageurl)
+                    binding.toolbar.image.loadImage(true, it.imageurl)
                     binding.name.text = it.username
                 }
             }

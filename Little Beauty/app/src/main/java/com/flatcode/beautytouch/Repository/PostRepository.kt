@@ -36,17 +36,17 @@ class PostRepository @Inject constructor(
 
     fun getPostsByCategory(category: String, publisher: String, appName: String): Flow<List<Post>> {
         syncPosts(publisher, appName)
-        return postDao.getPostsByCategory(category, publisher, appName)
+        return postDao.getPostsByCategory(category)
     }
 
     fun getAllPosts(publisher: String, appName: String): Flow<List<Post>> {
         syncPosts(publisher, appName)
-        return postDao.getPostsByPublisher(publisher, appName)
+        return postDao.getAllPosts()
     }
 
     fun getShoppingCenters(publisher: String, appName: String): Flow<List<ShoppingCenter>> {
         syncShoppingCenters(publisher, appName)
-        return shoppingCenterDao.getShoppingCenters(publisher, appName)
+        return shoppingCenterDao.getAllShoppingCenters()
     }
 
     fun getPostDetails(postId: String): Flow<Post?> {
@@ -77,8 +77,10 @@ class PostRepository @Inject constructor(
                 val list = mutableListOf<Post>()
                 for (child in snapshot.children) {
                     val post = child.getValue(Post::class.java)
-                    if (post != null && post.publisher == publisher && post.appName == appName) {
-                        list.add(post)
+                    if (post != null) {
+                        if (post.publisher.isNullOrEmpty() || post.publisher == publisher) {
+                            list.add(post)
+                        }
                     }
                 }
                 repositoryScope.launch {
@@ -99,8 +101,10 @@ class PostRepository @Inject constructor(
                     val list = mutableListOf<ShoppingCenter>()
                     for (child in snapshot.children) {
                         val center = child.getValue(ShoppingCenter::class.java)
-                        if (center != null && center.publisher == publisher && center.appName == appName) {
-                            list.add(center)
+                        if (center != null) {
+                            if (center.publisher.isNullOrEmpty() || center.publisher == publisher) {
+                                list.add(center)
+                            }
                         }
                     }
                     repositoryScope.launch {

@@ -1,23 +1,20 @@
 package com.flatcode.beautytouchadmin.repository
 
 import android.net.Uri
+import com.flatcode.beautytouchadmin.utils.CloudinaryHelper
 import com.flatcode.beautytouchadmin.utils.DATA
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.cloudinary.Cloudinary
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SliderRepository @Inject constructor(
-    private val database: FirebaseDatabase,
-    private val cloudinary: Cloudinary
+    private val database: FirebaseDatabase
 ) {
 
     fun getSliders(): Flow<Map<String, String>> = callbackFlow {
@@ -41,19 +38,11 @@ class SliderRepository @Inject constructor(
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    suspend fun uploadSliderImage(name: String, imageUri: Uri): String =
-        withContext(Dispatchers.IO) {
-            try {
-                val options = mapOf(
-                    "public_id" to name,
-                    "folder" to "Sliders"
-                )
-                val result = cloudinary.uploader().upload(imageUri.toString(), options)
-                result["secure_url"] as String
-            } catch (_: Exception) {
-                ""
-            }
-        }
+    suspend fun uploadSliderImage(name: String, imageUri: Uri): String = try {
+        CloudinaryHelper.uploadFile(imageUri)
+    } catch (_: Exception) {
+        ""
+    }
 
     suspend fun updateSlider(data: Map<String, Any?>) {
         database.getReference(DATA.SLIDER_SHOW).updateChildren(data).await()

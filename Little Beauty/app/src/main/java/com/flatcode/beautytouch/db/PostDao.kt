@@ -17,6 +17,9 @@ interface PostDao {
     @Query("SELECT * FROM posts WHERE postid = :postId")
     fun getPostById(postId: String): Flow<Post?>
 
+    @Query("SELECT * FROM posts WHERE category = :category")
+    fun getPostsByCategory(category: String): Flow<List<Post>>
+
     @Query("SELECT * FROM posts WHERE category = :category AND publisher = :publisher AND appName = :appName")
     fun getPostsByCategory(category: String, publisher: String, appName: String): Flow<List<Post>>
 
