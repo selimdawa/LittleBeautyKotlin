@@ -75,8 +75,9 @@ class HomeFragment : Fragment() {
                 launch {
                     viewModel.sliderImages.collect { images ->
                         _binding?.let { binding ->
-                            if (images.isNotEmpty()) {
+                            if (images.isNotEmpty() && binding.imageSlider.sliderAdapter == null) {
                                 binding.imageSlider.setSliderAdapter(ImageSliderAdapter(images))
+                                binding.imageSlider.startAutoCycle()
                             }
                         }
                     }
@@ -111,6 +112,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        _binding?.imageSlider?.stopAutoCycle()
         super.onDestroyView()
         _binding = null
     }

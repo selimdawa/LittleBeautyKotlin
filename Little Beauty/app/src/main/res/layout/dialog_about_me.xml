@@ -34,7 +34,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="5dp"
                 android:fontFamily="@font/kufi"
-                android:text="@string/about_my"
+                android:text="@string/about_me"
                 android:textColor="@color/white"
                 android:textSize="24sp"
                 android:textStyle="bold" />

@@ -17,7 +17,7 @@
     <string name="messenger">Messenger</string>
     <string name="about_app">About App</string>
     <string name="share_app">Share App</string>
-    <string name="about_my">About My</string>
+    <string name="about_me">About Me</string>
     <string name="logout">Logout</string>
     <string name="version_format">%1$sv</string>
     <string name="share_app_text">Little Beauty: beauty care application, download it now from Google Play https://play.google.com/store/apps/details?id=%1$s</string>

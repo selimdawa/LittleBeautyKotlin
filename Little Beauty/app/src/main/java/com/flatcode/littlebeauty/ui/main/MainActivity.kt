@@ -144,13 +144,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.aboutApp.setOnClickListener { dialogAboutApp() }
         binding.shareApp.setOnClickListener { shareApp() }
         binding.aboutMy.setOnClickListener {
-            lifecycleScope.launch {
-                val tools = userViewModel.appTools.first { it != null }
-                tools?.let {
-                    showDialogAboutMy(it.imageMe, it.aboutMe)
+            val tools = userViewModel.appTools.value
+            if (tools != null) {
+                showDialogAboutMy(tools.imageMe, tools.aboutMe)
+            } else {
+                lifecycleScope.launch {
+                    val loadedTools = userViewModel.appTools.first { it != null }
+                    loadedTools?.let {
+                        showDialogAboutMy(it.imageMe, it.aboutMe)
+                    }
                 }
+                userViewModel.loadAppTools()
             }
-            userViewModel.loadAppTools()
         }
         binding.logout.setOnClickListener { dialogLogout() }
 
@@ -214,6 +219,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         observeViewModels()
         userViewModel.loadUserInfo()
+        userViewModel.loadAppTools()
         postViewModel.loadSkinProducts(publisher, appName)
         postViewModel.loadHairProducts(publisher, appName)
         postViewModel.loadShoppingCenters(publisher, appName)

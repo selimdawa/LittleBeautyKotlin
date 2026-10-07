@@ -68,18 +68,19 @@ class UserRepository @Inject constructor(
 
     private fun syncTools() {
         database.getReference(DATA.M_TOOLS).addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    snapshot.getValue(Tools::class.java)?.let { tools ->
-                        repositoryScope.launch {
-                            toolsDao.insertTools(tools)
-                        }
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.getValue(Tools::class.java)?.let { tools ->
+                    tools.id = 0
+                    repositoryScope.launch {
+                        toolsDao.insertTools(tools)
                     }
                 }
+            }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Timber.e(error.toException(), "syncTools failed")
-                }
-            })
+            override fun onCancelled(error: DatabaseError) {
+                Timber.e(error.toException(), "syncTools failed")
+            }
+        })
     }
 
     fun logout() {

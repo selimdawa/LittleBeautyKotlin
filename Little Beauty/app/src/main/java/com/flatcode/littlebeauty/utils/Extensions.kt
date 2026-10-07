@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Parcelable
+import android.os.SystemClock
 import android.widget.ImageView
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.scale
@@ -31,9 +32,21 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.firebase.auth.FirebaseAuth
 import java.io.Serializable
 
+private var lastClickTime: Long = 0
+
+fun canClick(): Boolean {
+    val currentTime = SystemClock.elapsedRealtime()
+    if (currentTime - lastClickTime < 500) {
+        return false
+    }
+    lastClickTime = currentTime
+    return true
+}
+
 inline fun <reified T : Activity> Context.openActivity(
     vararg extras: Pair<String, Any?>, clear: Boolean = false
 ) {
+    if (!canClick()) return
     val intent = Intent(this, T::class.java).apply {
         if (clear) addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
         extras.forEach { (key, value) ->

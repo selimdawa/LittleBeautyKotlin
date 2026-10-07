@@ -4,10 +4,12 @@ import com.flatcode.littlebeauty.db.FavoriteDao
 import com.flatcode.littlebeauty.db.HotProductDao
 import com.flatcode.littlebeauty.db.PostDao
 import com.flatcode.littlebeauty.db.ShoppingCenterDao
+import com.flatcode.littlebeauty.db.SliderDao
 import com.flatcode.littlebeauty.model.FavoriteEntity
 import com.flatcode.littlebeauty.model.HotProductEntity
 import com.flatcode.littlebeauty.model.Post
 import com.flatcode.littlebeauty.model.ShoppingCenter
+import com.flatcode.littlebeauty.model.SliderEntity
 import com.flatcode.littlebeauty.utils.DATA
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -20,6 +22,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
@@ -33,7 +36,8 @@ class PostRepository @Inject constructor(
     private val postDao: PostDao,
     private val shoppingCenterDao: ShoppingCenterDao,
     private val favoriteDao: FavoriteDao,
-    private val hotProductDao: HotProductDao
+    private val hotProductDao: HotProductDao,
+    private val sliderDao: SliderDao
 ) {
 
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
@@ -243,26 +247,37 @@ class PostRepository @Inject constructor(
             })
     }
 
-    fun getImageSliderUrls(): Flow<List<String>> = callbackFlow {
-        val listener = database.getReference(DATA.IMAGE_LINKS)
+    fun getImageSliderUrls(): Flow<List<String>> {
+        syncSliderImages()
+        return sliderDao.getSliderImages().map { list ->
+            list.map { it.image }
+        }
+    }
+
+    private fun syncSliderImages() {
+        database.getReference(DATA.IMAGE_LINKS)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val list = mutableListOf<String>()
+                    val sliderList = mutableListOf<SliderEntity>()
+                    var index = 0
                     for (child in snapshot.children) {
+                        val id = child.key ?: index.toString()
                         val url = child.child(DATA.IMAGE_URL).value?.toString()
                             ?: (child.value as? String)
                         if (!url.isNullOrEmpty() && url != "null") {
-                            list.add(url)
+                            sliderList.add(SliderEntity(id, url, index++))
                         }
                     }
-                    trySend(list)
+                    repositoryScope.launch {
+                        sliderDao.deleteAllSliderImages()
+                        sliderDao.insertSliderImages(sliderList)
+                    }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    trySend(emptyList())
+                    Timber.e(error.toException(), "syncSliderImages failed")
                 }
             })
-        awaitClose { database.getReference(DATA.IMAGE_LINKS).removeEventListener(listener) }
     }
 
     fun addPostView(postId: String) {

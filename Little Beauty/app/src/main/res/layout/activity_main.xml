@@ -371,7 +371,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/bad_script"
-                        android:text="@string/about_my"
+                        android:text="@string/about_me"
                         android:textColor="@color/white"
                         android:textSize="14sp"
                         android:textStyle="bold" />
